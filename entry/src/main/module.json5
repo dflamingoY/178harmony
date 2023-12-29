@@ -1,0 +1,60 @@
+{
+  "module": {
+    "name": "entry",
+    "type": "entry",
+    "description": "$string:module_desc",
+    "mainElement": "EntryAbility",
+    "deviceTypes": [
+      "phone"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "abilities": [
+      {
+        "name": "EntryAbility",
+        "srcEntry": "./ets/entryability/EntryAbility.ts",
+        "description": "$string:EntryAbility_desc",
+        "icon": "$media:icon",
+        "label": "$string:EntryAbility_label",
+        "startWindowIcon": "$media:icon",
+        "startWindowBackground": "$color:start_window_background",
+        "exported": true,
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "action.system.home"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "LiveAbility",
+        "srcEntry": "./ets/liveability/LiveAbility.ts",
+        "description": "$string:LiveAbility_desc",
+        "launchType": "singleton",
+        "icon": "$media:icon",
+        "label": "$string:LiveAbility_label",
+        "startWindowIcon": "$media:icon",
+        "startWindowBackground": "$color:start_window_background"
+      },
+      {
+        "name": "LoginAbility",
+        "srcEntry": "./ets/loginability/LoginAbility.ts",
+        "description": "$string:LoginAbility_desc",
+        "icon": "$media:icon",
+        "label": "$string:LoginAbility_label",
+        "startWindowIcon": "$media:icon",
+        "startWindowBackground": "$color:start_window_background"
+      }
+    ],
+    "requestPermissions": [
+      {
+        "name": "ohos.permission.INTERNET"
+      }
+    ],
+  }
+}
