@@ -1,7 +1,5 @@
-import router from '@ohos.router';
 import Want from '@ohos.app.ability.Want';
-import RecommendData, { BaseResp, MatchBean } from '../data/Data';
-import { getData } from '../net/HttpUtils'
+import RecommendData, { MatchBean } from '../data/Data';
 import { IndexRecommendModel } from './IndexRecommendModel';
 import AppContext from '@ohos.app.ability.common';
 import hilog from '@ohos.hilog';

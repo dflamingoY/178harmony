@@ -41,6 +41,7 @@ export class MatchBean {
   start_time_int: number = 0
   is_game: number = 0
   list_type: number = 0
+  tournament_type: number = 0
   anchor: Array<TvUser> = []
 }
 
@@ -49,4 +50,20 @@ export class TvUser {
   username: string = ''
   url: string = '' //播放地址
   face: string = '' //头像
+}
+
+export class MatchListData {
+  match_list: Array<MatchDayEntity> = []
+  date_list?: Array<MatchDateEntity>
+}
+
+
+export class MatchDateEntity {
+  date: string = ''
+  week: string = ''
+}
+
+export class MatchDayEntity {
+  date: string = ''
+  list?: Array<MatchBean>
 }
