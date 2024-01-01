@@ -16,7 +16,7 @@ export class LoginModel {
       }
       post('login', params)
         .then((value: BaseResp) => {
-          hilog.debug(0xff0000, "Mozator", `${value.msg}`)
+          hilog.debug(0xff0000, "West", `${value.msg}`)
           if (value.code == 200) {
             resolve(value.data)
           } else {

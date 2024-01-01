@@ -13,12 +13,12 @@ export default class LiveAbility extends UIAbility {
     var memberId = wantParams.parameters.memberId
     let eventhub = this.context.eventHub;
     eventhub.on('event1', this.func1);
-    hilog.debug(0xff0000, "Mozator", `result : ${tournamentId}  ${url} ${type} ${memberId}`)
+    hilog.debug(0xff0000, "West", `result : ${tournamentId}  ${url} ${type} ${memberId}`)
   }
 
   func1(...data) {
     // 触发事件，完成相应的业务操作
-    hilog.debug(0xff0000, "Mozator", `result : 消息通知`)
+    hilog.debug(0xff0000, "West", `result : 消息通知`)
   }
 
   onDestroy() {

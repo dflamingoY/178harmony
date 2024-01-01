@@ -1,4 +1,3 @@
-import hilog from '@ohos.hilog'
 import { MatchListData } from '../data/Data'
 import { MatchChildPage } from './match/MatchChildPage'
 import MatchModel from './match/MatchModel'
@@ -45,13 +44,8 @@ export struct MatchPage {
     }
   }
 
-  onPageShow() {
-
-  }
-
   aboutToAppear() {
     MatchViewModel.getMatch().then((value: MatchListData) => {
-      hilog.debug(0xff00, "Mozator", '获取到数据直播列表')
       this.matchModel.allData = value.match_list
       this.matchModel.parseOtherData()
     })

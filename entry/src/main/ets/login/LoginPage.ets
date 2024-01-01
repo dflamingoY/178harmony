@@ -71,7 +71,7 @@ export struct LoginPage {
                 saveString('token', value.token)
                 saveNumber('uid', value.uid)
                 AppStorage.SetAndLink("token", value.token)
-                hilog.debug(0xff00, "Mozator", "登陆成功 " + `${value.token}`)
+                hilog.debug(0xff00, "West", "登陆成功 " + `${value.token}`)
               })
             })
 

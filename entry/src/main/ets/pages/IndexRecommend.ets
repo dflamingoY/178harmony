@@ -130,10 +130,10 @@ export struct IndexRecommend {
     let con = getContext(this) as AppContext.UIAbilityContext;
     try {
       con.startAbility(want).catch((err: Error) => {
-        hilog.debug(0x00ff00, "Mozator", `${err.message}`)
+        hilog.debug(0x00ff00, "West", `${err.message}`)
       })
     } catch (e) {
-      hilog.debug(0x00ff00, "Mozator", `${e}`)
+      hilog.debug(0x00ff00, "West", `${e}`)
     }
   }
 }

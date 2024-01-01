@@ -27,9 +27,9 @@ export struct LiveContentPage {
     var url = globalThis.wantParams.parameters.url
     var type = globalThis.wantParams.parameters.type
     var memberId = globalThis.wantParams.parameters.memberId
-    hilog.debug(0x0000ff, "Mozator", `tournamentId : ${tournamentId}`)
+    hilog.debug(0x0000ff, "West", `tournamentId : ${tournamentId}`)
     this.model.getLiveInfo(tournamentId, type, memberId).then((value: object) => {
-      hilog.debug(0xff00, "Mozator", "详情获取到 " + `${value}`)
+      hilog.debug(0xff00, "West", "详情获取到 " + `${value}`)
     })
   }
 }

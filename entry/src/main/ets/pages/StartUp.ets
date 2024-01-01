@@ -1,4 +1,5 @@
 import router from '@ohos.router'
+import { initWs } from '../net/Socket'
 import { initSp } from '../utils/SpUtil'
 
 @Entry
@@ -21,6 +22,7 @@ struct StartUp {
 
   onPageShow() {
     initSp()
+    initWs()
     setTimeout(() => {
       router.replaceUrl({ url: 'pages/HomePage' });
     }, 1000)
