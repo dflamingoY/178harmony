@@ -37,7 +37,7 @@ export struct HomeTabBar {
           if (isLogin()) {
             this.index = 1
           } else {
-            router.replaceUrl({ url: 'login/LoginPage' });
+            router.pushUrl({ url: 'login/LoginPage' });
           }
         }).width('100%').height('100%')
       }.width('20%').height('100%')
@@ -81,7 +81,7 @@ export struct HomeTabBar {
         if (isLogin()) {
           this.index = 4
         } else {
-          router.replaceUrl({ url: 'login/LoginPage' });
+          router.pushUrl({ url: 'login/LoginPage' });
         }
       })
       .width('20%').height('100%')

@@ -4,6 +4,7 @@ import { IndexRecommendModel } from './IndexRecommendModel';
 import AppContext from '@ohos.app.ability.common';
 import hilog from '@ohos.hilog';
 import display from '@ohos.display';
+import router from '@ohos.router';
 
 //new_index
 @Entry
@@ -117,23 +118,30 @@ export struct IndexRecommend {
   }
 
   jumpDetails(item: MatchBean) {
-    const want: Want = {
-      bundleName: getContext(this).applicationInfo.name,
-      abilityName: 'LiveAbility',
-      parameters: {
-        "tournamentId": item.tournament_id,
-        "url": item.url,
-        "type": item.type,
-        "memberId": item.member_id
-      }
-    }
-    let con = getContext(this) as AppContext.UIAbilityContext;
-    try {
-      con.startAbility(want).catch((err: Error) => {
-        hilog.debug(0x00ff00, "West", `${err.message}`)
-      })
-    } catch (e) {
-      hilog.debug(0x00ff00, "West", `${e}`)
-    }
+    router.pushUrl({ url: "liveInfo/LiveContentPage", params: {
+      "tournamentId": item.tournament_id,
+      "url": item.url,
+      "type": item.type,
+      "memberId": item.member_id } })
+
+    //跳转Ability
+    // const want: Want = {
+    //   bundleName: getContext(this).applicationInfo.name,
+    //   abilityName: 'LiveAbility',
+    //   parameters: {
+    //     "tournamentId": item.tournament_id,
+    //     "url": item.url,
+    //     "type": item.type,
+    //     "memberId": item.member_id
+    //   }
+    // }
+    // let con = getContext(this) as AppContext.UIAbilityContext;
+    // try {
+    //   con.startAbility(want).catch((err: Error) => {
+    //     hilog.debug(0x00ff00, "West", `${err.message}`)
+    //   })
+    // } catch (e) {
+    //   hilog.debug(0x00ff00, "West", `${e}`)
+    // }
   }
 }

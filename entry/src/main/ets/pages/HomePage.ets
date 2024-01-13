@@ -3,15 +3,12 @@ import { ChatPage } from './ChatPage';
 import { MatchPage } from './MatchPage';
 import { UserPage } from './UserPage';
 import { NewsPage } from './NewsPage';
-import router from '@ohos.router';
-import hilog from '@ohos.hilog';
 import { HomeTabBar } from './HomeTabBar';
 
 @Entry
 @Component
 struct HomePage {
   @State message: string = 'Hello World'
-  private tabsController: TabsController = new TabsController();
   @State currentIndex: number = 0
   @State unreadCount: number = 1
 

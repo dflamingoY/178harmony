@@ -30,25 +30,6 @@
             ]
           }
         ]
-      },
-      {
-        "name": "LiveAbility",
-        "srcEntry": "./ets/liveability/LiveAbility.ts",
-        "description": "$string:LiveAbility_desc",
-        "launchType": "singleton",
-        "icon": "$media:icon",
-        "label": "$string:LiveAbility_label",
-        "startWindowIcon": "$media:icon",
-        "startWindowBackground": "$color:start_window_background"
-      },
-      {
-        "name": "LoginAbility",
-        "srcEntry": "./ets/loginability/LoginAbility.ts",
-        "description": "$string:LoginAbility_desc",
-        "icon": "$media:icon",
-        "label": "$string:LoginAbility_label",
-        "startWindowIcon": "$media:icon",
-        "startWindowBackground": "$color:start_window_background"
       }
     ],
     "requestPermissions": [

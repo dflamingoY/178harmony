@@ -1,12 +1,17 @@
-import hilog from '@ohos.hilog'
+import router from '@ohos.router'
+import promptAction from '@ohos.promptAction'
 import { UserBean } from '../data/user'
-import { saveNumber, saveString } from '../utils/SpUtil'
+import LogUtil from '../utils/LogUtil'
+import PreferenceModel from '../utils/PreferenceModel'
 import { LoginModel } from './LoginModel'
 
 @Entry
 @Component
 export struct LoginPage {
   model: LoginModel = new LoginModel()
+  @State isLogin: boolean = false
+  @State account: string = ''
+  @State pwd: string = ''
 
   build() {
     Stack() {
@@ -17,7 +22,9 @@ export struct LoginPage {
             Image($r('app.media.icon_black_back'))
               .width('22vp')
               .height('22vp')
-              .margin({ left: "15vp", top: "15vp" })
+              .margin({ left: "15vp", top: "15vp" }).onClick(() => {
+              router.back()
+            })
           }.justifyContent(FlexAlign.Start).width('100%')
 
           Image($r('app.media.ic_launcher')).width('90vp').height('90vp').margin({ top: '100vp' })
@@ -30,6 +37,9 @@ export struct LoginPage {
               .placeholderColor(0x99ffffff)
               .type(InputType.Number)
               .enterKeyType(EnterKeyType.Next)
+              .onChange((value: string) => {
+                this.account = value
+              })
           }
           .height('52vp')
           .backgroundColor(0x40ffffff)
@@ -45,6 +55,9 @@ export struct LoginPage {
               .placeholderColor(0x99ffffff)
               .type(InputType.Password)
               .enterKeyType(EnterKeyType.Done)
+              .onChange((value: string) => {
+                this.pwd = value
+              })
           }
           .height('52vp')
           .backgroundColor(0x40ffffff)
@@ -67,14 +80,25 @@ export struct LoginPage {
             .backgroundColor(0xFED8BD)
             .fontColor(0x1E1E20)
             .onClick(() => {
-              this.model.login('13200000001', '111111').then((value: UserBean) => {
-                saveString('token', value.token)
-                saveNumber('uid', value.uid)
-                AppStorage.SetAndLink("token", value.token)
-                hilog.debug(0xff00, "West", "登陆成功 " + `${value.token}`)
+              if (this.account === '' || this.pwd === '') {
+                promptAction.showToast({ message: '请输入账号密码', duration: 1500 })
+                return
+              }
+              this.isLogin = true
+              this.model.login(this.account, this.pwd).then((value: UserBean) => {
+                PreferenceModel.putNormal("token", value.token)
+                PreferenceModel.putJson("user", value)
+                globalThis.token = value.token
+                router.back()
+              }).catch((err) => {
+                promptAction.showToast({
+                  message: err.toString(),
+                  duration: 1500
+                })
+                LogUtil.d("West", err.toString)
+                this.isLogin = false
               })
             })
-
           Text("注册")
             .fontSize('18vp')
             .fontColor(Color.White)
@@ -83,7 +107,7 @@ export struct LoginPage {
             .margin({ top: '10vp' })
             .height('50vp')
             .onClick(() => {
-
+              router.back()
             })
 
           Blank()
@@ -97,6 +121,13 @@ export struct LoginPage {
         }.align(Alignment.Center).height('100%')
       }
 
+      if (this.isLogin)
+      Column() {
+        LoadingProgress()
+          .width('30vp')
+          .color(Color.Red)
+          .height('30vp')
+      }
     }
   }
 }

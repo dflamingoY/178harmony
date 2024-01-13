@@ -1,6 +1,7 @@
 import router from '@ohos.router'
 import { initWs } from '../net/Socket'
-import { initSp } from '../utils/SpUtil'
+import LogUtil from '../utils/LogUtil'
+import PreferenceModel from '../utils/PreferenceModel'
 
 @Entry
 @Component
@@ -21,8 +22,13 @@ struct StartUp {
   }
 
   onPageShow() {
-    initSp()
     initWs()
+    PreferenceModel.getString("token", null).then((value?: string) => {
+      LogUtil.d("West", '获取到缓存数据：' + value)
+      if (value != null) {
+        globalThis.token = value
+      }
+    })
     setTimeout(() => {
       router.replaceUrl({ url: 'pages/HomePage' });
     }, 1000)

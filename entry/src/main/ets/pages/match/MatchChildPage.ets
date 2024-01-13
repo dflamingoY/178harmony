@@ -3,6 +3,7 @@ import display from '@ohos.display'
 import { MatchBean, MatchDayEntity, TvUser } from '../../data/Data'
 import { getBasketState } from '../../utils/BallUtils'
 import MatchModel from './MatchModel'
+import router from '@ohos.router'
 
 @Component
 export struct MatchChildPage {
@@ -155,7 +156,16 @@ export struct MatchChildPage {
         .margin({ top: '5vp' })
         .fontSize('13fp')
         .fontColor(0x5B5E68)
-    }.height('100%').width('18%')
+    }.height('100%').width('18%').onClick(() => {
+      if (!item) {
+        // router.pushUrl({ url: 'liveInfo/LiveContentPage', params: {
+        //   "tournamentId": item.tournament_id,
+        //   "url": item.url,
+        //   "type": item.type,
+        //   "memberId": item.member_id
+        // } })
+      }
+    })
   }
 
   aboutToAppear() {

@@ -1,7 +1,8 @@
 //是否登陆
-import hilog from '@ohos.hilog'
+import LogUtil from '../utils/LogUtil'
 
 export function isLogin(): boolean {
-  hilog.debug(0xff00, "West", "token: " + AppStorage.Link('token'))
-  return AppStorage.Link('token') != undefined && AppStorage.Link('token') != null
+  let token = globalThis.token
+  LogUtil.d("West", `token 状态 ${token!=null}  ${token}`)
+  return token != null
 }

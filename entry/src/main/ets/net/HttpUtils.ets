@@ -1,15 +1,15 @@
 import http from '@ohos.net.http'
 import { BaseResp } from '../data/Data'
+import PreferenceModel from '../utils/PreferenceModel'
 
 export function getData(uri: string): Promise<BaseResp> {
-  let token = AppStorage.Link('token')
   let request = http.createHttp().request(PORT + uri, {
     method: http.RequestMethod.GET,
     header: {
       "clientType": "android",
       "version": "1.0",
       "Content-Type": "application/x-www-form-urlencoded",
-      "Authorization": token??""
+      "Authorization": globalThis.token??""
     },
     readTimeout: 15000,
     connectTimeout: 15000
@@ -19,6 +19,11 @@ export function getData(uri: string): Promise<BaseResp> {
     if (value.responseCode == 200) {
       let result = `${value.result}`
       let resData: BaseResp = JSON.parse(result)
+      if (resp.code == 401) { //清除所有用户登陆凭证相关的缓存
+        globalThis.token = null
+        PreferenceModel.deleteKey('token')
+        PreferenceModel.deleteKey('user')
+      }
       resp.data = resData.data
       resp.code = resData.code
       resp.msg = resData.msg
@@ -33,7 +38,6 @@ export function getData(uri: string): Promise<BaseResp> {
 }
 
 export function post(uri: String, params: Object): Promise<BaseResp> {
-  let token = AppStorage.Link('token')
   let request = http.createHttp().request(PORT + uri, {
     method: http.RequestMethod.POST,
     extraData: params,
@@ -41,7 +45,7 @@ export function post(uri: String, params: Object): Promise<BaseResp> {
       "clientType": "android",
       "version": "1.0",
       "Content-Type": "application/json",
-      "Authorization": token??""
+      "Authorization": globalThis.token??""
     },
     readTimeout: 15000,
     connectTimeout: 15000
@@ -54,6 +58,11 @@ export function post(uri: String, params: Object): Promise<BaseResp> {
       resp.code = netResp.code
       resp.msg = netResp.msg
       resp.data = netResp.data
+      if (resp.code == 401) { //清除所有用户登陆凭证相关的缓存
+        globalThis.token = null
+        PreferenceModel.deleteKey('token')
+        PreferenceModel.deleteKey('user')
+      }
     } else {
       resp.code = value.responseCode
       resp.msg = ''

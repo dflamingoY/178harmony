@@ -1,0 +1,25 @@
+export class MsgBean {
+  from_name_ios: string = ''
+  key: string = ''
+  mid: string = ''
+  from: string = ''
+  sub_type: string = ''
+  content_type: string = ''
+  type: string = ''
+  remark: string = ''
+  from_avatar: string = ''
+  from_name: string = ''
+  to: string = ''
+  quote: string = ''
+  to_avatar: string = ''
+  to_name: string = ''
+  groupName: string = ''
+  from_name_remark: string = ''
+  sendId: string = ''
+  verifyStatus: string = ''
+  role: number = 0
+  timestamp: number = 0
+  msgStatus: number = 0
+  unread_count: number = 0
+  identity: number = 0
+}
