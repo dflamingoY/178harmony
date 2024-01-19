@@ -4,6 +4,7 @@ import { MatchBean, MatchDayEntity, TvUser } from '../../data/Data'
 import { getBasketState } from '../../utils/BallUtils'
 import MatchModel from './MatchModel'
 import router from '@ohos.router'
+import promptAction from '@ohos.promptAction'
 
 @Component
 export struct MatchChildPage {
@@ -124,12 +125,12 @@ export struct MatchChildPage {
       }.height('48vp').width('100%')
 
       if (item.anchor == null || item.anchor.length == 0) {
-        this.buildPlayerUser(null)
+        this.buildPlayerUser(null, null, null)
       } else {
         Scroll() {
           Row() {
             ForEach(item.anchor, (anchor: TvUser) => {
-              this.buildPlayerUser(anchor)
+              this.buildPlayerUser(anchor, item.tournament_id, item.tournament_type)
             })
           }
           .height('100%')
@@ -145,7 +146,7 @@ export struct MatchChildPage {
   }
 
   @Builder
-  buildPlayerUser(item?: TvUser) {
+  buildPlayerUser(item?: TvUser, tournament_id?: number, type?: number) {
     Column() {
       Image(item ? item.face : $r('app.media.icon_empty_live_user_1'))
         .width('20vp')
@@ -157,13 +158,15 @@ export struct MatchChildPage {
         .fontSize('13fp')
         .fontColor(0x5B5E68)
     }.height('100%').width('18%').onClick(() => {
-      if (!item) {
-        // router.pushUrl({ url: 'liveInfo/LiveContentPage', params: {
-        //   "tournamentId": item.tournament_id,
-        //   "url": item.url,
-        //   "type": item.type,
-        //   "memberId": item.member_id
-        // } })
+      if (item!=null) {
+        router.pushUrl({ url: 'liveInfo/LiveContentPage', params: {
+          "tournamentId": tournament_id,
+          "url": item.url,
+          "type": type,
+          "memberId": item.member_id
+        } })
+      } else {
+        promptAction.showToast({ message: '暂无主播', duration: 1500 })
       }
     })
   }

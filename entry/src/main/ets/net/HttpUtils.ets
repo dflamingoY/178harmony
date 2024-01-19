@@ -1,5 +1,6 @@
 import http from '@ohos.net.http'
 import { BaseResp } from '../data/Data'
+import LogUtil from '../utils/LogUtil'
 import PreferenceModel from '../utils/PreferenceModel'
 
 export function getData(uri: string): Promise<BaseResp> {
@@ -14,6 +15,7 @@ export function getData(uri: string): Promise<BaseResp> {
     readTimeout: 15000,
     connectTimeout: 15000
   })
+  LogUtil.d("NetLog",`请求路由  ${uri}`)
   let resp = new BaseResp()
   return request.then((value: http.HttpResponse) => {
     if (value.responseCode == 200) {
@@ -24,6 +26,7 @@ export function getData(uri: string): Promise<BaseResp> {
         PreferenceModel.deleteKey('token')
         PreferenceModel.deleteKey('user')
       }
+      LogUtil.d("NetLog",result)
       resp.data = resData.data
       resp.code = resData.code
       resp.msg = resData.msg

@@ -1,8 +1,7 @@
 import RecommendData, { BaseResp } from '../data/Data'
 import { getData } from '../net/HttpUtils'
 
-export class IndexRecommendModel {
-
+class IndexRecommendModel {
   getIndex(): Promise<RecommendData> {
     return new Promise(async (resolve: Function, reject: Function) => {
       getData("index").then((value: BaseResp) => {
@@ -17,3 +16,5 @@ export class IndexRecommendModel {
     })
   }
 }
+
+export default new IndexRecommendModel()

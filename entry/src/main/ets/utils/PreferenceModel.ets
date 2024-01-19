@@ -40,6 +40,7 @@ class PreferenceModel {
       this.loadPreference()
     }
     await preference.delete(key)
+    await preference.flush()
   }
 }
 

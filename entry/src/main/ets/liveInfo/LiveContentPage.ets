@@ -1,22 +1,57 @@
 import hilog from '@ohos.hilog'
 import router from '@ohos.router'
+import display from '@ohos.display'
 import { LiveInfoModel } from './LiveIndoModel'
+import { LiveTabBar } from './LiveTabBar'
+import { ChatRoomPage } from './ChatRoomPage'
+import { LiveAnchorPage } from './LiveAnchorPage'
+import { LiveOddPage } from './LiveOddPage'
+import { LiveAnalysePage } from './LiveAnalysePage'
+import { LiveLeagueListPage } from './LiveLeagueListPage'
+import { LiveChatPage } from './LiveChatPage'
 
 @Entry
 @Component
 export struct LiveContentPage {
   model: LiveInfoModel = new LiveInfoModel()
+  @State index: number = 0
+  @State unreadCount: number = 0
 
   build() {
-    Row() {
-      Column() {
-        Text("直播详情")
-          .fontSize(50)
-          .fontWeight(FontWeight.Bold)
+    Column() {
+
+      Stack({ alignContent: Alignment.TopStart }) {
+
+
+
+        Image($r('app.media.icon_back'))
+          .height('21vp')
+          .width('21vp')
+          .margin({ left: '12vp', top: '12vp' })
+          .onClick(() => {
+            router.back()
+          })
+      }.width('100%')
+      .height(`${display.getDefaultDisplaySync().width * 0.5629}px`)
+
+      LiveTabBar({ index: $index, unreadCount: $unreadCount })
+
+      Swiper() {
+        ChatRoomPage()
+        LiveAnchorPage()
+        LiveOddPage()
+        LiveAnalysePage()
+        LiveLeagueListPage()
+        LiveChatPage()
       }
-      .width('100%')
+      .index(this.index)
+      .indicator(false)
+      .loop(false)
+      .duration(50)
+      .onChange((index) => {
+        this.index = index
+      })
     }
-    .height('100%')
   }
 
   onPageShow() {

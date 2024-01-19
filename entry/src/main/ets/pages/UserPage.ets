@@ -1,4 +1,5 @@
 import router from '@ohos.router'
+import promptAction from '@ohos.promptAction'
 import { UserBean } from '../data/user'
 import UserViewModel from './UserViewModel'
 
@@ -142,13 +143,12 @@ export struct UserPage {
 
           break;
         case ClickType.CleanCache:
-
+          promptAction.showToast({ message: '已经清理缓存', duration: 1500 })
           break;
         case ClickType.Setting:
-          router.pushUrl({ url: 'pages/SettingPage' })
+          router.pushUrl({ url: 'pages/SettingPage' });
           break;
       }
-
     })
   }
 

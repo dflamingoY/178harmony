@@ -4,6 +4,7 @@ import { MatchPage } from './MatchPage';
 import { UserPage } from './UserPage';
 import { NewsPage } from './NewsPage';
 import { HomeTabBar } from './HomeTabBar';
+import { ContactPage } from './ContactPage';
 
 @Entry
 @Component
@@ -18,13 +19,15 @@ struct HomePage {
         IndexRecommend()
         ChatPage()
         MatchPage()
-        NewsPage()
+        // NewsPage()
+        ContactPage()
         UserPage()
       }
       .index(this.currentIndex)
       .indicator(false)
       .loop(false)
       .duration(50)
+      .disableSwipe(true)
       .onChange((index) => {
         this.currentIndex = index
       })

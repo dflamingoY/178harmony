@@ -60,7 +60,7 @@ export struct HomeTabBar {
           .width('19vp')
           .margin({ top: '5vp' })
           .height('19vp')
-        Text('资讯').fontColor(this.index == 3 ? 0xFED8BD : 0x91939A)
+        Text('通讯录').fontColor(this.index == 3 ? 0xFED8BD : 0x91939A)
           .fontSize('13fp')
           .margin({ top: '5vp' })
 

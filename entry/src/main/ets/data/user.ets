@@ -5,7 +5,7 @@ export class UserBean {
   nickname: string = ''
   avatar: string = ''
   sign: string = ''
-  state: string = ''
+  state: string = ''//offline online
   logout_timestamp: number = 0
   timestamp: number = 0
   account_state: string = ''
@@ -14,4 +14,5 @@ export class UserBean {
   role: number = 0
   last_login_time: number = 0
   token: string = ''
+  remark: string = ''
 }
