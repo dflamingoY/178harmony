@@ -26,19 +26,19 @@ export struct IndexRecommend {
             .margin({ left: "15vp", top: '8.5vp' })
 
           Row() {
-              Image($r('app.media.icon_search'))
-                .width('17vp')
-                .height('17vp')
-                .margin({left:'12vp'})
+            Image($r('app.media.icon_search'))
+              .width('17vp')
+              .height('17vp')
+              .margin({ left: '12vp' })
             Text('搜索球队、主播')
               .fontSize('12fp')
-              .margin({left:'12vp'})
+              .margin({ left: '12vp' })
               .fontColor(0x99ffffff)
               .width('100%')
           }
           .backgroundColor(Color.Red)
           .backgroundColor(0x33ffffff)
-          .margin({left:'12vp',top:'8.5vp',right:'12vp'})
+          .margin({ left: '12vp', top: '8.5vp', right: '12vp' })
           .borderRadius('17vp')
           .height('31vp')
 
@@ -48,11 +48,12 @@ export struct IndexRecommend {
         Refresh({ refreshing: $$this.isRefreshing, offset: 120, friction: 100 }) {
           Scroll() {
             Column({ space: 12 }) {
+              //banner
               Swiper(this.swiperController) {
                 ForEach(this.model.banner, (item: MatchBean) => {
                   Image(item.cover).borderRadius($r('app.float.home_swiper_borderRadius')).onClick(() => {
                     this.jumpDetails(item)
-                  })
+                  }).alt($r('app.media.icon_news_default'))
                 }, (item: MatchBean, index?: number) => {
                   return item.cover
                 })
@@ -62,7 +63,7 @@ export struct IndexRecommend {
               .width('90%')
               .margin({ top: "12vp" })
               .align(Alignment.Top)
-
+              //热门比赛
               if (this.model.hot_matches.length > 0) {
                 Row() {
                   Image($r('app.media.icon_home_hot_league'))
@@ -75,24 +76,80 @@ export struct IndexRecommend {
                 }.alignItems(VerticalAlign.Bottom).align(Alignment.Start).width('100%').margin({ left: '15vp' })
 
                 List({}) {
-                  ForEach(this.model.recommend, (item: MatchBean) => {
+                  ForEach(this.model.hot_matches, (item: MatchBean) => {
                     ListItem() {
-                      Stack() {
-                        Image(item.cover)
+                      Stack({ alignContent: Alignment.TopStart }) {
+                        Rect({ width: '100%', height: 27 })
+                          .radius([[8, 8], [8, 8]])
+                          .fill(0x353B49)
+                        Row() {
+                          Text(item.league_name_zh)
+                            .fontColor(0xfed8bd)
+                            .fontSize('12fp')
+                            .margin({ left: '10vp' })
+                          Blank()
+                          Text(item.start_time)
+                            .fontColor(0xfed8bd)
+                            .fontSize('11fp')
+                        }.height(27)
+                        .width('100%')
+                        .justifyContent(FlexAlign.SpaceBetween)
+
+                        Column() {
+                          Row() {
+                            Image(item.home_logo)
+                              .width(20)
+                              .height(20)
+                              .alt(item.type == 1 ? $r('app.media.icon_football') : $r('app.media.icon_basketball'))
+                              .margin({ left: 8 })
+                            Text(item.home_team_zh)
+                              .fontSize(13)
+                              .fontColor(0x1e1e20)
+                              .margin({ left: 8 })
+                              .width("50%")
+                            Blank()
+                            Text(`${item.home_score}`)
+                              .fontSize(13)
+                              .fontColor(0xD61818)
+                              .margin({ right: '10vp' })
+                          }.margin({ top: 5 })
+
+                          Row() {
+                            Image(item.away_logo)
+                              .width(20)
+                              .height(20)
+                              .alt(item.type == 1 ? $r('app.media.icon_football') : $r('app.media.icon_basketball'))
+                              .margin({ left: 8 })
+                            Text(item.away_team_zh)
+                              .fontSize(13)
+                              .fontColor(0x1e1e20)
+                              .margin({ left: 8 })
+                              .width("50%")
+                            Blank()
+                            Text(`${item.away_score}`)
+                              .fontSize(13)
+                              .fontColor(0xD61818)
+                              .margin({ right: '10vp' })
+                          }.margin({ bottom: 5 })
+                        }.height(53)
+                        .margin({ top: 27 })
+                        .justifyContent(FlexAlign.SpaceBetween)
+
                       }
                       .height('100%')
-                      // .width(this.matchWidth)
                       .borderWidth('1vp')
                       .margin({ left: '10vp' })
                       .borderColor(0xf6f6f6)
+                      .width('155vp')
+                      .margin({ left: '10vp' })
                       .borderRadius('8vp')
-                    }.margin({ left: '10vp' })
+                    }.height('100%')
                   }, (item: MatchBean, index?: number) => {
                     return JSON.stringify(item)
                   })
                 }.listDirection(Axis.Horizontal).height('80vp').width('100%')
               }
-
+              //今日推荐
               Row() {
                 Image($r('app.media.icon_hot_logo'))
                   .width('20vp')
@@ -112,6 +169,7 @@ export struct IndexRecommend {
                     Stack() {
                       Image(item.cover).borderRadius('10vp')
                         .margin({ left: '3vp', right: '3vp' })
+                        .alt($r('app.media.icon_news_default'))
                     }
                   }
                   .onClick(() => {
