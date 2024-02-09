@@ -151,6 +151,7 @@ export struct MatchChildPage {
       Image(item ? item.face : $r('app.media.icon_empty_live_user_1'))
         .width('20vp')
         .height('20vp')
+        .alt($r('app.media.icon_default_avatar'))
         .margin({ top: '5vp' })
         .borderRadius('10vp')
       Text(item ? item.username : '暂无主播')
@@ -158,7 +159,7 @@ export struct MatchChildPage {
         .fontSize('13fp')
         .fontColor(0x5B5E68)
     }.height('100%').width('18%').onClick(() => {
-      if (item!=null) {
+      if (item != null) {
         router.pushUrl({ url: 'liveInfo/LiveContentPage', params: {
           "tournamentId": tournament_id,
           "url": item.url,

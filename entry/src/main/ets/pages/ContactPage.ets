@@ -3,6 +3,7 @@ import systemDateTime from '@ohos.systemDateTime'
 import { UserBean } from '../data/user'
 import CommonUtil from '../utils/CommonUtil'
 import LogUtil from '../utils/LogUtil'
+import RdbModel from './RdbModel'
 import UserViewModel from './UserViewModel'
 
 @Entry
@@ -129,7 +130,8 @@ export struct ContactPage {
           .fontSize('13fp')
           .margin({ bottom: '12vp' })
       }.onClick(() => {
-        this.getFriend()
+        RdbModel.getAllFriend()
+        // this.getFriend()
       }).width('100%').height('100%')
       .justifyContent(FlexAlign.SpaceBetween)
     }.width('33%').height('100%')

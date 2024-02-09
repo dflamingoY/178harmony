@@ -87,8 +87,9 @@ export struct LoginPage {
               this.isLogin = true
               this.model.login(this.account, this.pwd).then((value: UserBean) => {
                 PreferenceModel.putNormal("token", value.token)
-                PreferenceModel.putJson("user", value)
+                PreferenceModel.putNormal("user", JSON.stringify(value))
                 globalThis.token = value.token
+                globalThis.uid = value.uid
                 router.back()
               }).catch((err) => {
                 promptAction.showToast({

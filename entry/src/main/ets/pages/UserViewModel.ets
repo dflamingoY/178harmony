@@ -4,6 +4,7 @@ import { GroupBean } from '../data/GroupData'
 import { UserBean } from '../data/user'
 import { getData } from '../net/HttpUtils'
 import LogUtil from '../utils/LogUtil'
+import RdbModel from './RdbModel'
 
 class UserViewModel {
   getUserInfo(): Promise<UserBean> {
@@ -20,6 +21,10 @@ class UserViewModel {
     })
   }
 
+  getLocalFriend():Promise<Array<UserBean>> {
+    return  RdbModel.getAllFriend()
+  }
+
   getFriendList(): Promise<Array<UserBean>> {
     return new Promise(async (resolve: Function, reject: Function) => {
       getData('get_friend_list').then((resp: BaseResp) => {
@@ -32,6 +37,7 @@ class UserViewModel {
               arr.push(item)
             })
           })
+          RdbModel.insertFriends(arr)
           resolve(arr)
         } else {
           reject(resp.msg)

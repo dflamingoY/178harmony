@@ -11,7 +11,6 @@ class PreferenceModel {
       await this.loadPreference()
     }
     var result = await preference.get(key, defaultValue)
-    LogUtil.d("West", `查询结果：${result}`)
     return result
   }
 
@@ -24,14 +23,6 @@ class PreferenceModel {
       this.loadPreference()
     }
     await preference.put(key, value)
-    await preference.flush()
-  }
-
-  async putJson(key: string, value: object) {
-    if (!preference) {
-      this.loadPreference()
-    }
-    await preference.put(key, JSON.stringify(value))
     await preference.flush()
   }
 

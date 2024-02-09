@@ -10,7 +10,7 @@ export class UserBean {
   timestamp: number = 0
   account_state: string = ''
   qrcode: string = ''
-  member_id: Object | string
+  member_id:string
   role: number = 0
   last_login_time: number = 0
   token: string = ''

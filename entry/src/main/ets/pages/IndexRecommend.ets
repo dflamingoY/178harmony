@@ -4,7 +4,6 @@ import router from '@ohos.router';
 import IndexRecommendModel from './IndexRecommendModel';
 
 //new_index
-@Entry
 @Component
 export struct IndexRecommend {
   @State model: RecommendData = new RecommendData()

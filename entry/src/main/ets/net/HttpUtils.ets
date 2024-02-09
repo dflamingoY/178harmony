@@ -15,18 +15,19 @@ export function getData(uri: string): Promise<BaseResp> {
     readTimeout: 15000,
     connectTimeout: 15000
   })
-  LogUtil.d("NetLog",`请求路由  ${uri}`)
+  LogUtil.d("NetLog", `请求路由  ${uri}`)
   let resp = new BaseResp()
   return request.then((value: http.HttpResponse) => {
     if (value.responseCode == 200) {
       let result = `${value.result}`
       let resData: BaseResp = JSON.parse(result)
-      if (resp.code == 401) { //清除所有用户登陆凭证相关的缓存
+      if (resData.code == 401) { //清除所有用户登陆凭证相关的缓存
         globalThis.token = null
+        globalThis.uid = null
         PreferenceModel.deleteKey('token')
         PreferenceModel.deleteKey('user')
       }
-      LogUtil.d("NetLog",result)
+      LogUtil.d("NetLog", result)
       resp.data = resData.data
       resp.code = resData.code
       resp.msg = resData.msg
@@ -35,7 +36,8 @@ export function getData(uri: string): Promise<BaseResp> {
       resp.code = value.responseCode
     }
     return resp
-  }).catch(() => {
+  }).catch((e: Error) => {
+    LogUtil.d("NetLog", e.message)
     return resp
   })
 }
@@ -63,6 +65,7 @@ export function post(uri: String, params: Object): Promise<BaseResp> {
       resp.data = netResp.data
       if (resp.code == 401) { //清除所有用户登陆凭证相关的缓存
         globalThis.token = null
+        globalThis.uid = null
         PreferenceModel.deleteKey('token')
         PreferenceModel.deleteKey('user')
       }
@@ -77,4 +80,4 @@ export function post(uri: String, params: Object): Promise<BaseResp> {
   })
 }
 
-const PORT = "https://dev-api.gqj.live/v2/"
+const PORT = "https://api.gqj.live/v2/"
