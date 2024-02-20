@@ -85,6 +85,8 @@ export struct IndexRecommend {
                           Text(item.league_name_zh)
                             .fontColor(0xfed8bd)
                             .fontSize('12fp')
+                              // .textOverflow({ overflow: TextOverflow.Ellipsis })
+                            .maxLines(1)
                             .margin({ left: '10vp' })
                           Blank()
                           Text(item.start_time)
@@ -105,6 +107,7 @@ export struct IndexRecommend {
                               .fontSize(13)
                               .fontColor(0x1e1e20)
                               .margin({ left: 8 })
+                              .maxLines(1)
                               .width("50%")
                             Blank()
                             Text(`${item.home_score}`)
@@ -122,6 +125,7 @@ export struct IndexRecommend {
                             Text(item.away_team_zh)
                               .fontSize(13)
                               .fontColor(0x1e1e20)
+                              .maxLines(1)
                               .margin({ left: 8 })
                               .width("50%")
                             Blank()
@@ -165,17 +169,28 @@ export struct IndexRecommend {
               List() {
                 ForEach(this.model.recommend, (item: MatchBean) => {
                   ListItem() {
-                    Stack() {
-                      Image(item.cover).borderRadius('10vp')
-                        .margin({ left: '3vp', right: '3vp' })
-                        .alt($r('app.media.icon_news_default'))
-                    }
+                    Column() {
+                      Stack() {
+                        Image(item.cover)
+                          .borderRadius('10vp')
+                          .margin({ left: '3vp', right: '3vp' })
+                          .alt($r('app.media.icon_news_default'))
+                          .height(`${this.matchHeight}px`)
+                          .width(`${this.matchWidth - display.getDefaultDisplaySync().densityPixels * 6}px`)
+                      }
+
+                      Text(`${item.league_name_zh} ${item.home_team_zh} VS ${item.away_team_zh}`)
+                        .textAlign(TextAlign.Start)
+                        .width('100%')
+                        .margin({ top: '10vp' })
+                        .maxLines(1)
+                    }.margin({ top: '10vp' })
                   }
                   .onClick(() => {
                     this.jumpDetails(item)
                   })
                   .width(`${this.matchWidth}px`)
-                  .height(`${this.matchHeight}px`)
+                  // .height(`${this.matchHeight}px`)
                   .margin({ top: '6vp' })
                 }, (item: MatchBean) => {
                   return JSON.stringify(item)

@@ -32,36 +32,39 @@ export default class FriendTable {
     })
   }
 
-  getAll() {
-    let predicates = new relationalStore.RdbPredicates(SqlConstant.FRIEND_TABLE.tableName)
-    this.friendTab.queryAsync(predicates).then((value) => {
-      let count = value.rowCount
-      if (count == 0) {
-
-      } else {
-        value.goToFirstRow()
-        const result: UserBean[] = []
-        for (let index = 0; index < count; index++) {
-          var user = new UserBean()
-          user.uid = value.getLong(value.getColumnIndex('uid'))
-          user.phone = value.getString(value.getColumnIndex('phone'))
-          user.username = value.getString(value.getColumnIndex('username'))
-          user.nickname = value.getString(value.getColumnIndex('nickname'))
-          user.avatar = value.getString(value.getColumnIndex('avatar'))
-          user.sign = value.getString(value.getColumnIndex('sign'))
-          user.state = value.getString(value.getColumnIndex('state'))
-          user.member_id = value.getString(value.getColumnIndex('member_id'))
-          user.role = value.getLong(value.getColumnIndex('role'))
-          user.last_login_time = value.getLong(value.getColumnIndex('last_login_time'))
-          user.remark = value.getString(value.getColumnIndex('remark'))
-          result.push(user)
-          value.goToNextRow()
+  getAll(): Promise<Array<UserBean>> {
+    return new Promise(async (resolve: Function, reject: Function) => {
+      let predicates = new relationalStore.RdbPredicates(SqlConstant.FRIEND_TABLE.tableName)
+      this.friendTab.queryAsync(predicates).then((value) => {
+        let count = value.rowCount
+        if (count == 0) {
+          reject("empty")
+        } else {
+          value.goToFirstRow()
+          const result: UserBean[] = []
+          for (let index = 0; index < count; index++) {
+            var user = new UserBean()
+            user.uid = value.getLong(value.getColumnIndex('uid'))
+            user.phone = value.getString(value.getColumnIndex('phone'))
+            user.username = value.getString(value.getColumnIndex('username'))
+            user.nickname = value.getString(value.getColumnIndex('nickname'))
+            user.avatar = value.getString(value.getColumnIndex('avatar'))
+            user.sign = value.getString(value.getColumnIndex('sign'))
+            user.state = value.getString(value.getColumnIndex('state'))
+            user.member_id = value.getString(value.getColumnIndex('member_id'))
+            user.role = value.getLong(value.getColumnIndex('role'))
+            user.last_login_time = value.getLong(value.getColumnIndex('last_login_time'))
+            user.remark = value.getString(value.getColumnIndex('remark'))
+            result.push(user)
+            value.goToNextRow()
+          }
+          resolve(result)
         }
-      }
-      LogUtil.d("Dao", `查询到的数据量${count}`)
+      }).catch((err:Error)=>{
+        LogUtil.d("Dao", `查询出错：${err}`)
+      })
     })
   }
-
 
   delete() {
 

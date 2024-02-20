@@ -9,6 +9,7 @@
     "login/LoginPage",
     "pages/Index",
     "pages/SettingPage",
-    "pages/ContactPage"
+    "pages/ContactPage",
+    "p2p/P2PPage"
   ]
 }

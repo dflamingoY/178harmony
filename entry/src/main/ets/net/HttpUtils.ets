@@ -15,7 +15,7 @@ export function getData(uri: string): Promise<BaseResp> {
     readTimeout: 15000,
     connectTimeout: 15000
   })
-  LogUtil.d("NetLog", `请求路由  ${uri}`)
+  // LogUtil.d("NetLog", `请求路由token   ${globalThis.token}`)
   let resp = new BaseResp()
   return request.then((value: http.HttpResponse) => {
     if (value.responseCode == 200) {
@@ -27,7 +27,7 @@ export function getData(uri: string): Promise<BaseResp> {
         PreferenceModel.deleteKey('token')
         PreferenceModel.deleteKey('user')
       }
-      LogUtil.d("NetLog", result)
+      LogUtil.d("NetLog", `请求路由  ${uri}  ` +result)
       resp.data = resData.data
       resp.code = resData.code
       resp.msg = resData.msg

@@ -1,8 +1,10 @@
 import router from '@ohos.router'
 import { UserBean } from '../data/user'
+import { isLogin } from '../login/LoginPlugin'
 import { initWs } from '../net/Socket'
 import LogUtil from '../utils/LogUtil'
 import PreferenceModel from '../utils/PreferenceModel'
+import UserViewModel from './UserViewModel'
 
 @Entry
 @Component
@@ -23,7 +25,7 @@ struct StartUp {
   }
 
   onPageShow() {
-    initWs()
+    // initWs()
     PreferenceModel.getString("user", null).then((value?: string) => {
       LogUtil.d("West", '获取到缓存数据：' + value)
       if (value != null) {
@@ -31,6 +33,7 @@ struct StartUp {
         globalThis.token = user.token
         globalThis.uid = user.uid
       }
+      UserViewModel.getOffline()
     })
     setTimeout(() => {
       router.replaceUrl({ url: 'pages/HomePage' });

@@ -22,4 +22,6 @@ export class MsgBean {
   msgStatus: number = 0
   unread_count: number = 0
   identity: number = 0
+  content: string = ''
+  isRead: number = 0
 }

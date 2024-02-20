@@ -1,10 +1,11 @@
 import display from '@ohos.display'
 import systemDateTime from '@ohos.systemDateTime'
+import router from '@ohos.router'
 import { UserBean } from '../data/user'
 import CommonUtil from '../utils/CommonUtil'
 import LogUtil from '../utils/LogUtil'
-import RdbModel from './RdbModel'
 import UserViewModel from './UserViewModel'
+import IConstant from '../utils/IConstant'
 
 @Entry
 @Component
@@ -106,7 +107,12 @@ export struct ContactPage {
                 .borderRadius('15vp')
                 .backgroundColor(0x1e2024)
                 .margin({ right: '12vp' })
-
+                .onClick(() => {
+                  router.pushUrl({ url: "p2p/P2PPage", params: {
+                    'type': IConstant.FRIEND,
+                    'id': item.uid
+                  } })
+                })
             }.width('100%')
             .height('60vp')
           }
@@ -130,7 +136,7 @@ export struct ContactPage {
           .fontSize('13fp')
           .margin({ bottom: '12vp' })
       }.onClick(() => {
-        RdbModel.getAllFriend()
+        // this.getLocal()
         // this.getFriend()
       }).width('100%').height('100%')
       .justifyContent(FlexAlign.SpaceBetween)
@@ -155,6 +161,15 @@ export struct ContactPage {
 
   getFriend() {
     UserViewModel.getFriendList().then((data: Array<UserBean>) => {
+      this.friendLit = data
+    }).catch((err: Error) => {
+      this.getLocal()
+      LogUtil.d("West", `${err}`)
+    })
+  }
+
+  getLocal() {
+    UserViewModel.getLocalFriend().then((data: Array<UserBean>) => {
       this.friendLit = data
     }).catch((err: Error) => {
       LogUtil.d("West", `${err}`)

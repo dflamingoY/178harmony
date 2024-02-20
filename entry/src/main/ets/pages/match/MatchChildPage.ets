@@ -1,5 +1,3 @@
-import ArrayList from '@ohos.util.ArrayList'
-import display from '@ohos.display'
 import { MatchBean, MatchDayEntity, TvUser } from '../../data/Data'
 import { getBasketState } from '../../utils/BallUtils'
 import MatchModel from './MatchModel'
@@ -52,7 +50,7 @@ export struct MatchChildPage {
           })
         }.width('100%').height('100%')
       } else {
-        Text(`当前角标：${this.index}`)
+        Text(`数据加载中`)
           .width('100%')
           .height('100%')
           .textAlign(TextAlign.Center)

@@ -1,6 +1,7 @@
 import { BaseResp } from '../data/Data'
 import { FriendKeyData } from '../data/FriendKeyData'
 import { GroupBean } from '../data/GroupData'
+import { OffLineData } from '../data/OffLineData'
 import { UserBean } from '../data/user'
 import { getData } from '../net/HttpUtils'
 import LogUtil from '../utils/LogUtil'
@@ -21,8 +22,8 @@ class UserViewModel {
     })
   }
 
-  getLocalFriend():Promise<Array<UserBean>> {
-    return  RdbModel.getAllFriend()
+  getLocalFriend(): Promise<Array<UserBean>> {
+    return RdbModel.getAllFriend()
   }
 
   getFriendList(): Promise<Array<UserBean>> {
@@ -65,8 +66,42 @@ class UserViewModel {
   async getOffline() {
     getData("get_off_line_msg").then((resp: BaseResp) => {
       if (resp.code == 200) {
-        // let result:   JSON.parse(`${resp.data}`)
+        let result: OffLineData = JSON.parse(`${resp.data}`)
+        //数据库存储
+        if (result.msg != null) {
+          RdbModel.insertMsgs(result.msg)
+        }
       }
+    }).catch((e: Error) => {
+      LogUtil.d("West", `getOffline ${e.message}`)
+    })
+  }
+
+  getFriend(uid: string): Promise<UserBean> {
+    return new Promise(async (resolve: Function, reject: Function) => {
+      getData('get_friend_info/' + uid).then((resp: BaseResp) => {
+        if (resp.code == 200) {
+          resolve(resp.data)
+        } else {
+          reject(resp.msg)
+        }
+      }).catch((err: Error) => {
+        reject(err.message)
+      })
+    })
+  }
+
+  getGroupInfo(gid: string): Promise<GroupBean> {
+    return new Promise(async (resolve: Function, reject: Function) => {
+      getData('detail_group/' + gid).then((resp: BaseResp) => {
+        if (resp.code == 200) {
+          resolve(resp.data)
+        } else {
+          reject(resp.msg)
+        }
+      }).catch((err: Error) => {
+        reject(err.message)
+      })
     })
   }
 }
