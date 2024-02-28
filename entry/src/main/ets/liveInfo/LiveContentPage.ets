@@ -1,4 +1,3 @@
-import hilog from '@ohos.hilog'
 import router from '@ohos.router'
 import display from '@ohos.display'
 import { LiveInfoModel } from './LiveIndoModel'
@@ -9,6 +8,9 @@ import { LiveOddPage } from './LiveOddPage'
 import { LiveAnalysePage } from './LiveAnalysePage'
 import { LiveLeagueListPage } from './LiveLeagueListPage'
 import { LiveChatPage } from './LiveChatPage'
+import LogUtil from '../utils/LogUtil'
+import { LiveInfo } from '../data/LiveDetailData'
+import { VideoController } from './VideoController'
 
 @Entry
 @Component
@@ -16,14 +18,24 @@ export struct LiveContentPage {
   model: LiveInfoModel = new LiveInfoModel()
   @State index: number = 0
   @State unreadCount: number = 0
+  private xComponentController = new XComponentController();
+  private videoController: VideoController = new VideoController()
+  private surfaceID: string = '';
 
   build() {
     Column() {
-
       Stack({ alignContent: Alignment.TopStart }) {
-
-
-
+        XComponent({ id: '', type: 'surface', libraryname: '', controller: this.xComponentController })
+          .onLoad(async () => {
+            this.xComponentController.setXComponentSurfaceSize({
+              surfaceWidth: display.getDefaultDisplaySync().width,
+              surfaceHeight: display.getDefaultDisplaySync().width * 0.5629
+            });
+            this.surfaceID = this.xComponentController.getXComponentSurfaceId();
+          })
+          .backgroundColor(Color.White)
+          .width('100%')
+          .height(`${display.getDefaultDisplaySync().width * 0.5629}px`)
         Image($r('app.media.icon_back'))
           .height('21vp')
           .width('21vp')
@@ -58,15 +70,18 @@ export struct LiveContentPage {
 
   }
 
+  aboutToDisappear() {
+    this.videoController.release()
+  }
+
   aboutToAppear() {
     let params = router.getParams() as Record<string, object>
     var tournamentId = params.tournamentId as unknown as number
-    var url = params.url
     var type = params.type as unknown as number
     var memberId = params.memberId as unknown as number
-    hilog.debug(0x0000ff, "West", `tournamentId : ${tournamentId}`)
-    this.model.getLiveInfo(tournamentId, type, memberId).then((value: object) => {
-      hilog.debug(0xff00, "West", "详情获取到 " + `${value}`)
+    this.model.getLiveInfo(tournamentId, type, memberId).then((value: LiveInfo) => {
+      LogUtil.d("West", "详情获取到 " + `${value}`)
+      this.videoController.firstPlay(value.detail.screen_url_m3u8, this.surfaceID)
     })
   }
 }

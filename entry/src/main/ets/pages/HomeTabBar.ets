@@ -65,7 +65,9 @@ export struct HomeTabBar {
           .margin({ top: '5vp' })
 
       }.onClick(() => {
-        this.index = 3
+        if (isLogin()) {
+          this.index = 3
+        } else router.pushUrl({ url: 'login/LoginPage' });
       }).width('20%').height('100%')
 
       Column() {

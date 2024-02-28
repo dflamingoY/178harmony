@@ -1,6 +1,6 @@
 import router from '@ohos.router'
 import { MsgBean } from '../data/MsgBean'
-import RdbModel from '../pages/RdbModel'
+import Dao from '../db/Dao'
 
 @Entry
 @Component
@@ -48,10 +48,10 @@ export struct P2PPage {
     let params = router.getParams() as Record<string, object>
     let type = params.type as unknown as string
     let id = params.id
-    RdbModel.getMsgByChatId(`${type + id}`, 20).then((msg) => {
+    Dao.getRdbModel()?.getMsgByChatId(`${type + id}`, 20)/*.then((msg) => {
 
     }).catch((e: Error) => {
 
-    })
+    })*/
   }
 }

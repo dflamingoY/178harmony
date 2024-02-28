@@ -165,7 +165,7 @@ export default class Rdb {
     }
   }
 
-  querySql( sql: string): Promise<relationalStore.ResultSet> {
+  querySql(sql: string): Promise<relationalStore.ResultSet> {
     if (this.rdbStore) {
       return this.rdbStore.querySql(sql, this.columns);
     } else return null

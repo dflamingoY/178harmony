@@ -1,8 +1,9 @@
 import { BaseResp } from '../data/Data'
+import { LiveInfo } from '../data/LiveDetailData'
 import { post } from '../net/HttpUtils'
 
 export class LiveInfoModel {
-  getLiveInfo(tournamentId: number, type: number, memberId: number): Promise<Object> {
+  getLiveInfo(tournamentId: number, type: number, memberId: number): Promise<LiveInfo> {
     return new Promise((resolve: Function, reject: Function) => {
       post(`get_match/${type}/detail/${tournamentId}`, { "member_id": memberId }).then((value: BaseResp) => {
         if (value.code == 200) {

@@ -3,8 +3,9 @@ import { UserBean } from '../data/user'
 import FriendTable from '../db/FriendTable'
 import MsgTable from '../db/MsgTable'
 
-class RdbModel {
+export class RdbModel {
   private friendTable = new FriendTable(() => {
+
   })
   private msgTable = new MsgTable(() => {
 
@@ -25,16 +26,18 @@ class RdbModel {
   }
 
   insertMsgs(msg: MsgBean[]) {
+    // msg.forEach((value) => {
+    //   this.msgTable.insert(value, () => {
+    //   })
+    // })
+
     this.msgTable.insertTx(msg, () => {
 
     })
   }
 
-  getMsgByChatId(key: string, offset: number): Promise<Array<MsgBean>> {
+  getMsgByChatId(key: string, offset: number)/*: Promise<Array<MsgBean>>*/ {
     return this.msgTable.getChatListByKey(key)
   }
 }
-
-export default new RdbModel()
-
 

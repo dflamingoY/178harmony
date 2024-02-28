@@ -1,5 +1,6 @@
 import router from '@ohos.router'
 import { UserBean } from '../data/user'
+import Dao from '../db/Dao'
 import { isLogin } from '../login/LoginPlugin'
 import { initWs } from '../net/Socket'
 import LogUtil from '../utils/LogUtil'
@@ -9,8 +10,6 @@ import UserViewModel from './UserViewModel'
 @Entry
 @Component
 struct StartUp {
-  @State message: string = 'Hello World'
-
   build() {
     Row() {
       Image($r("app.media.draw_splash_5"))
@@ -33,11 +32,16 @@ struct StartUp {
         globalThis.token = user.token
         globalThis.uid = user.uid
       }
+      Dao.getRdbModel()
       UserViewModel.getOffline()
+      setTimeout(() => {
+        router.replaceUrl({ url: 'pages/HomePage' });
+      }, 1000)
+    }).catch(() => {
+      setTimeout(() => {
+        router.replaceUrl({ url: 'pages/HomePage' });
+      }, 1000)
     })
-    setTimeout(() => {
-      router.replaceUrl({ url: 'pages/HomePage' });
-    }, 1000)
   }
 }
 

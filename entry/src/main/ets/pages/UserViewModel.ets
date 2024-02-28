@@ -3,9 +3,9 @@ import { FriendKeyData } from '../data/FriendKeyData'
 import { GroupBean } from '../data/GroupData'
 import { OffLineData } from '../data/OffLineData'
 import { UserBean } from '../data/user'
+import Dao from '../db/Dao'
 import { getData } from '../net/HttpUtils'
 import LogUtil from '../utils/LogUtil'
-import RdbModel from './RdbModel'
 
 class UserViewModel {
   getUserInfo(): Promise<UserBean> {
@@ -23,7 +23,7 @@ class UserViewModel {
   }
 
   getLocalFriend(): Promise<Array<UserBean>> {
-    return RdbModel.getAllFriend()
+    return Dao.getRdbModel()?.getAllFriend()
   }
 
   getFriendList(): Promise<Array<UserBean>> {
@@ -38,7 +38,7 @@ class UserViewModel {
               arr.push(item)
             })
           })
-          RdbModel.insertFriends(arr)
+          Dao.getRdbModel()?.insertFriends(arr)
           resolve(arr)
         } else {
           reject(resp.msg)
@@ -66,10 +66,10 @@ class UserViewModel {
   async getOffline() {
     getData("get_off_line_msg").then((resp: BaseResp) => {
       if (resp.code == 200) {
-        let result: OffLineData = JSON.parse(`${resp.data}`)
+        let result: OffLineData = JSON.parse(JSON.stringify(resp.data))
         //数据库存储
         if (result.msg != null) {
-          RdbModel.insertMsgs(result.msg)
+          Dao.getRdbModel()?.insertMsgs(result.msg)
         }
       }
     }).catch((e: Error) => {

@@ -63,6 +63,7 @@ export function post(uri: String, params: Object): Promise<BaseResp> {
       resp.code = netResp.code
       resp.msg = netResp.msg
       resp.data = netResp.data
+      LogUtil.d("NetLog", `post 请求路由  ${uri}  ` +result)
       if (resp.code == 401) { //清除所有用户登陆凭证相关的缓存
         globalThis.token = null
         globalThis.uid = null
