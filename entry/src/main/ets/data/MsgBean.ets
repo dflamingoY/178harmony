@@ -1,6 +1,6 @@
 export class MsgBean {
   from_name_ios: string = ''
-  key: string = ''
+  listId: string = ''
   mid: string = ''
   from: string = ''
   sub_type: string = ''
@@ -24,4 +24,11 @@ export class MsgBean {
   identity: number = 0
   content: string = ''
   isRead: number = 0
+}
+
+export class RecentBean {
+
+
+
+
 }

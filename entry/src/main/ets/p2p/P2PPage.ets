@@ -1,6 +1,7 @@
 import router from '@ohos.router'
 import { MsgBean } from '../data/MsgBean'
 import Dao from '../db/Dao'
+import LogUtil from '../utils/LogUtil'
 
 @Entry
 @Component
@@ -48,10 +49,10 @@ export struct P2PPage {
     let params = router.getParams() as Record<string, object>
     let type = params.type as unknown as string
     let id = params.id
-    Dao.getRdbModel()?.getMsgByChatId(`${type + id}`, 20)/*.then((msg) => {
-
+    Dao.getRdbModel()?.getMsgByChatId(`${type + id}`, 20).then((msg) => {
+      LogUtil.d("West", `查询结果${msg}`)
     }).catch((e: Error) => {
 
-    })*/
+    })
   }
 }

@@ -37,28 +37,28 @@ export default class Rdb {
   getRdbStore(callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
-      LogUtil.d("Dao", 'getRdbStore() has no callback!');
+      LogUtil.d("Dao", this.tableName + ' getRdbStore() has no callback!');
       return;
     }
     if (this.rdbStore !== null) {
-      LogUtil.d("Dao", 'The rdbStore exists.');
+      LogUtil.d("Dao", this.tableName + 'The rdbStore exists.');
       callback();
       return
     }
     if (globalThis.uid == null) {
-      LogUtil.d("Dao", '未登录不允许创建数据库');
+      LogUtil.d("Dao", this.tableName + '未登录不允许创建数据库');
       return
     }
 
     let context: Context = getContext(this) as Context;
     relationalStore.getRdbStore(context, STORE_CONFIG, (err, rdb) => {
       if (err) {
-        LogUtil.d("Dao", `gerRdbStore() failed, err: ${err}`);
+        LogUtil.d("Dao", this.tableName + `gerRdbStore() failed, err: ${err}`);
         return;
       }
       this.rdbStore = rdb;
       this.rdbStore.executeSql(this.sqlCreateTable);
-      LogUtil.d("Dao", 'getRdbStore() finished.');
+      LogUtil.d("Dao", this.tableName + 'getRdbStore() finished.');
       callback();
     });
   }
@@ -66,7 +66,7 @@ export default class Rdb {
   insertDataTx(data: relationalStore.ValuesBucket[], callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
-      LogUtil.d("Dao", 'insertData() has no callback!');
+      LogUtil.d("Dao", this.tableName + 'insertData() has no callback!');
       return;
     }
     let resFlag: boolean = false;
@@ -74,11 +74,11 @@ export default class Rdb {
     if (this.rdbStore) {
       this.rdbStore.batchInsert(this.tableName, valueBucket, (err, ret) => {
         if (err) {
-          LogUtil.d("Dao", `insertData() failed, err: ${err}`);
+          LogUtil.d("Dao", this.tableName + `insertData() failed, err: ${err}`);
           callback(resFlag);
           return;
         }
-        LogUtil.d("Dao", `insertData() finished: ${ret}`);
+        LogUtil.d("Dao", this.tableName + `insertData() finished: ${ret}`);
         callback(ret);
       });
     }
@@ -87,7 +87,7 @@ export default class Rdb {
   insertData(data: relationalStore.ValuesBucket, callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
-      LogUtil.d("Dao", 'insertData() has no callback!');
+      LogUtil.d("Dao", this.tableName + 'insertData() has no callback!');
       return;
     }
     let resFlag: boolean = false;
@@ -95,11 +95,11 @@ export default class Rdb {
     if (this.rdbStore) {
       this.rdbStore.insert(this.tableName, valueBucket, (err, ret) => {
         if (err) {
-          LogUtil.d("Dao", `insertData() failed, err: ${err}`);
+          LogUtil.d("Dao", this.tableName + `insertData() failed, err: ${err}`);
           callback(resFlag);
           return;
         }
-        LogUtil.d("Dao", `insertData() finished: ${ret}`);
+        LogUtil.d("Dao", this.tableName + `insertData() finished: ${ret}`);
         callback(ret);
       });
     }
@@ -108,18 +108,18 @@ export default class Rdb {
   deleteData(predicates: relationalStore.RdbPredicates, callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
-      LogUtil.d("Dao", 'deleteData() has no callback!');
+      LogUtil.d("Dao", this.tableName + 'deleteData() has no callback!');
       return;
     }
     let resFlag: boolean = false;
     if (this.rdbStore) {
       this.rdbStore.delete(predicates, (err, ret) => {
         if (err) {
-          LogUtil.d("Dao", `deleteData() failed, err: ${err}`);
+          LogUtil.d("Dao", this.tableName + `deleteData() failed, err: ${err}`);
           callback(resFlag);
           return;
         }
-        LogUtil.d("Dao", `deleteData() finished: ${ret}`);
+        LogUtil.d("Dao", this.tableName + `deleteData() finished: ${ret}`);
         callback(!resFlag);
       });
     }
@@ -128,7 +128,7 @@ export default class Rdb {
   updateData(predicates: relationalStore.RdbPredicates, data: relationalStore.ValuesBucket, callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
-      LogUtil.d("Dao", 'updateDate() has no callback!');
+      LogUtil.d("Dao", this.tableName + 'updateDate() has no callback!');
       return;
     }
     let resFlag: boolean = false;
@@ -136,11 +136,11 @@ export default class Rdb {
     if (this.rdbStore) {
       this.rdbStore.update(valueBucket, predicates, (err, ret) => {
         if (err) {
-          LogUtil.d("Dao", `updateData() failed, err: ${err}`);
+          LogUtil.d("Dao", this.tableName + `updateData() failed, err: ${err}`);
           callback(resFlag);
           return;
         }
-        LogUtil.d("Dao", `updateData() finished: ${ret}`);
+        LogUtil.d("Dao", this.tableName + `updateData() finished: ${ret}`);
         callback(!resFlag);
       });
     }
@@ -149,16 +149,16 @@ export default class Rdb {
   query(predicates: relationalStore.RdbPredicates, callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
-      LogUtil.d("Dao", 'query() has no callback!');
+      LogUtil.d("Dao", this.tableName + 'query() has no callback!');
       return;
     }
     if (this.rdbStore) {
       this.rdbStore.query(predicates, this.columns, (err, resultSet) => {
         if (err) {
-          LogUtil.d("Dao", `query() failed, err:  ${err}`);
+          LogUtil.d("Dao", this.tableName + `query() failed, err:  ${err}`);
           return;
         }
-        LogUtil.d("Dao", 'query() finished.');
+        LogUtil.d("Dao", this.tableName + 'query() finished.');
         callback(resultSet);
         resultSet.close();
       });

@@ -40,10 +40,16 @@ export default class MsgTable {
     })
   }
 
-  getChatListByKey(key: string): Promise<Array<MsgBean>> {
+  deleteAll(callback?: Function) {
+    let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+    this.msgTable.deleteData(predicates, callback)
+  }
+
+  getChatListByKey(listId: string): Promise<Array<MsgBean>> {
     return new Promise(async (resolve: Function, reject: Function) => {
-      let sql = `select * from ${SqlConstant.MSG_TABLE.tableName}`
-      this.msgTable.querySql(sql).then((value) => {
+      let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+      predicates.equalTo("listId", listId)
+      this.msgTable.queryAsync(predicates).then((value) => {
         let count = value.rowCount
         LogUtil.d("Dao", `查询到的数据量${count}`)
         if (count == 0) {
@@ -53,28 +59,25 @@ export default class MsgTable {
           const result: MsgBean[] = []
           for (let index = 0; index < count; index++) {
             let msg = new MsgBean()
-            msg.from_name_ios = value.getString(value.getColumnIndex('from_name_ios'))
-            msg.key = value.getString(value.getColumnIndex('key'))
+            msg.from_name_ios = value.getString(value.getColumnIndex('name_from_ios'))
+            msg.listId = value.getString(value.getColumnIndex('listId'))
             msg.mid = value.getString(value.getColumnIndex('mid'))
-            msg.from = value.getString(value.getColumnIndex('from'))
+            msg.from = value.getString(value.getColumnIndex('id_from'))
             msg.sub_type = value.getString(value.getColumnIndex('sub_type'))
             msg.content_type = value.getString(value.getColumnIndex('content_type'))
-            msg.type = value.getString(value.getColumnIndex('type'))
+            msg.type = value.getString(value.getColumnIndex('chat_type'))
             msg.remark = value.getString(value.getColumnIndex('remark'))
-            msg.from_avatar = value.getString(value.getColumnIndex('from_avatar'))
-            msg.from_name = value.getString(value.getColumnIndex('from_name'))
-            msg.to = value.getString(value.getColumnIndex('to'))
+            msg.from_avatar = value.getString(value.getColumnIndex('avatar_from'))
+            msg.from_name = value.getString(value.getColumnIndex('name_from'))
+            msg.to = value.getString(value.getColumnIndex('chat_to'))
             msg.quote = value.getString(value.getColumnIndex('quote'))
-            msg.to_avatar = value.getString(value.getColumnIndex('to_avatar'))
-            msg.to_name = value.getString(value.getColumnIndex('to_name'))
-            msg.groupName = value.getString(value.getColumnIndex('groupName'))
-            msg.from_name_remark = value.getString(value.getColumnIndex('from_name_remark'))
+            msg.to_avatar = value.getString(value.getColumnIndex('avatar_to'))
+            msg.to_name = value.getString(value.getColumnIndex('name_to'))
+            msg.from_name_remark = value.getString(value.getColumnIndex('name_from_remark'))
             msg.sendId = value.getString(value.getColumnIndex('sendId'))
             msg.verifyStatus = value.getString(value.getColumnIndex('verifyStatus'))
             msg.timestamp = value.getLong(value.getColumnIndex('timestamp'))
             msg.msgStatus = value.getLong(value.getColumnIndex('msgStatus'))
-            msg.unread_count = value.getLong(value.getColumnIndex('unread_count'))
-            msg.identity = value.getLong(value.getColumnIndex('identity'))
             msg.content = value.getString(value.getColumnIndex('content'))
             msg.isRead = value.getLong(value.getColumnIndex('isRead'))
             msg.role = value.getLong(value.getColumnIndex('role'))
@@ -99,30 +102,30 @@ function generatorBucketTx(user: MsgBean[]): relationalStore.ValuesBucket[] {
 
 function generatorBucket(item: MsgBean): relationalStore.ValuesBucket {
   let bucket: relationalStore.ValuesBucket = {}
-  bucket.mid = item.mid??''
-  bucket.from_name_ios = item.from_name_ios??''
+  bucket.mid = `${item.mid}`
+  bucket.name_from_ios = item.from_name_ios??''
   bucket.content = item.content??''
-  bucket.from = item.from??''
+  bucket.id_from = `${item.from}`
   bucket.sub_type = item.sub_type??''
   bucket.timestamp = item.timestamp??0
   bucket.msgStatus = item.msgStatus??0
   bucket.content_type = item.content_type??''
-  bucket.type = item.type??''
+  bucket.chat_type = item.type??''
   bucket.remark = item.remark??''
-  bucket.from_avatar = item.from_avatar??''
-  bucket.from_name = item.from_name??''
-  bucket.to = item.to??''
+  bucket.avatar_from = item.from_avatar??''
+  bucket.name_from = item.from_name??''
+  bucket.chat_to = item.to??''
   bucket.isRead = item.isRead??0
   bucket.quote = item.quote??''
-  bucket.to_avatar = item.to_avatar??''
-  bucket.to_name = item.to_name??''
-  bucket.from_name_remark = item.from_name_remark??''
+  bucket.avatar_to = item.to_avatar??''
+  bucket.name_to = item.to_name??''
+  bucket.name_from_remark = item.from_name_remark??''
   bucket.sendId = item.sendId??''
   bucket.verifyStatus = item.verifyStatus??'0'
   if (item.type == IConstant.FRIEND && item.from != globalThis.uid) {
-    bucket.key = IConstant.FRIEND + item.from
+    bucket.listId = IConstant.FRIEND + item.from
   } else {
-    bucket.key = IConstant.GROUP + item.to
+    bucket.listId = IConstant.GROUP + item.to
   }
   bucket.role = item.role??4
   return bucket

@@ -30,13 +30,14 @@ export class RdbModel {
     //   this.msgTable.insert(value, () => {
     //   })
     // })
-
-    this.msgTable.insertTx(msg, () => {
-
+    new Promise(async () => {
+      this.msgTable.deleteAll()
+      this.msgTable.insertTx(msg, () => {
+      })
     })
   }
 
-  getMsgByChatId(key: string, offset: number)/*: Promise<Array<MsgBean>>*/ {
+  getMsgByChatId(key: string, offset: number): Promise<Array<MsgBean>> {
     return this.msgTable.getChatListByKey(key)
   }
 }

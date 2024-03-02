@@ -17,49 +17,47 @@ export default class SqlConstant {
     ' remark TEXT)',
     columns: ['id', 'uid', 'phone', 'username', 'nickname', 'avatar', 'sign', 'state', 'member_id', 'role', 'last_login_time', 'remark']
   }
-
   static readonly MSG_TABLE: TableInfo = {
     tableName: 'msg',
     sqlCreate: 'CREATE TABLE IF NOT EXISTS msg(id INTEGER PRIMARY KEY AUTOINCREMENT,' +
-    'mid TEXT ,' +
-    'from_name_ios TEXT,' +
-    'content TEXT,' +
-    'from TEXT,' +
-    'sub_type TEXT,' +
-    'timestamp INTEGER,' +
-    'msgStatus INTEGER,' +
-    'content_type TEXT,' +
-    'type TEXT,' +
-    'remark TEXT,' +
-    'from_avatar TEXT,' +
-    'from_name TEXT,' +
-    'to TEXT,' +
-    'isRead INTEGER,' +
-    'quote TEXT,' +
-    'to_avatar TEXT,' +
-    'to_name TEXT,' +
-    'from_name_remark TEXT,' +
-    'sendId TEXT,' +
-    'verifyStatus TEXT,' +
-    'key TEXT,' +
-    'role INTEGER)',
-    columns: ['id', 'mid', 'from_name_ios', 'content',
-      'from', 'sub_type', 'timestamp', 'msgStatus', 'content_type',
-      'type', 'remark', 'from_avatar', 'from_name', 'to',
-      'isRead', 'quote', 'to_avatar', 'to_name', 'from_name_remark', 'sendId', 'verifyStatus', 'key', 'role']
+    ' mid TEXT,' +
+    ' name_from_ios TEXT,' +
+    ' content TEXT,' +
+    ' id_from TEXT,' +
+    ' sub_type TEXT,' +
+    ' timestamp INTEGER,' +
+    ' msgStatus INTEGER,' +
+    ' content_type TEXT,' +
+    ' chat_type TEXT,' +
+    ' remark TEXT,' +
+    ' avatar_from TEXT,' +
+    ' name_from TEXT,' +
+    ' chat_to TEXT,' +
+    ' isRead INTEGER,' +
+    ' quote TEXT,' +
+    ' avatar_to TEXT,' +
+    ' name_to TEXT,' +
+    ' name_from_remark TEXT,' +
+    ' sendId TEXT,' +
+    ' verifyStatus TEXT,' +
+    ' listId TEXT,' +
+    ' role INTEGER)',
+    columns: ['id', 'mid', 'name_from_ios', 'content',
+      'id_from', 'sub_type', 'timestamp', 'msgStatus', 'content_type',
+      'chat_type', 'remark', 'avatar_from', 'name_from', 'chat_to',
+      'isRead', 'quote', 'avatar_to', 'name_to', 'name_from_remark', 'sendId', 'verifyStatus', 'listId', 'role']
   }
-
   static readonly RECENT_TABLE: TableInfo = {
     tableName: 'recent',
     sqlCreate: 'CREATE TABLE IF NOT EXISTS recent(id INTEGER PRIMARY KEY AUTOINCREMENT,' +
     'avatar TEXT,' +
     'content TEXT,' +
-    'from TEXT,' +
+    'id_from TEXT,' +
     'sub_type TEXT,' +
     'timestamp INTEGER,' +
     'content_type TEXT,' +
     'unread_count INTEGER,' +
-    'type TEXT,' +
+    'chat_type TEXT,' +
     'name TEXT,' +
     'chatId TEXT,' +
     'remark TEXT,' +
@@ -75,7 +73,7 @@ export default class SqlConstant {
     'readMid TEXT,' +
     'updateTime INTEGER,' +
     'role INTEGER)',
-    columns: ['id', 'avatar', 'content', 'from', 'sub_type', 'timestamp', 'content_type', 'unread_count', 'type',
+    columns: ['id', 'avatar', 'content', 'id_from', 'sub_type', 'timestamp', 'content_type', 'unread_count', 'chat_type',
       'name', 'chatId', 'remark', 'is_top', 'is_disturb', 'mid', 'topTime', 'isRemind', 'draft',
       'isOnline', 'fromUserName', 'fromUserName', 'isReadAudio', 'readMid', 'updateTime', 'role'
     ]
