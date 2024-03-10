@@ -10,6 +10,12 @@
     "pages/Index",
     "pages/SettingPage",
     "pages/ContactPage",
-    "p2p/P2PPage"
+    "p2p/P2PPage",
+    "pages/contact/FriendRequestPage",
+    "pages/contact/GroupListPage",
+    "pages/contact/TagPage",
+    "pages/contact/UserDetailsPage",
+    "p2p/friend/FriendChatConfig",
+    "p2p/group/GroupDetails"
   ]
 }

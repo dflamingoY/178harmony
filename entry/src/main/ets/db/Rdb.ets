@@ -146,6 +146,20 @@ export default class Rdb {
     }
   }
 
+  updateDataSingle(predicates: relationalStore.RdbPredicates, data: relationalStore.ValuesBucket) {
+    const valueBucket: relationalStore.ValuesBucket = data;
+    if (this.rdbStore) {
+      this.rdbStore.update(valueBucket, predicates, (err, ret) => {
+        if (err) {
+          LogUtil.d("Dao", this.tableName + `updateData() failed, err: ${err}`);
+          return;
+        }
+        LogUtil.d("Dao", this.tableName + `updateData() finished: ${ret}`);
+      });
+    }
+  }
+
+
   query(predicates: relationalStore.RdbPredicates, callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {

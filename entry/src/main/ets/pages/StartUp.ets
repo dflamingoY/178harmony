@@ -26,7 +26,7 @@ struct StartUp {
   onPageShow() {
     // initWs()
     PreferenceModel.getString("user", null).then((value?: string) => {
-      LogUtil.d("West", '获取到缓存数据：' + value)
+      // LogUtil.d("West", '获取到缓存数据：' + value)
       if (value != null) {
         let user: UserBean = JSON.parse(value)
         globalThis.token = user.token

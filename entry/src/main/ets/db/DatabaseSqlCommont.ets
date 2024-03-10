@@ -57,9 +57,9 @@ export default class SqlConstant {
     'timestamp INTEGER,' +
     'content_type TEXT,' +
     'unread_count INTEGER,' +
-    'chat_type TEXT,' +
+    'chat_type TEXT,' + //friend or group
     'name TEXT,' +
-    'chatId TEXT,' +
+    'chatId TEXT,' + //聊天对象id
     'remark TEXT,' +
     'is_top INTEGER,' +
     'is_disturb INTEGER,' +
@@ -69,13 +69,14 @@ export default class SqlConstant {
     'draft TEXT,' +
     'isOnline INTEGER,' +
     'fromUserName TEXT,' +
-    'isReadAudio TEXT,' +
+    'isReadAudio INTEGER,' +
     'readMid TEXT,' +
     'updateTime INTEGER,' +
+    'listId TEXT unique,' +
     'role INTEGER)',
     columns: ['id', 'avatar', 'content', 'id_from', 'sub_type', 'timestamp', 'content_type', 'unread_count', 'chat_type',
       'name', 'chatId', 'remark', 'is_top', 'is_disturb', 'mid', 'topTime', 'isRemind', 'draft',
-      'isOnline', 'fromUserName', 'fromUserName', 'isReadAudio', 'readMid', 'updateTime', 'role'
+      'isOnline', 'fromUserName', 'fromUserName', 'isReadAudio', 'readMid', 'updateTime', 'listId', 'role'
     ]
   }
 }

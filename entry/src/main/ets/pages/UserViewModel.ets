@@ -1,6 +1,7 @@
 import { BaseResp } from '../data/Data'
 import { FriendKeyData } from '../data/FriendKeyData'
-import { GroupBean } from '../data/GroupData'
+import { GroupBean, GroupDetails } from '../data/GroupData'
+import { RecentBean } from '../data/MsgBean'
 import { OffLineData } from '../data/OffLineData'
 import { UserBean } from '../data/user'
 import Dao from '../db/Dao'
@@ -68,9 +69,7 @@ class UserViewModel {
       if (resp.code == 200) {
         let result: OffLineData = JSON.parse(JSON.stringify(resp.data))
         //数据库存储
-        if (result.msg != null) {
-          Dao.getRdbModel()?.insertMsgs(result.msg)
-        }
+        Dao.getRdbModel()?.insertMsgs(result)
       }
     }).catch((e: Error) => {
       LogUtil.d("West", `getOffline ${e.message}`)
@@ -91,7 +90,7 @@ class UserViewModel {
     })
   }
 
-  getGroupInfo(gid: string): Promise<GroupBean> {
+  getGroupInfo(gid: string): Promise<GroupDetails> {
     return new Promise(async (resolve: Function, reject: Function) => {
       getData('detail_group/' + gid).then((resp: BaseResp) => {
         if (resp.code == 200) {
@@ -100,6 +99,38 @@ class UserViewModel {
           reject(resp.msg)
         }
       }).catch((err: Error) => {
+        reject(err.message)
+      })
+    })
+  }
+
+  getRecentList(): Promise<Array<RecentBean>> {
+    return Dao.getRdbModel()?.getRecentList()
+  }
+
+  getFriendInfo(uid: string): Promise<UserBean> {
+    return new Promise((resolve: Function, reject: Function) => {
+      getData(`get_friend_info/${uid}`).then((resp: BaseResp) => {
+        if (resp.code == 200) {
+          resolve(resp.data)
+        } else {
+          reject(resp.msg)
+        }
+      }).catch((err: Error) => {
+        reject(err.message)
+      })
+    })
+  }
+
+  getFriendApplyList(page: number): Promise<Array<UserBean>> {
+    return new Promise((resolve: Function, reject: Function) => {
+      getData(`apply_friend_lists?limit=20&page=${page}`).then((resp: BaseResp) => {
+        if (resp.code == 200) {
+          resolve(resp.data)
+        } else {
+          reject(resp.msg)
+        }
+      }).catch((err) => {
         reject(err.message)
       })
     })

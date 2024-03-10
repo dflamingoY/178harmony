@@ -21,22 +21,27 @@ export struct ContactPage {
         Image($r('app.media.draw_content_actionbar_bg_3'))
           .width("100%")
           .height('100%')
-        Row() {
-          Image($r('app.media.icon_search'))
-            .width('17vp')
-            .height('17vp')
-            .margin({ left: '12vp' })
-          Text('搜索')
-            .fontSize('12fp')
-            .margin({ left: '12vp' })
-            .fontColor(0x99ffffff)
-            .width('100%')
+        Column() {
+          Text('通讯录')
+            .fontSize('18fp')
+            .fontColor(Color.White)
+          Row() {
+            Image($r('app.media.icon_search'))
+              .width('17vp')
+              .height('17vp')
+              .margin({ left: '12vp' })
+            Text('搜索')
+              .fontSize('12fp')
+              .margin({ left: '12vp' })
+              .fontColor(0x99ffffff)
+              .width('100%')
+          }
+          .backgroundColor(Color.Red)
+          .backgroundColor(0x33ffffff)
+          .margin({ left: '12vp', top: '8.5vp', right: '12vp', bottom: '12vp' })
+          .borderRadius('17vp')
+          .height('31vp')
         }
-        .backgroundColor(Color.Red)
-        .backgroundColor(0x33ffffff)
-        .margin({ left: '12vp', top: '8.5vp', right: '12vp', bottom: '12vp' })
-        .borderRadius('17vp')
-        .height('31vp')
 
       }.height(`${display.getDefaultDisplaySync().width * 0.2666}px`)
       .align(Alignment.Bottom)
@@ -48,14 +53,14 @@ export struct ContactPage {
           .height(22)
           .color('#C7C7C7')
           .opacity(0.6)
-        this.buildOtherCard('群聊', $r('app.media.icon_contact_group_card'))
+        this.buildOtherCard('群聊', $r('app.media.icon_contact_group_card'), 1)
         Divider()
           .vertical(true)
           .height(22)
           .color('#C7C7C7')
           .opacity(0.6)
 
-        this.buildOtherCard('标签', $r('app.media.icon_contact_tag_card'))
+        this.buildOtherCard('标签', $r('app.media.icon_contact_tag_card'), 2)
       }
       .height("88vp")
       .margin({ left: "12vp", right: '12vp', top: '12vp' })
@@ -67,55 +72,10 @@ export struct ContactPage {
       List({}) {
         ForEach(this.friendLit, (item: UserBean) => {
           ListItem() {
-            Row() {
-              Image(item.avatar)
-                .height('35vp')
-                .width('35vp')
-                .borderRadius('17.5vp')
-                .alt($r('app.media.icon_default_avatar'))
-                .margin({ left: '12vp' })
-
-              Column() {
-                Text(item.remark == "" ? item.nickname : item.remark)
-                  .fontSize('13fp')
-                  .fontColor("#1E1E20")
-                  .textAlign(TextAlign.Start)
-                  .width('100%')
-                Row() {
-                  Circle({ width: '6vp', height: '6vp' })
-                    .fill(item.state == 'offline' ? 0xBDBEC2 : 0x0CFF00)
-
-                  Text(CommonUtil.getUserState(item.state, this.currentTime - item.logout_timestamp))
-                    .fontColor(0x5B5E68)
-                    .fontSize('12fp')
-                    .margin({ left: '12vp' })
-                }.justifyContent(FlexAlign.Start)
-                .width('100%')
-
-              }.justifyContent(FlexAlign.SpaceBetween)
-              .margin({ left: '12vp' })
-              .height('35vp')
-              .width('50%')
-
-              Blank()
-              Text('去聊天')
-                .fontSize('12fp')
-                .fontColor(0xfed8bd)
-                .width("71vp")
-                .height('29vp')
-                .textAlign(TextAlign.Center)
-                .borderRadius('15vp')
-                .backgroundColor(0x1e2024)
-                .margin({ right: '12vp' })
-                .onClick(() => {
-                  router.pushUrl({ url: "p2p/P2PPage", params: {
-                    'type': IConstant.FRIEND,
-                    'id': item.uid
-                  } })
-                })
-            }.width('100%')
-            .height('60vp')
-          }
+            this.buildFriendItem(item)
+          }.onClick(() => {
+            router.pushUrl({ url: 'pages/contact/UserDetailsPage' })
+          })
         })
       }
     }.align(Alignment.TopStart).height('100%')
@@ -123,7 +83,59 @@ export struct ContactPage {
   }
 
   @Builder
-  buildFriendCard() {
+  private buildFriendItem(item: UserBean) {
+    Row() {
+      Image(item.avatar)
+        .height('35vp')
+        .width('35vp')
+        .borderRadius('17.5vp')
+        .alt($r('app.media.icon_default_avatar'))
+        .margin({ left: '12vp' })
+
+      Column() {
+        Text(item.remark == "" ? item.nickname : item.remark)
+          .fontSize('13fp')
+          .fontColor("#1E1E20")
+          .textAlign(TextAlign.Start)
+          .width('100%')
+        Row() {
+          Circle({ width: '6vp', height: '6vp' })
+            .fill(item.state == 'offline' ? 0xBDBEC2 : 0x0CFF00)
+
+          Text(CommonUtil.getUserState(item.state, this.currentTime - item.logout_timestamp))
+            .fontColor(0x5B5E68)
+            .fontSize('12fp')
+            .margin({ left: '12vp' })
+        }.justifyContent(FlexAlign.Start)
+        .width('100%')
+
+      }.justifyContent(FlexAlign.SpaceBetween)
+      .margin({ left: '12vp' })
+      .height('35vp')
+      .width('50%')
+
+      Blank()
+      Text('去聊天')
+        .fontSize('12fp')
+        .fontColor(0xfed8bd)
+        .width("71vp")
+        .height('29vp')
+        .textAlign(TextAlign.Center)
+        .borderRadius('15vp')
+        .backgroundColor(0x1e2024)
+        .margin({ right: '12vp' })
+        .onClick(() => {
+          router.pushUrl({ url: "p2p/P2PPage", params: {
+            'type': IConstant.FRIEND,
+            'id': item.uid.toString()
+          } })
+        })
+    }.width('100%')
+    .height('60vp')
+  }
+
+  @Builder
+  private buildFriendCard() {
     Badge({ count: this.unreadCount, maxCount: 99, style: {
       fontSize: '11fp', color: Color.White, badgeColor: Color.Red
     } }) {
@@ -136,15 +148,14 @@ export struct ContactPage {
           .fontSize('13fp')
           .margin({ bottom: '12vp' })
       }.onClick(() => {
-        // this.getLocal()
-        // this.getFriend()
+        router.pushUrl({ url: 'pages/contact/FriendRequestPage' })
       }).width('100%').height('100%')
       .justifyContent(FlexAlign.SpaceBetween)
     }.width('33%').height('100%')
   }
 
   @Builder
-  buildOtherCard(title: string, res: Resource) {
+  private buildOtherCard(title: string, res: Resource, type: number) {
     Column() {
       Image(res)
         .width('35vp')
@@ -157,6 +168,10 @@ export struct ContactPage {
         .fontColor(0xff1E1E20)
 
     }.justifyContent(FlexAlign.SpaceBetween).width('33%').height('100%')
+    .onClick(() => {
+      router.pushUrl({ url: type == 1 ? 'pages/contact/GroupListPage' : 'pages/contact/TagPage' })
+    })
+
   }
 
   getFriend() {

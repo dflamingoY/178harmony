@@ -19,7 +19,6 @@ struct HomePage {
         IndexRecommend()
         ChatPage()
         MatchPage()
-        // NewsPage()
         ContactPage()
         UserPage()
       }

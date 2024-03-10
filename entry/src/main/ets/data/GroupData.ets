@@ -1,3 +1,5 @@
+import { MsgBean } from './MsgBean'
+
 export class GroupBean {
   gid: string = ''
   groupname: string = ''
@@ -14,5 +16,13 @@ export class GroupBean {
   total: number = 0
   role: number = 0 //1 群主2 管理员 3 成员
   is_owner: boolean = false
+}
+
+export class GroupDetails {
+  group: GroupBean | null = null
+  is_owner: boolean = false
+  noticeBean: string | null = null
+  manager_uid: string = ''
+  supervise_uid: Array<string> = [] //管理员
 }
 

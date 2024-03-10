@@ -29,6 +29,26 @@ export default class MsgTable {
     })
   }
 
+  getTopByListId(listId: string): Promise<MsgBean> {
+    return new Promise((resolve: Function, reject: Function) => {
+      let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+      predicates.equalTo("listId", listId)
+      predicates.limitAs(1)
+      this.msgTable.queryAsync(predicates).then((value) => {
+        let count = value.rowCount
+        if (count == 0) {
+          reject("empty")
+        } else {
+          value.goToFirstRow()
+          let msg = this.parseMsgBean(value)
+          resolve(msg)
+        }
+      }).catch(() => {
+        reject("empty")
+      })
+    })
+  }
+
   deleteFromMid() {
 
   }
@@ -45,6 +65,33 @@ export default class MsgTable {
     this.msgTable.deleteData(predicates, callback)
   }
 
+  parseMsgBean(value: relationalStore.ResultSet): MsgBean {
+    let msg = new MsgBean()
+    msg.from_name_ios = value.getString(value.getColumnIndex('name_from_ios'))
+    msg.listId = value.getString(value.getColumnIndex('listId'))
+    msg.mid = value.getString(value.getColumnIndex('mid'))
+    msg.from = value.getString(value.getColumnIndex('id_from'))
+    msg.sub_type = value.getString(value.getColumnIndex('sub_type'))
+    msg.content_type = value.getString(value.getColumnIndex('content_type'))
+    msg.type = value.getString(value.getColumnIndex('chat_type'))
+    msg.remark = value.getString(value.getColumnIndex('remark'))
+    msg.from_avatar = value.getString(value.getColumnIndex('avatar_from'))
+    msg.from_name = value.getString(value.getColumnIndex('name_from'))
+    msg.to = value.getString(value.getColumnIndex('chat_to'))
+    msg.quote = value.getString(value.getColumnIndex('quote'))
+    msg.to_avatar = value.getString(value.getColumnIndex('avatar_to'))
+    msg.to_name = value.getString(value.getColumnIndex('name_to'))
+    msg.from_name_remark = value.getString(value.getColumnIndex('name_from_remark'))
+    msg.sendId = value.getString(value.getColumnIndex('sendId'))
+    msg.verifyStatus = value.getString(value.getColumnIndex('verifyStatus'))
+    msg.timestamp = value.getLong(value.getColumnIndex('timestamp'))
+    msg.msgStatus = value.getLong(value.getColumnIndex('msgStatus'))
+    msg.content = value.getString(value.getColumnIndex('content'))
+    msg.isRead = value.getLong(value.getColumnIndex('isRead'))
+    msg.role = value.getLong(value.getColumnIndex('role'))
+    return msg
+  }
+
   getChatListByKey(listId: string): Promise<Array<MsgBean>> {
     return new Promise(async (resolve: Function, reject: Function) => {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
@@ -58,30 +105,9 @@ export default class MsgTable {
           value.goToFirstRow()
           const result: MsgBean[] = []
           for (let index = 0; index < count; index++) {
-            let msg = new MsgBean()
-            msg.from_name_ios = value.getString(value.getColumnIndex('name_from_ios'))
-            msg.listId = value.getString(value.getColumnIndex('listId'))
-            msg.mid = value.getString(value.getColumnIndex('mid'))
-            msg.from = value.getString(value.getColumnIndex('id_from'))
-            msg.sub_type = value.getString(value.getColumnIndex('sub_type'))
-            msg.content_type = value.getString(value.getColumnIndex('content_type'))
-            msg.type = value.getString(value.getColumnIndex('chat_type'))
-            msg.remark = value.getString(value.getColumnIndex('remark'))
-            msg.from_avatar = value.getString(value.getColumnIndex('avatar_from'))
-            msg.from_name = value.getString(value.getColumnIndex('name_from'))
-            msg.to = value.getString(value.getColumnIndex('chat_to'))
-            msg.quote = value.getString(value.getColumnIndex('quote'))
-            msg.to_avatar = value.getString(value.getColumnIndex('avatar_to'))
-            msg.to_name = value.getString(value.getColumnIndex('name_to'))
-            msg.from_name_remark = value.getString(value.getColumnIndex('name_from_remark'))
-            msg.sendId = value.getString(value.getColumnIndex('sendId'))
-            msg.verifyStatus = value.getString(value.getColumnIndex('verifyStatus'))
-            msg.timestamp = value.getLong(value.getColumnIndex('timestamp'))
-            msg.msgStatus = value.getLong(value.getColumnIndex('msgStatus'))
-            msg.content = value.getString(value.getColumnIndex('content'))
-            msg.isRead = value.getLong(value.getColumnIndex('isRead'))
-            msg.role = value.getLong(value.getColumnIndex('role'))
+            let msg = this.parseMsgBean(value)
             result.push(msg)
+            value.goToNextRow()
           }
           resolve(result)
         }

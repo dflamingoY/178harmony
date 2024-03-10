@@ -27,8 +27,28 @@ export class MsgBean {
 }
 
 export class RecentBean {
-
-
-
-
+  avatar: string = ''
+  content: string = ''
+  id_from: string = ''
+  sub_type: string = ''
+  timestamp: number = 0
+  content_type: string = ''
+  unread_count: number = 0
+  chat_type: string = '' //friend group
+  name: string = ''
+  chatId: string = ''
+  remark: string = ''
+  is_top: number = 0
+  is_disturb: number = 0
+  mid: string = ''
+  topTime: number = 0
+  isRemind: number = 0
+  draft: string = ''
+  isOnline: number = 0
+  fromUserName: string = ''
+  isReadAudio: number = 0
+  readMid: string = ''
+  updateTime: number = 0
+  listId: string = ''
+  role: number = 0
 }

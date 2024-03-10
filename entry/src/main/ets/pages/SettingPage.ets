@@ -12,7 +12,7 @@ export struct SettingPage {
           .fontColor(0x333333)
           .textAlign(TextAlign.Center)
           .fontWeight(FontWeight.Bold)
-          .fontSize('20fp')
+          .fontSize('17fp')
           .width('100%')
 
         Image($r('app.media.icon_back'))
