@@ -6,8 +6,8 @@ import { UserBean } from '../data/user'
 import Dao from '../db/Dao'
 import UserViewModel from '../pages/UserViewModel'
 import CommonUtil from '../utils/CommonUtil'
+import IColors from '../utils/IColors'
 import IConstant from '../utils/IConstant'
-import LogUtil from '../utils/LogUtil'
 
 @Entry
 @Component
@@ -21,12 +21,15 @@ export struct P2PPage {
   @State userInfo: UserBean | null = null
   private groupInfo: GroupBean | null = null
   @State currentTime: number = 0
+  @State ownerId: string | null = null //群主id
+  @State managerUids: Array<string> | null = null //管理员数组
 
   build() {
     Stack({ alignContent: Alignment.Top }) {
       Image($r('app.media.icon_chat_bg'))
         .height('48vp')
         .width('100%')
+        .backgroundColor(Color.Black)
         .objectFit(ImageFit.Cover)
       Flex({ direction: FlexDirection.Column }) {
         Stack({ alignContent: Alignment.Start }) {
@@ -87,13 +90,11 @@ export struct P2PPage {
                 this.buildMsgItem(item)
               }
             })
-          }
+          }.height('100%')
         }.onRefreshing(() => {
           this.isRefreshing = true
-        }).height('100%').backgroundColor(Color.Gray)
-
-
-
+        })
+        .height('100%')
 
       }
     }
@@ -102,9 +103,67 @@ export struct P2PPage {
 
   @Builder
   private buildMsgItem(item: MsgBean) {
-      Column(){
+    Column() {
+      Text(CommonUtil.parseTime(this.currentTime - item.timestamp, item.timestamp))
+        .fontSize(IColors.color999)
+        .fontSize('12fp').margin({ top: '8vp' })
+      if (item.content_type == "notice" || item.sub_type == "notice") {
+        Text(item.content).fontSize('12fp')
+          .fontColor(IColors.color999)
+          .margin({ top: '12vp', bottom: '12vp' })
+      } else {
+        Flex({ direction: FlexDirection.Row }) {
+          if (item.from != globalThis.uid) { //自己发的消息
+            Image(item.from_avatar)
+              .height('37vp')
+              .width('37vp')
+              .borderRadius('18.5vp')
+              .margin({ left: '12vp', top: '12vp' })
+          }
+          Column() {
+            if (this.type == IConstant.GROUP) {
 
+            } else {
+              Divider().color(Color.White).height('30vp')
+            }
+            Column() {
+              if (item.content_type == "img") {
+
+              }
+              else if (item.content_type == "voice") {
+
+              } else if (item.content_type == "video") {
+
+              } else if (item.content_type == "file") {
+
+              } else if (item.content_type == 'call' || item.content_type == 'VOICE_CALL') {
+
+              } else { //所有未处理的类型默认为txt文本
+                Text(item.content)
+                  .fontSize('14fp')
+                  .padding({ left: '8vp', top: '10vp', right: '8vp', bottom: '10vp' })
+                  .fontColor(item.from == globalThis.uid ? Color.White : IColors.color1R1E20)
+                  .borderRadius('5vp')
+                  .backgroundColor(item.from == globalThis.uid ? IColors.color1R1E20 : Color.White)
+              }
+            }.width('80%')
+            .alignItems(item.from == globalThis.uid ? HorizontalAlign.End : HorizontalAlign.Start)
+          }
+          .margin({ top: '12vp' })
+          .width('100%')
+          // .alignItems(HorizontalAlign.End)
+          .alignItems(item.from == globalThis.uid ? HorizontalAlign.End : HorizontalAlign.Start)
+
+          if (item.from == globalThis.uid) {
+            Image(item.from_avatar)
+              .height('37vp')
+              .width('37vp')
+              .borderRadius('18.5vp')
+              .margin({ right: '12vp', top: '12vp' })
+          }
+        }.width('100%')
       }
+    }.justifyContent(FlexAlign.Center).width('100%')
   }
 
   aboutToAppear() {
@@ -112,6 +171,9 @@ export struct P2PPage {
     let type = params.type as unknown as string
     let id = params.id
     this.type = type
+    systemDateTime.getCurrentTime(false).then((time: number) => {
+      this.currentTime = time
+    })
     Dao.getRdbModel()?.getMsgByChatId(`${type + id}`, 20).then((msg) => {
       msg.forEach((item) => {
         this.msgList.push(item)
@@ -129,8 +191,6 @@ export struct P2PPage {
         this.name = group.group.groupname
       })
     }
-    systemDateTime.getCurrentTime(false).then((time: number) => {
-      this.currentTime = time
-    })
+
   }
 }

@@ -1,5 +1,5 @@
 export class UserBean {
-  uid: number = 0
+  uid: string = ''
   phone: string = ''
   username: string = ''
   nickname: string = ''

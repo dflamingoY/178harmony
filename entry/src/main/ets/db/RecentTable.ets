@@ -20,6 +20,12 @@ export default class RecentTable {
     this.recent.insertData(generatorBucket(msg), callback)
   }
 
+  async update(recentBean: RecentBean, callback: Function) {
+    let predicates = new relationalStore.RdbPredicates(SqlConstant.RECENT_TABLE.tableName)
+    let data = generatorBucket(recentBean)
+    this.recent.updateData(predicates, data, callback)
+  }
+
   //获取需要更新的最新聊天列表
   getNeedUpdateRecentList(array: Array<string>): Promise<Array<RecentBean>> {
     return new Promise((resolve: Function, reject: Function) => {

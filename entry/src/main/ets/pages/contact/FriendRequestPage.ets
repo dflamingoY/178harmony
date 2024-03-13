@@ -105,7 +105,7 @@ export struct FriendRequestPage {
             .margin({ top: '5vp' })
             .maxLines(1)
           Blank()
-          Text(CommonUtil.parseTime(item.timestamp, this.currentTime))
+          Text(CommonUtil.parseTime(this.currentTime - item.timestamp, item.timestamp))
             .fontSize('13fp')
             .fontColor(0xff666666)
             .textOverflow({ overflow: TextOverflow.Ellipsis })

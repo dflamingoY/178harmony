@@ -55,12 +55,31 @@ export class RdbModel {
       let set = new Set(result)
       this.recentTable.getNeedUpdateRecentList(Array.from(set))
         .then((recents) => {
-          LogUtil.d("Dao", 'RdbModel 查询到数据  ' + recents.length)
           recents.forEach((recent) => { //更新最新内容， 更新最新未读数
-            let find = offline.msg.find((item) => {
+            let find = offline.msg.reverse().find((item) => {
               return item.listId == recent.listId
+            }) //存在数据进行赋值
+            recent.timestamp = find.timestamp
+            recent.content = find.content
+            recent.content_type = find.content_type
+            recent.sub_type = find.sub_type
+            recent.chat_type = find.type
+            recent.timestamp = find.timestamp
+            recent.mid = find.mid
+            if (find.from == globalThis.uid || find.type == IConstant.GROUP) {
+              recent.name = find.to_name
+              recent.avatar = find.to_avatar
+              recent.chatId = find.to.toString()
+            } else {
+              recent.name = find.from_name_ios
+              recent.avatar = find.from_avatar
+              recent.chatId = find.from.toString()
+            }
+            // recent.unread_count = recent.unread_count + offline.msg.filter((item) => {
+            //   return item.listId == recent.listId && item.from != globalThis.uid
+            // }).length
+            this.recentTable.update(recent, () => {
             })
-
             set.delete(recent.listId)
           })
           //没有最近聊天记录的进行赋值

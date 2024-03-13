@@ -23,15 +23,13 @@ class CommonUtil {
   }
 
   //格式化聊天列表展示时间规则
-  parseTime(time: number, currentTime: number) {
-    LogUtil.d("West", `time: ${time}  current: ${currentTime}`)
-    let dTime = currentTime - time
+  parseTime(dTime: number, time: number) {
     if (dTime < 60) {
       return "刚刚";
-    } else if (time < 3600) {
-      return (time / 60) + "分钟前";
-    } else if (time < 86400) {
-      return (time / 3600) + "小时前在线";
+    } else if (dTime < 3600) {
+      return (dTime / 60) + "分钟前";
+    } else if (dTime < 86400) {
+      return (dTime / 3600) + "小时前在线";
     } else {
       let datefmt = new Intl.DateTimeFormat();
       let result = datefmt.format(time * 1000)

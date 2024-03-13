@@ -4,7 +4,7 @@ export default class SqlConstant {
   static readonly FRIEND_TABLE: TableInfo = {
     tableName: "friend",
     sqlCreate: 'CREATE TABLE IF NOT EXISTS friend(id INTEGER PRIMARY KEY AUTOINCREMENT,' +
-    'uid INTEGER unique, ' +
+    'uid TEXT unique, ' +
     'phone TEXT,' +
     'username TEXT,' +
     'nickname TEXT,' +

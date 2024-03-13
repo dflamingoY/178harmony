@@ -44,7 +44,7 @@ export default class FriendTable {
           const result: UserBean[] = []
           for (let index = 0; index < count; index++) {
             var user = new UserBean()
-            user.uid = value.getLong(value.getColumnIndex('uid'))
+            user.uid = value.getString(value.getColumnIndex('uid'))
             user.phone = value.getString(value.getColumnIndex('phone'))
             user.username = value.getString(value.getColumnIndex('username'))
             user.nickname = value.getString(value.getColumnIndex('nickname'))

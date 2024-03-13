@@ -134,7 +134,7 @@ export struct ChatPage {
         Blank()
 
         Column() {
-          Text(CommonUtil.parseTime(item.timestamp, this.currentTime))
+          Text(CommonUtil.parseTime(this.currentTime - item.timestamp, item.timestamp))
             .fontSize('13fp')
             .fontColor(0xff999999)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
