@@ -10,13 +10,13 @@ class CommonUtil {
     if (time < 60) {
       return "刚刚在线";
     } else if (time < 3600) {
-      return (time / 60) + "分钟前在线";
+      return Math.floor(time / 60) + "分钟前在线";
     } else if (time < 86400) {
-      return (time / 3600) + "小时前在线";
+      return Math.floor(time / 3600) + "小时前在线";
     } else if (time < 86400 * 7) {
-      return (time / 86400) + "天前在线";
+      return Math.floor(time / 86400) + "天前在线";
     } else if (time < 30 * 86400) {
-      return (time / (86400 * 7)) + "周前在线";
+      return Math.floor(time / (86400 * 7)) + "周前在线";
     } else {
       return "一个月前在线";
     }
@@ -27,9 +27,10 @@ class CommonUtil {
     if (dTime < 60) {
       return "刚刚";
     } else if (dTime < 3600) {
-      return (dTime / 60) + "分钟前";
+      Math.floor(dTime / 60)
+      return Math.floor(dTime / 60) + "分钟前";
     } else if (dTime < 86400) {
-      return (dTime / 3600) + "小时前在线";
+      return Math.floor(dTime / 3600).valueOf() + "小时前在线";
     } else {
       let datefmt = new Intl.DateTimeFormat();
       let result = datefmt.format(time * 1000)

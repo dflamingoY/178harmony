@@ -5,6 +5,7 @@ import { RecentBean } from '../data/MsgBean'
 import CommonUtil from '../utils/CommonUtil'
 import UserViewModel from './UserViewModel'
 import promptAction from '@ohos.promptAction'
+import IConstant from '../utils/IConstant'
 
 @Entry
 @Component
@@ -86,6 +87,7 @@ export struct ChatPage {
             Image(item.avatar)
               .width('49vp')
               .height('49vp')
+              .alt(item.chat_type == IConstant.GROUP ? $r('app.media.icon_default_group_avatar') : $r('app.media.icon_default_avatar'))
               .borderRadius('24.5vp')
           }.alignRules({
             top: { anchor: "__container__", align: VerticalAlign.Top },
@@ -173,15 +175,18 @@ export struct ChatPage {
   }
 
   aboutToAppear() {
-    UserViewModel.getRecentList()?.then((recents) => {
-      if (recents != null && recents.length > 0) {
-        this.recentList = recents
-      } else {
+    try {
+      UserViewModel.getRecentList()?.then((recents) => {
+        if (recents != null && recents.length > 0) {
+          this.recentList = recents
+        } else {
+          this.recentList = []
+        }
+      }).catch(() => {
         this.recentList = []
-      }
-    }).catch(() => {
-      this.recentList = []
-    })
+      })
+    } catch (e) {
+    }
 
     systemDateTime.getCurrentTime(false).then((time: number) => {
       this.currentTime = time / 1000

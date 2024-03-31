@@ -1,9 +1,7 @@
 import router from '@ohos.router'
 import { UserBean } from '../data/user'
 import Dao from '../db/Dao'
-import { isLogin } from '../login/LoginPlugin'
-import { initWs } from '../net/Socket'
-import LogUtil from '../utils/LogUtil'
+import SocketTask from '../net/SocketTask'
 import PreferenceModel from '../utils/PreferenceModel'
 import UserViewModel from './UserViewModel'
 
@@ -24,13 +22,14 @@ struct StartUp {
   }
 
   onPageShow() {
-    // initWs()
+    // SocketTask.createWs()
     PreferenceModel.getString("user", null).then((value?: string) => {
       // LogUtil.d("West", '获取到缓存数据：' + value)
       if (value != null) {
         let user: UserBean = JSON.parse(value)
         globalThis.token = user.token
         globalThis.uid = user.uid
+        globalThis.user = user
       }
       Dao.getRdbModel()
       UserViewModel.getOffline()

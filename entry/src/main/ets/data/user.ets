@@ -16,4 +16,5 @@ export class UserBean {
   token: string = ''
   remark: string = ''
   operation: string = '' //'not_operated','refuse','agree' 未操作,拒绝,同意
+  is_friend: boolean = false //是否是好友
 }

@@ -2,9 +2,10 @@ import http from '@ohos.net.http'
 import { BaseResp } from '../data/Data'
 import LogUtil from '../utils/LogUtil'
 import PreferenceModel from '../utils/PreferenceModel'
+import HttpIp from './HttpIP'
 
 export function getData(uri: string): Promise<BaseResp> {
-  let request = http.createHttp().request(PORT + uri, {
+  let request = http.createHttp().request(HttpIp.PORT + uri, {
     method: http.RequestMethod.GET,
     header: {
       "clientType": "android",
@@ -43,7 +44,7 @@ export function getData(uri: string): Promise<BaseResp> {
 }
 
 export function post(uri: String, params: Object): Promise<BaseResp> {
-  let request = http.createHttp().request(PORT + uri, {
+  let request = http.createHttp().request(HttpIp.PORT + uri, {
     method: http.RequestMethod.POST,
     extraData: params,
     header: {
@@ -80,5 +81,3 @@ export function post(uri: String, params: Object): Promise<BaseResp> {
     return resp
   })
 }
-
-const PORT = "https://api.gqj.live/v2/"

@@ -1,4 +1,3 @@
-import hilog from '@ohos.hilog'
 import { MatchBean, MatchDayEntity } from '../../data/Data'
 
 export default class MatchModel {

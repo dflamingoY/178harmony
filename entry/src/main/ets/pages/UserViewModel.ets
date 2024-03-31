@@ -1,11 +1,11 @@
 import { BaseResp } from '../data/Data'
 import { FriendKeyData } from '../data/FriendKeyData'
 import { GroupBean, GroupDetails } from '../data/GroupData'
-import { RecentBean } from '../data/MsgBean'
+import { MsgBean, RecentBean } from '../data/MsgBean'
 import { OffLineData } from '../data/OffLineData'
 import { UserBean } from '../data/user'
 import Dao from '../db/Dao'
-import { getData } from '../net/HttpUtils'
+import { getData, post } from '../net/HttpUtils'
 import LogUtil from '../utils/LogUtil'
 
 class UserViewModel {
@@ -82,7 +82,7 @@ class UserViewModel {
         if (resp.code == 200) {
           resolve(resp.data)
         } else {
-          reject(resp.msg)
+          reject(resp.code)
         }
       }).catch((err: Error) => {
         reject(err.message)
@@ -128,11 +128,30 @@ class UserViewModel {
         if (resp.code == 200) {
           resolve(resp.data)
         } else {
-          reject(resp.msg)
+          reject(resp.code)
         }
       }).catch((err) => {
         reject(err.message)
       })
+    })
+  }
+
+  /*
+  发送消息
+   */
+  async sendMsg(to: string, type: string, content_type: string, content: string, remark: string, verify: string) {
+    let msg = {
+      "to": to,
+      'type': type,
+      'content_type': content_type,
+      'content': content,
+      'remark': remark,
+      'verify': verify
+    }
+    post("send", msg).then((MsgBean) => {
+
+    }).catch(() => {
+
     })
   }
 }

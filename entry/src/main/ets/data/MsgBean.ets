@@ -1,5 +1,5 @@
 export class MsgBean {
-  from_name_ios: string = ''
+  from_name_ios: string = '' //用户备注
   listId: string = ''
   mid: string = ''
   from: string = ''
@@ -14,7 +14,7 @@ export class MsgBean {
   to_avatar: string = ''
   to_name: string = ''
   groupName: string = ''
-  from_name_remark: string = ''
+  from_name_remark: string = '' //用户在群里的备注
   sendId: string = ''
   verifyStatus: string = ''
   role: number = 0
@@ -24,6 +24,7 @@ export class MsgBean {
   identity: number = 0
   content: string = ''
   isRead: number = 0
+  isPlay: boolean = false //是否正在播放
 }
 
 export class RecentBean {

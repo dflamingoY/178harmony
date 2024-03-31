@@ -3,59 +3,72 @@ import { getBasketState } from '../../utils/BallUtils'
 import MatchModel from './MatchModel'
 import router from '@ohos.router'
 import promptAction from '@ohos.promptAction'
+import IColors from '../../utils/IColors'
 
 @Component
 export struct MatchChildPage {
   index: number
   @Link data: MatchModel
+  @Link isRefresh: boolean
 
   build() {
     Column() {
       if (this.data.getShowList(this.index)?.length > 0) {
-        List({}) {
-          ForEach(this.data.getShowList(this.index), (item: MatchDayEntity) => {
-            ListItem() {
-              Column() {
-                Text(`${item.date}`)
-                  .height('40vp')
-                  .width('100%')
-                  .textAlign(TextAlign.Start)
-                  .fontSize('12fp')
-                  .fontColor(0x666666)
-                  .backgroundColor(0xf6f6f6)
-                  .padding({ left: '10vp' })
-                if (item.list == null || item.list.length == 0 || item.list.length == undefined) {
-                  Text('暂无直播')
-                    .height('37vp')
+        Refresh({ refreshing: $$this.isRefresh, offset: 120, friction: 100 }) {
+          List({}) {
+            ForEach(this.data.getShowList(this.index), (item: MatchDayEntity) => {
+              ListItem() {
+                Column() {
+                  Text(`${item.date}`)
+                    .height('40vp')
                     .width('100%')
                     .textAlign(TextAlign.Start)
                     .fontSize('12fp')
-                    .fontColor(0x999999)
+                    .fontColor(0x666666)
+                    .backgroundColor(0xf6f6f6)
                     .padding({ left: '10vp' })
+                  if (item.list == null || item.list.length == 0 || item.list.length == undefined) {
+                    Text('暂无直播')
+                      .height('37vp')
+                      .width('100%')
+                      .textAlign(TextAlign.Start)
+                      .fontSize('12fp')
+                      .fontColor(0x999999)
+                      .padding({ left: '10vp' })
+                  }
                 }
-              }
-            }.backgroundColor(0xF3F3F5)
+              }.backgroundColor(0xF3F3F5)
 
-            ForEach(item.list, (value: MatchBean) => {
-              ListItem() {
-                this.buildListItem(value)
-              }.backgroundColor(Color.White)
+              ForEach(item.list, (value: MatchBean) => {
+                ListItem() {
+                  this.buildListItem(value)
+                }.backgroundColor(Color.White)
+              })
+              ForEach(item.list, (value: MatchBean) => {
+              }, (value: MatchBean) => {
+                return JSON.stringify(value)
+              })
+            }, (item: MatchDayEntity) => {
+              return JSON.stringify(item)
             })
-            ForEach(item.list, (value: MatchBean) => {
-            }, (value: MatchBean) => {
-              return JSON.stringify(value)
-            })
-          }, (item: MatchDayEntity) => {
-            return JSON.stringify(item)
-          })
-        }.width('100%').height('100%')
+          }.width('100%').height('100%')
+        }.onRefreshing(() => {
+          if (!this.isRefresh) {
+            this.isRefresh = true
+          }
+        })
       } else {
-        Text(`数据加载中`)
-          .width('100%')
-          .height('100%')
-          .textAlign(TextAlign.Center)
-          .fontSize('20fp')
-          .fontColor(Color.Black)
+        Column() {
+          LoadingProgress()
+            .width('50vp')
+            .color(Color.Red)
+            .height('50vp')
+            .backgroundColor(Color.White)
+            .borderRadius('10vp')
+        }.width('100%')
+        .justifyContent(FlexAlign.Center)
+        .backgroundColor(IColors.colorF3F3F5)
+        .height('100%')
       }
     }.width('100%')
     .height('100%')
@@ -126,13 +139,12 @@ export struct MatchChildPage {
         this.buildPlayerUser(null, null, null)
       } else {
         Scroll() {
-          Row() {
+          List() {
             ForEach(item.anchor, (anchor: TvUser) => {
               this.buildPlayerUser(anchor, item.tournament_id, item.tournament_type)
             })
-          }
+          }.listDirection(Axis.Horizontal)
           .height('100%')
-          .justifyContent(FlexAlign.Start)
           .width('100%')
         }
         .scrollable(ScrollDirection.Horizontal)
@@ -154,6 +166,8 @@ export struct MatchChildPage {
         .borderRadius('10vp')
       Text(item ? item.username : '暂无主播')
         .margin({ top: '5vp' })
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .maxLines(1)
         .fontSize('13fp')
         .fontColor(0x5B5E68)
     }.height('100%').width('18%').onClick(() => {
