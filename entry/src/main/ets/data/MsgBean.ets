@@ -25,6 +25,7 @@ export class MsgBean {
   content: string = ''
   isRead: number = 0
   isPlay: boolean = false //是否正在播放
+  nickname: string = ''
 }
 
 export class RecentBean {

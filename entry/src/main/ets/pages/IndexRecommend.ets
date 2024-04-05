@@ -177,7 +177,37 @@ export struct IndexRecommend {
                           .alt($r('app.media.icon_news_default'))
                           .height(`${this.matchHeight}px`)
                           .width(`${this.matchWidth - display.getDefaultDisplaySync().densityPixels * 6}px`)
-                      }
+
+                        Row() {
+                          Image(item.face)
+                            .alt($r('app.media.icon_default_avatar'))
+                            .width('15vp')
+                            .height('15vp')
+                            .margin({ left: '8vp' })
+                            .borderRadius('7.5vp')
+
+                          Text(item.username??item.nickname)
+                            .fontSize(12)
+                            .fontColor(Color.White)
+                            .margin({ left: '5vp' })
+                          Blank()
+
+                          Image($r('app.media.icon_live_count_user'))
+                            .width('10vp')
+                            .height('14vp')
+
+                          Text(`${item.viewer}`)
+                            .fontColor(Color.White)
+                            .margin({ left: '5vp' })
+                            .margin({ right: '8vp' })
+                            .fontSize('12vp')
+
+                        }.width(`${this.matchWidth - display.getDefaultDisplaySync().densityPixels * 6}px`)
+                        .height('30vp')
+                        .alignItems(VerticalAlign.Center)
+                        .backgroundColor(0xb3000000)
+
+                      }.alignContent(Alignment.Bottom)
 
                       Text(`${item.league_name_zh} ${item.home_team_zh} VS ${item.away_team_zh}`)
                         .textAlign(TextAlign.Start)

@@ -44,10 +44,6 @@ export struct MatchChildPage {
                   this.buildListItem(value)
                 }.backgroundColor(Color.White)
               })
-              ForEach(item.list, (value: MatchBean) => {
-              }, (value: MatchBean) => {
-                return JSON.stringify(value)
-              })
             }, (item: MatchDayEntity) => {
               return JSON.stringify(item)
             })
@@ -163,6 +159,7 @@ export struct MatchChildPage {
         .height('20vp')
         .alt($r('app.media.icon_default_avatar'))
         .margin({ top: '5vp' })
+
         .borderRadius('10vp')
       Text(item ? item.username : '暂无主播')
         .margin({ top: '5vp' })
@@ -185,6 +182,6 @@ export struct MatchChildPage {
   }
 
   aboutToAppear() {
-    this.data.getShowList(0)
+
   }
 }

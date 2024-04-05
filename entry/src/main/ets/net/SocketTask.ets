@@ -1,4 +1,6 @@
 import webSocket from '@ohos.net.webSocket';
+import emitter from '@ohos.events.emitter';
+import { SocketData } from '../data/SocketData';
 import LogUtil from '../utils/LogUtil';
 import HttpIp from './HttpIP';
 
@@ -86,7 +88,20 @@ class SocketTask {
   }
 
   private parseWs(value: string | ArrayBuffer) {
-    var respData = JSON.parse(value.toString())
+    var respData: SocketData = JSON.parse(value.toString())
+    switch (respData.event) {
+      case "pushMatch": //match_type   match_id on_time away_score home_score
+        let eventData = {
+          data: {
+            "data": respData.data
+          } }
+        let innerEvent = {
+          eventId: 1,
+          priority: emitter.EventPriority.IMMEDIATE
+        };
+        emitter.emit(innerEvent, eventData)
+        break;
+    }
     LogUtil.d("Socket", "message:" + value + "  " + respData)
 
   }

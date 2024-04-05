@@ -18,6 +18,7 @@ export class LiveDetailBean {
   uid: string = '';
   nickname: string = '';
   is_friend: number = 0;
+  room_id: string = ''
 }
 
 export class TvUser {

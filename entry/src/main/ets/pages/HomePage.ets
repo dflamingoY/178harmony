@@ -5,6 +5,7 @@ import { UserPage } from './UserPage';
 import { NewsPage } from './NewsPage';
 import { HomeTabBar } from './HomeTabBar';
 import { ContactPage } from './ContactPage';
+import router from '@ohos.router';
 
 @Entry
 @Component
@@ -30,10 +31,12 @@ struct HomePage {
       .onChange((index) => {
         this.currentIndex = index
       })
-
       HomeTabBar({ index: $currentIndex, unreadCount: $unreadCount })
-
     }.height('100%').width('100%')
 
+  }
+
+  aboutToAppear() {
+    router.clear()
   }
 }

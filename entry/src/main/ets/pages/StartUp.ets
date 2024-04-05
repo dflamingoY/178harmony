@@ -22,7 +22,7 @@ struct StartUp {
   }
 
   onPageShow() {
-    // SocketTask.createWs()
+    SocketTask.createWs()
     PreferenceModel.getString("user", null).then((value?: string) => {
       // LogUtil.d("West", '获取到缓存数据：' + value)
       if (value != null) {
@@ -34,11 +34,11 @@ struct StartUp {
       Dao.getRdbModel()
       UserViewModel.getOffline()
       setTimeout(() => {
-        router.replaceUrl({ url: 'pages/HomePage' });
+        router.pushUrl({ url: 'pages/HomePage' },);
       }, 1000)
     }).catch(() => {
       setTimeout(() => {
-        router.replaceUrl({ url: 'pages/HomePage' });
+        router.pushUrl({ url: 'pages/HomePage' });
       }, 1000)
     })
   }

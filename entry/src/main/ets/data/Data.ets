@@ -34,7 +34,7 @@ export class MatchBean {
   member_id: number = 0
   viewer: number = 0
   nickname: string = ''
-  state: number = 0  //1 直播中 0 未开始     电竞 1未开始 2 进行中 3完结 11 中断
+  state: number = 0 //1 直播中 0 未开始     电竞 1未开始 2 进行中 3完结 11 中断
   is_video: number = 0 //1video 0 live
   on_time: string = ''
   start_time: string = ''
@@ -50,6 +50,12 @@ export class TvUser {
   username: string = ''
   url: string = '' //播放地址
   face: string = '' //头像
+  room_user_num: number = 0
+  state: number = 0
+  tournament_id: number = 0
+  viewer: number = 0 //人气
+  cover: string = ''
+
 }
 
 export class MatchListData {

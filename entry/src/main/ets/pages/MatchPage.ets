@@ -1,4 +1,6 @@
+import emitter from '@ohos.events.emitter'
 import { MatchListData } from '../data/Data'
+import LogUtil from '../utils/LogUtil'
 import { MatchChildPage } from './match/MatchChildPage'
 import MatchModel from './match/MatchModel'
 import { MatchTopBar } from './match/MatchTopBar'
@@ -62,5 +64,19 @@ export struct MatchPage {
 
   aboutToAppear() {
     this.getData()
+    emitter.on(this.innerEvent, (event) => {
+      var emit: Array<any> = JSON.parse(event.data.data)
+      emit.forEach((value) => {
+        this.matchModel.update(value)
+      })
+    })
+  }
+
+  innerEvent = {
+    eventId: 1
+  }
+
+  aboutToDisappear() {
+    emitter.off(1)
   }
 }

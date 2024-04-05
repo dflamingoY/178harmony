@@ -9,7 +9,7 @@ import { LiveAnalysePage } from './LiveAnalysePage'
 import { LiveLeagueListPage } from './LiveLeagueListPage'
 import { LiveChatPage } from './LiveChatPage'
 import LogUtil from '../utils/LogUtil'
-import { LiveInfo } from '../data/LiveDetailData'
+import { LiveInfo, TvUser } from '../data/LiveDetailData'
 import { VideoController } from './VideoController'
 
 @Entry
@@ -21,6 +21,10 @@ export struct LiveContentPage {
   private xComponentController = new XComponentController();
   private videoController: VideoController = new VideoController()
   private surfaceID: string = '';
+  @State currentUser: TvUser | null = null
+  @State roomId: string = ''
+  @State ballType: number = 0
+  @State tournamentId: number = -1
 
   build() {
     Column() {
@@ -49,25 +53,21 @@ export struct LiveContentPage {
       LiveTabBar({ index: $index, unreadCount: $unreadCount })
 
       Swiper() {
-        ChatRoomPage()
-        LiveAnchorPage()
+        ChatRoomPage({ model: this.model, roomId: this.roomId })
+        LiveAnchorPage({ user: $currentUser })
         LiveOddPage()
-        LiveAnalysePage()
+        LiveAnalysePage({ type: this.ballType, tournamentId: this.tournamentId })
         LiveLeagueListPage()
         LiveChatPage()
       }
       .index(this.index)
       .indicator(false)
-      .loop(false)
+      .disableSwipe(true)
       .duration(50)
       .onChange((index) => {
         this.index = index
       })
-    }
-  }
-
-  onPageShow() {
-
+    }.height('100%').width('100%')
   }
 
   aboutToDisappear() {
@@ -76,11 +76,14 @@ export struct LiveContentPage {
 
   aboutToAppear() {
     let params = router.getParams() as Record<string, object>
-    var tournamentId = params.tournamentId as unknown as number
-    var type = params.type as unknown as number
+    this.tournamentId = params.tournamentId as unknown as number
+    this.ballType = params.type as unknown as number
     var memberId = params.memberId as unknown as number
-    this.model.getLiveInfo(tournamentId, type, memberId).then((value: LiveInfo) => {
-      LogUtil.d("West", "详情获取到 " + `${value}`)
+    this.model.getLiveInfo(this.tournamentId, this.ballType, memberId).then((value: LiveInfo) => {
+      this.currentUser = value.more.find((more) => {
+        return more.member_id == `${memberId}`
+      })
+      this.roomId = value.detail.room_id
       this.videoController.firstPlay(value.detail.screen_url_m3u8, this.surfaceID)
     })
   }
