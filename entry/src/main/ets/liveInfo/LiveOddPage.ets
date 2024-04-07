@@ -1,9 +1,11 @@
-
 @Component
-export  struct LiveOddPage{
+export struct LiveOddPage {
 
-  build(){
-    Row(){
+  type: number = 0
+  tournamentId: number = 0
+
+  build() {
+    Row() {
       Text("指数")
         .fontColor(Color.Black)
         .fontSize('17fp')
@@ -11,4 +13,7 @@ export  struct LiveOddPage{
     .width('100%')
   }
 
+  aboutToAppear() {
+
+  }
 }

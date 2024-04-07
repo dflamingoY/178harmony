@@ -22,7 +22,7 @@ export struct LiveTabBar {
         .onClick(() => {
           this.index = 1
         })
-      Text('指数').fontColor(this.index == 2 ? 0xFFB400 : 0x5B5E68)
+      /*Text('指数').fontColor(this.index == 2 ? 0xFFB400 : 0x5B5E68)
         .fontSize('15fp')
         .textAlign(TextAlign.Center)
         .width(`${100 / 6}%`)
@@ -35,15 +35,15 @@ export struct LiveTabBar {
         .width(`${100 / 6}%`)
         .onClick(() => {
           this.index = 3
-        })
-      Text('直播').fontColor(this.index == 4 ? 0xFFB400 : 0x5B5E68)
+        })*/
+      Text('直播').fontColor(this.index == 2 ? 0xFFB400 : 0x5B5E68)
         .fontSize('15fp')
         .width(`${100 / 6}%`)
         .textAlign(TextAlign.Center)
         .onClick(() => {
-          this.index = 4
+          this.index = 2
         })
-      Stack({ alignContent: Alignment.TopEnd }) {
+      /*Stack({ alignContent: Alignment.TopEnd }) {
         Badge({ count: this.unreadCount, maxCount: 99, style: {
           fontSize: '11fp', color: Color.White, badgeColor: Color.Red
         } }) {
@@ -59,7 +59,7 @@ export struct LiveTabBar {
       .width(`${100 / 6}%`)
       .onClick(() => {
         this.index = 5
-      })
+      })*/
 
     }.height('48vp').width('100%')
   }

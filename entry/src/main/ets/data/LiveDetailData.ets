@@ -19,6 +19,8 @@ export class LiveDetailBean {
   nickname: string = '';
   is_friend: number = 0;
   room_id: string = ''
+  home_team_zh: string = ''
+  away_team_zh: string = ''
 }
 
 export class TvUser {
@@ -28,4 +30,5 @@ export class TvUser {
   member_id: string = '';
   username: string = '';
   viewer: number = 0;
+  isPlay: Boolean = false
 }

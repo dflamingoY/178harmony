@@ -14,6 +14,7 @@
     "pages/contact/TagPage",
     "pages/contact/UserDetailsPage",
     "p2p/friend/FriendChatConfig",
-    "p2p/group/GroupDetails"
+    "p2p/group/GroupDetails",
+    "pages/other/WebPage"
   ]
 }

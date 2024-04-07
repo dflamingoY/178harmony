@@ -8,8 +8,7 @@ import { LiveOddPage } from './LiveOddPage'
 import { LiveAnalysePage } from './LiveAnalysePage'
 import { LiveLeagueListPage } from './LiveLeagueListPage'
 import { LiveChatPage } from './LiveChatPage'
-import LogUtil from '../utils/LogUtil'
-import { LiveInfo, TvUser } from '../data/LiveDetailData'
+import { LiveDetailBean, LiveInfo, TvUser } from '../data/LiveDetailData'
 import { VideoController } from './VideoController'
 
 @Entry
@@ -25,6 +24,8 @@ export struct LiveContentPage {
   @State roomId: string = ''
   @State ballType: number = 0
   @State tournamentId: number = -1
+  @State more: Array<TvUser> = []
+  @State liveDetails: LiveDetailBean = new LiveDetailBean()
 
   build() {
     Column() {
@@ -55,10 +56,10 @@ export struct LiveContentPage {
       Swiper() {
         ChatRoomPage({ model: this.model, roomId: this.roomId })
         LiveAnchorPage({ user: $currentUser })
-        LiveOddPage()
-        LiveAnalysePage({ type: this.ballType, tournamentId: this.tournamentId })
-        LiveLeagueListPage()
-        LiveChatPage()
+        // LiveOddPage()
+        // LiveAnalysePage({ type: this.ballType, tournamentId: this.tournamentId })
+        LiveLeagueListPage({ list: $more, details: $liveDetails })
+        // LiveChatPage()
       }
       .index(this.index)
       .indicator(false)
@@ -80,11 +81,20 @@ export struct LiveContentPage {
     this.ballType = params.type as unknown as number
     var memberId = params.memberId as unknown as number
     this.model.getLiveInfo(this.tournamentId, this.ballType, memberId).then((value: LiveInfo) => {
-      this.currentUser = value.more.find((more) => {
-        return more.member_id == `${memberId}`
+      // this.currentUser = value.more.find((more) => {
+      //   return more.member_id == `${memberId}`
+      // })
+      value.more.forEach((item) => {
+        if (item.member_id == value.detail.member_id) {
+          item.isPlay = true
+          this.currentUser = item
+          return
+        }
       })
       this.roomId = value.detail.room_id
       this.videoController.firstPlay(value.detail.screen_url_m3u8, this.surfaceID)
+      this.more = value.more
+      this.liveDetails = value.detail
     })
   }
 }

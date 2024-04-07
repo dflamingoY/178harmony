@@ -18,9 +18,9 @@ struct HomePage {
     Flex({ direction: FlexDirection.Column }) {
       Swiper() {
         IndexRecommend()
-        ChatPage()
+        // ChatPage()
         MatchPage()
-        ContactPage()
+        // ContactPage()
         UserPage()
       }
       .index(this.currentIndex)

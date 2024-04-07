@@ -137,10 +137,10 @@ export struct IndexRecommend {
                         }.height(53)
                         .margin({ top: 27 })
                         .justifyContent(FlexAlign.SpaceBetween)
-
                       }
                       .height('100%')
                       .borderWidth('1vp')
+                      .backgroundColor(Color.White)
                       .margin({ left: '10vp' })
                       .borderColor(0xf6f6f6)
                       .width('155vp')
@@ -202,10 +202,12 @@ export struct IndexRecommend {
                             .margin({ right: '8vp' })
                             .fontSize('12vp')
 
-                        }.width(`${this.matchWidth - display.getDefaultDisplaySync().densityPixels * 6}px`)
+                        }
+                        .width(`${this.matchWidth - display.getDefaultDisplaySync().densityPixels * 6}px`)
                         .height('30vp')
                         .alignItems(VerticalAlign.Center)
                         .backgroundColor(0xb3000000)
+                        .borderRadius({ bottomLeft: '10vp', bottomRight: '10vp' })
 
                       }.alignContent(Alignment.Bottom)
 
