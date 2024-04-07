@@ -6,27 +6,39 @@ import HttpIp from '../../net/HttpIP'
 @Component
 export struct WebPage {
   controller: WebviewController = new webview.WebviewController()
-  @State type: number = 0
-  @State tournamentId: number = 0
+  @State url: string = ''
+  @State title: string = ''
 
   build() {
-    Scroll() {
-      Column() {
-        Web({ src: this.type == 1 ? HttpIp.HOST_H5_ANALYST + `Fenxi2?type=0&id=${this.tournamentId}`
-                                  : HttpIp.HOST_H5_ANALYST + `BasketballFenxi2?type=1&id=${this.tournamentId}`
-        , controller: this.controller })
-          .width('100%')
-          .javaScriptAccess(true)
-          .zoomAccess(false)
-          .height('100%')
-          .verticalScrollBarAccess(true)
-      }
-    }.height('100%')
+    Column() {
+      Stack({ alignContent: Alignment.Start }) {
+        Text(this.title)
+          .fontColor(Color.White)
+          .textAlign(TextAlign.Center)
+          .fontSize('17fp').width('100%')
+        Image($r('app.media.icon_black_back'))
+          .width('22vp')
+          .height('22vp')
+          .margin({ left: "15vp" }).onClick(() => {
+          router.back()
+        })
+      }.width('100%')
+      .height('50vp')
+
+      Web({ src: this.url, controller: this.controller })
+        .width('100%')
+        .javaScriptAccess(true)
+        .zoomAccess(false)
+        .height('100%')
+        .verticalScrollBarAccess(true)
+    }
+    .backgroundColor(Color.Black)
+    .height('100%')
   }
 
   aboutToAppear() {
     let params = router.getParams() as Record<string, object>
-    this.type = params.type as unknown as number
-    this.tournamentId = params.tournamentId as unknown as number
+    this.url = params.url as unknown as string
+    this.title = params.title as unknown as string
   }
 }

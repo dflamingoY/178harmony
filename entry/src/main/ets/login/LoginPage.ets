@@ -52,6 +52,7 @@ export struct LoginPage {
             TextInput({ placeholder: "请输入密码" })
               .fontColor(Color.White)
               .fontSize('22fp')
+              .showPasswordIcon(true)
               .placeholderColor(0x99ffffff)
               .type(InputType.Password)
               .enterKeyType(EnterKeyType.Done)
@@ -66,10 +67,15 @@ export struct LoginPage {
           .borderRadius('25vp')
 
           Row() {
-            Text("忘记密码")
+            Text("忘记密码?")
               .fontSize('12vp')
               .fontColor(Color.White)
               .align(Alignment.End)
+              .onClick(() => {
+                router.pushUrl({ url: 'login/ResetPwsPage' })
+              })
+              .margin({ right: '12vp' })
+
           }.justifyContent(FlexAlign.End).width('100%').margin({ top: "20vp", right: '20vp' })
 
           Button('登 陆', { type: ButtonType.Capsule })
@@ -80,26 +86,9 @@ export struct LoginPage {
             .backgroundColor(0xFED8BD)
             .fontColor(0x1E1E20)
             .onClick(() => {
-              if (this.account === '' || this.pwd === '') {
-                promptAction.showToast({ message: '请输入账号密码', duration: 1500 })
-                return
-              }
-              this.isLogin = true
-              this.model.login(this.account, this.pwd).then((value: UserBean) => {
-                PreferenceModel.putNormal("token", value.token)
-                PreferenceModel.putNormal("user", JSON.stringify(value))
-                globalThis.token = value.token
-                globalThis.uid = value.uid
-                router.back()
-              }).catch((err) => {
-                promptAction.showToast({
-                  message: err.toString(),
-                  duration: 1500
-                })
-                LogUtil.d("West", err.toString)
-                this.isLogin = false
-              })
+              this.login()
             })
+
           Text("注册")
             .fontSize('18vp')
             .fontColor(Color.White)
@@ -108,7 +97,7 @@ export struct LoginPage {
             .margin({ top: '10vp' })
             .height('50vp')
             .onClick(() => {
-              router.back()
+              router.pushUrl({ url: "login/SignPage" })
             })
 
           Blank()
@@ -116,8 +105,18 @@ export struct LoginPage {
           Text() {
             Span('登录代表您已阅读并同意').fontSize('12fp').fontColor(Color.White)
             Span('使用协议').fontSize('12fp').fontColor(0xFED8BD)
+              .onClick(() => {
+                router.pushUrl({ url: 'pages/other/WebPage', params: {
+                  title: '使用协议', url: 'https://www.baidu.com'
+                } })
+              })
             Span('和').fontSize('12fp').fontColor(Color.White)
             Span('隐私政策').fontSize('12fp').fontColor(0xFED8BD)
+              .onClick(() => {
+                router.pushUrl({ url: 'pages/other/WebPage', params: {
+                  title: '隐私政策', url: 'https://www.baidu.com'
+                } })
+              })
           }.margin({ bottom: '20vp' })
         }.align(Alignment.Center).height('100%')
       }
@@ -130,5 +129,27 @@ export struct LoginPage {
           .height('30vp')
       }
     }
+  }
+
+  login() {
+    if (this.account === '' || this.pwd === '') {
+      promptAction.showToast({ message: '请输入账号密码', duration: 1500 })
+      return
+    }
+    this.isLogin = true
+    this.model.login(this.account, this.pwd).then((value: UserBean) => {
+      PreferenceModel.putNormal("token", value.token)
+      PreferenceModel.putNormal("user", JSON.stringify(value))
+      globalThis.token = value.token
+      globalThis.uid = value.uid
+      router.back()
+    }).catch((err) => {
+      promptAction.showToast({
+        message: err.toString(),
+        duration: 1500
+      })
+      LogUtil.d("West", err.toString)
+      this.isLogin = false
+    })
   }
 }

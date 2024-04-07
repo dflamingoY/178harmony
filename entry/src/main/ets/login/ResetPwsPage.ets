@@ -1,20 +1,19 @@
 import router from '@ohos.router'
+import promptAction from '@ohos.promptAction'
 import IColors from '../utils/IColors'
 import UserViewModel from '../pages/UserViewModel'
 import { LoginStatuePage } from './LoginStatuePage'
-import CommonUtil from '../utils/CommonUtil'
 
 @Entry
 @Component
-export struct SignPage {
+export struct ResetPwsPage {
   @State account: string = ''
   @State optCode: string = ''
   @State pwd: string = ''
-  @State nickname: string = ''
-  @State timerCount: number = -1
+  @State confirmPwd: string = ''
   @State loading: boolean = false
+  @State timerCount: number = -1
   @State showSuccess: boolean = false
-  @State checkState: boolean = false
 
   build() {
     Stack({ alignContent: Alignment.TopStart }) {
@@ -37,44 +36,6 @@ export struct SignPage {
         .backgroundColor(0x40ffffff)
         .width('90%')
         .margin({ top: '51vp' })
-        .borderRadius('25vp')
-
-        Row() {
-          Image($r('app.media.icon_pwd')).width('25vp').height('25vp').margin({ left: "16vp" })
-          TextInput({ placeholder: "请输入6-16位字母或数字" })
-            .fontColor(Color.White)
-            .fontSize('22fp')
-            .showPasswordIcon(true)
-            .placeholderColor(0x99ffffff)
-            .type(InputType.Password)
-            .width('100%')
-            .enterKeyType(EnterKeyType.Next)
-            .onChange((value: string) => {
-              this.pwd = value
-            })
-        }
-        .height('52vp')
-        .backgroundColor(0x40ffffff)
-        .width('90%')
-        .margin({ top: '20vp' })
-        .borderRadius('25vp')
-
-        Row() {
-          Image($r('app.media.icon_pwd')).width('25vp').height('25vp').margin({ left: "16vp" })
-          TextInput({ placeholder: "请输入昵称" })
-            .fontColor(Color.White)
-            .fontSize('22fp')
-            .showPasswordIcon(true)
-            .placeholderColor(0x99ffffff)
-            .enterKeyType(EnterKeyType.Next)
-            .onChange((value: string) => {
-              this.nickname = value
-            })
-        }
-        .height('52vp')
-        .backgroundColor(0x40ffffff)
-        .width('90%')
-        .margin({ top: '30vp' })
         .borderRadius('25vp')
 
         Stack({ alignContent: Alignment.End }) {
@@ -110,29 +71,44 @@ export struct SignPage {
         .borderRadius('25vp')
 
         Row() {
-          Checkbox()
-            .select(false)
-            .selectedColor(IColors.colorOrange)
-            .onChange((statue) => {
-              this.checkState = statue
+          Image($r('app.media.icon_pwd')).width('25vp').height('25vp').margin({ left: "16vp" })
+          TextInput({ placeholder: "请输入密码" })
+            .fontColor(Color.White)
+            .fontSize('22fp')
+            .showPasswordIcon(true)
+            .placeholderColor(0x99ffffff)
+            .type(InputType.Password)
+            .enterKeyType(EnterKeyType.Done)
+            .onChange((value: string) => {
+              this.pwd = value
             })
+        }
+        .height('52vp')
+        .backgroundColor(0x40ffffff)
+        .width('90%')
+        .margin({ top: '30vp' })
+        .borderRadius('25vp')
 
-          Text() {
-            Span('同意')
-              .fontColor(Color.White)
-              .fontSize('13fp')
-            Span('《使用协议》')
-              .fontColor(IColors.colorOrange)
-              .fontSize('13fp')
-              .onClick(() => {
-                router.pushUrl({ url: 'pages/other/WebPage', params: {
-                  title: '使用协议', url: 'https://www.baidu.com'
-                } })
-              })
-          }.margin({ left: '12vp' })
-        }.width('90%').margin({ top: '30vp' })
+        Row() {
+          Image($r('app.media.icon_pwd')).width('25vp').height('25vp').margin({ left: "16vp" })
+          TextInput({ placeholder: "请再次确认密码" })
+            .fontColor(Color.White)
+            .fontSize('22fp')
+            .showPasswordIcon(true)
+            .placeholderColor(0x99ffffff)
+            .type(InputType.Password)
+            .enterKeyType(EnterKeyType.Done)
+            .onChange((value: string) => {
+              this.confirmPwd = value
+            })
+        }
+        .height('52vp')
+        .backgroundColor(0x40ffffff)
+        .width('90%')
+        .margin({ top: '30vp' })
+        .borderRadius('25vp')
 
-        Button('注册', { type: ButtonType.Capsule })
+        Button('登 陆', { type: ButtonType.Capsule })
           .fontSize('18vp')
           .width('90%')
           .height('50vp')
@@ -140,13 +116,13 @@ export struct SignPage {
           .backgroundColor(0xFED8BD)
           .fontColor(0x1E1E20)
           .onClick(() => {
-            this.register()
+            this.reset()
           })
       }
       .margin({ top: '100vp' })
 
       Stack({ alignContent: Alignment.Start }) {
-        Text('用户注册')
+        Text('重置密码')
           .fontColor(Color.White)
           .textAlign(TextAlign.Center)
           .fontSize('17fp').width('100%')
@@ -172,7 +148,7 @@ export struct SignPage {
         .height("100%")
       }
       if (this.showSuccess)
-        LoginStatuePage({ type: 1 })
+        LoginStatuePage({ type: 0 })
 
     }.width('100%')
     .height('100%')
@@ -194,50 +170,39 @@ export struct SignPage {
     this.timeoutID = setTimeout(funInter, 60_000);
   }
 
+  reset() {
+    if (this.account == "") {
+      promptAction.showToast({ message: '请输入手机号', duration: 500 })
+      return
+    }
+
+    if (this.pwd !== this.confirmPwd) {
+      promptAction.showToast({ message: '两次输入的密码不一致', duration: 500 })
+      return
+    }
+    this.loading = true
+    UserViewModel.resetPwd(this.account, this.pwd, this.optCode).then(() => {
+      this.loading = false
+      this.showSuccess = true
+    }).catch((err) => {
+      promptAction.showToast({ message: err, duration: 500 })
+      this.loading = false
+    })
+  }
+
   getOpt() {
     if (this.account == "") {
-      CommonUtil.showToast('请输入手机号')
+      promptAction.showToast({ message: '请输入手机号', duration: 500 })
       return
     }
     this.loading = true
     UserViewModel.getOptCode(this.account).then(() => {
       this.startTimer()
       this.loading = false
-      CommonUtil.showToast('发送成功')
+      promptAction.showToast({ message: '发送成功', duration: 500 })
     }).catch((err) => {
       this.loading = false
-      CommonUtil.showToast(err)
-    })
-  }
-
-  register() {
-    if (!this.checkState) {
-      CommonUtil.showToast('请先阅读并同意用户注册协议')
-      return
-    }
-    if (this.account == "") {
-      CommonUtil.showToast('请输入手机号')
-      return
-    }
-    if (this.nickname == '') {
-      CommonUtil.showToast('请输入昵称')
-      return
-    }
-    if (this.pwd == '') {
-      CommonUtil.showToast('请输入密码')
-      return
-    }
-    if (this.optCode == '') {
-      CommonUtil.showToast('请输入验证码')
-      return
-    }
-    this.loading = true
-    UserViewModel.register(this.account, this.optCode, this.nickname, this.pwd).then(() => {
-      this.loading = false
-      this.showSuccess = true
-    }).catch((err) => {
-      CommonUtil.showToast(err)
-      this.loading = false
+      promptAction.showToast({ message: err, duration: 500 })
     })
   }
 

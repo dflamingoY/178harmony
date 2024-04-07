@@ -15,6 +15,8 @@
     "pages/contact/UserDetailsPage",
     "p2p/friend/FriendChatConfig",
     "p2p/group/GroupDetails",
-    "pages/other/WebPage"
+    "pages/other/WebPage",
+    "login/ResetPwsPage",
+    "login/SignPage"
   ]
 }

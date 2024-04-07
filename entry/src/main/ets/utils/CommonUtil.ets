@@ -1,4 +1,5 @@
 import systemDateTime from '@ohos.systemDateTime';
+import promptAction from '@ohos.promptAction';
 import LogUtil from './LogUtil';
 
 class CommonUtil {
@@ -36,6 +37,10 @@ class CommonUtil {
       let result = datefmt.format(time * 1000)
       return result
     }
+  }
+
+  showToast(message: string) {
+    promptAction.showToast({ message: message, duration: 500 })
   }
 }
 

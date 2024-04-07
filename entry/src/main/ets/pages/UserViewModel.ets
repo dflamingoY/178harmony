@@ -1,7 +1,7 @@
 import { BaseResp } from '../data/Data'
 import { FriendKeyData } from '../data/FriendKeyData'
 import { GroupBean, GroupDetails } from '../data/GroupData'
-import { MsgBean, RecentBean } from '../data/MsgBean'
+import { RecentBean } from '../data/MsgBean'
 import { OffLineData } from '../data/OffLineData'
 import { UserBean } from '../data/user'
 import Dao from '../db/Dao'
@@ -152,6 +152,55 @@ class UserViewModel {
 
     }).catch(() => {
 
+    })
+  }
+
+  /*
+  获取验证码
+   */
+  getOptCode(phone: string): Promise<any> {
+    return new Promise((resolve: Function, reject: Function) => {
+      post("send_sms", { "phone": phone }).then((value) => {
+        if (value.code == 200) {
+          resolve(value.msg)
+        } else {
+          reject(value.msg)
+        }
+      }).catch((err: Error) => {
+        reject(err.message)
+      })
+    })
+  }
+
+  /*
+  重置登陆密码
+   */
+  resetPwd(phone: string, pwd: string, optCode: string): Promise<any> {
+    return new Promise((resolve: Function, reject: Function) => {
+      post("reset_password", { "phone": phone, "code": optCode, "password": pwd }).then((value) => {
+        if (value.code == 200) {
+          resolve(value.msg)
+        } else {
+          reject(value.msg)
+        }
+      }).catch((err: Error) => {
+        reject(err.message)
+      })
+    })
+  }
+
+  register(phone: string, optCode: string, nickname: string, pwd: string): Promise<any> {
+    return new Promise((resolve: Function, reject: Function) => {
+      post('register', { "phone": phone, "nickname": nickname, "password": pwd, "code": optCode })
+        .then((value) => {
+          if (value.code == 200) {
+            resolve(value.msg)
+          } else {
+            reject(value.msg)
+          }
+        }).catch((err: Error) => {
+        reject(err.message)
+      })
     })
   }
 }
