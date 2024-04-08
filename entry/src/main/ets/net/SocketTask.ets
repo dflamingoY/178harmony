@@ -3,6 +3,7 @@ import emitter from '@ohos.events.emitter';
 import { SocketData } from '../data/SocketData';
 import LogUtil from '../utils/LogUtil';
 import HttpIp from './HttpIP';
+import IConstant from '../utils/IConstant';
 
 var defaultIpAddress = "wss://ws.gqj.live";
 
@@ -96,7 +97,7 @@ class SocketTask {
             "data": respData.data
           } }
         let innerEvent = {
-          eventId: 1,
+          eventId: IConstant.EVENT_ID_MATCH,
           priority: emitter.EventPriority.IMMEDIATE
         };
         emitter.emit(innerEvent, eventData)

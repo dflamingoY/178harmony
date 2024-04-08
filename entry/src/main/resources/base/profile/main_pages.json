@@ -17,6 +17,10 @@
     "p2p/group/GroupDetails",
     "pages/other/WebPage",
     "login/ResetPwsPage",
-    "login/SignPage"
+    "login/SignPage",
+    "pages/other/AboutUsPage",
+    "pages/other/FeedbackPage",
+    "pages/other/UserQrPage",
+    "pages/user/UserDetailPage"
   ]
 }

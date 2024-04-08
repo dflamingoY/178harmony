@@ -12,4 +12,6 @@ export default class IColors {
   static readonly colorF3F3F5 = 0xffF3F3F5
   //主要文字浅黄色颜色
   static readonly colorFED8BD = 0xffFED8BD
+  //文字颜色
+  static readonly color5B5E68 = 0xff5B5E68
 }

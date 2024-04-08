@@ -6,6 +6,8 @@ import { NewsPage } from './NewsPage';
 import { HomeTabBar } from './HomeTabBar';
 import { ContactPage } from './ContactPage';
 import router from '@ohos.router';
+import IConstant from '../utils/IConstant';
+import emitter from '@ohos.events.emitter';
 
 @Entry
 @Component
@@ -33,10 +35,22 @@ struct HomePage {
       })
       HomeTabBar({ index: $currentIndex, unreadCount: $unreadCount })
     }.height('100%').width('100%')
-
   }
 
   aboutToAppear() {
     router.clear()
+    emitter.on(this.innerEvent, () => {
+      if (!globalThis.user || globalThis.user == null) {
+        this.currentIndex = 0
+      }
+    })
+  }
+
+  innerEvent = {
+    eventId: IConstant.LOGIN_EVENT_ID
+  }
+
+  aboutToDisappear() {
+    emitter.off(IConstant.LOGIN_EVENT_ID)
   }
 }

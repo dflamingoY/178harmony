@@ -1,5 +1,6 @@
 import emitter from '@ohos.events.emitter'
 import { MatchListData } from '../data/Data'
+import IConstant from '../utils/IConstant'
 import LogUtil from '../utils/LogUtil'
 import { MatchChildPage } from './match/MatchChildPage'
 import MatchModel from './match/MatchModel'
@@ -73,10 +74,10 @@ export struct MatchPage {
   }
 
   innerEvent = {
-    eventId: 1
+    eventId: IConstant.EVENT_ID_MATCH
   }
 
   aboutToDisappear() {
-    emitter.off(1)
+    emitter.off(IConstant.EVENT_ID_MATCH)
   }
 }

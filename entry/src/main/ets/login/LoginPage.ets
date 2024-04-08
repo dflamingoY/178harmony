@@ -4,6 +4,9 @@ import { UserBean } from '../data/user'
 import LogUtil from '../utils/LogUtil'
 import PreferenceModel from '../utils/PreferenceModel'
 import { LoginModel } from './LoginModel'
+import emitter from '@ohos.events.emitter'
+import IConstant from '../utils/IConstant'
+import IColors from '../utils/IColors'
 
 @Entry
 @Component
@@ -124,10 +127,16 @@ export struct LoginPage {
       if (this.isLogin)
       Column() {
         LoadingProgress()
-          .width('30vp')
-          .color(Color.Red)
-          .height('30vp')
-      }
+          .color(IColors.colorOrange)
+          .height('50vp')
+          .width('50vp')
+          .backgroundColor(IColors.colorF3F3F5)
+          .borderRadius('5vp')
+          .padding('2vp')
+
+      }.width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
     }
   }
 
@@ -142,6 +151,14 @@ export struct LoginPage {
       PreferenceModel.putNormal("user", JSON.stringify(value))
       globalThis.token = value.token
       globalThis.uid = value.uid
+      globalThis.user = value
+      let eventData = {}
+      let innerEvent = {
+        eventId: IConstant.LOGIN_EVENT_ID,
+        priority: emitter.EventPriority.IMMEDIATE
+      };
+      emitter.emit(innerEvent, eventData)
+
       router.back()
     }).catch((err) => {
       promptAction.showToast({

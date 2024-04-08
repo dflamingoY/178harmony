@@ -2,6 +2,8 @@ import router from '@ohos.router'
 import promptAction from '@ohos.promptAction'
 import { UserBean } from '../data/user'
 import UserViewModel from './UserViewModel'
+import IConstant from '../utils/IConstant'
+import emitter from '@ohos.events.emitter'
 
 @Entry
 @Component
@@ -137,10 +139,10 @@ export struct UserPage {
 
           break;
         case ClickType.Feedback:
-
+          router.pushUrl({ url: 'pages/other/FeedbackPage' })
           break;
         case ClickType.About:
-
+          router.pushUrl({ url: 'pages/other/AboutUsPage' })
           break;
         case ClickType.CleanCache:
           promptAction.showToast({ message: '已经清理缓存', duration: 1500 })
@@ -158,6 +160,21 @@ export struct UserPage {
     }).catch((err: Error) => {
       err.message
     })
+    emitter.on(this.innerEvent, (event) => {
+      if (!globalThis.user || globalThis.user == null) {
+        this.user = new UserBean()
+      } else {
+        this.user = globalThis.user
+      }
+    })
+  }
+
+  innerEvent = {
+    eventId: IConstant.LOGIN_EVENT_ID
+  }
+
+  aboutToDisappear() {
+    emitter.off(IConstant.LOGIN_EVENT_ID)
   }
 }
 
