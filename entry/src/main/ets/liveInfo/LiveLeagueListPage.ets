@@ -8,6 +8,7 @@ export struct LiveLeagueListPage {
   @Link details: LiveDetailBean
   private matchWidth = 0
   private matchHeight = 0
+  @Link contentHeight: number
 
   build() {
     Column() {
@@ -67,8 +68,8 @@ export struct LiveLeagueListPage {
         })
       }.lanes(2)
       .margin({ left: '3vp', right: '3vp' })
-      .height(`${display.getDefaultDisplaySync().height - display.getDefaultDisplaySync()
-        .width * 0.5629 - display.getDefaultDisplaySync().densityPixels * 128}px`)
+      .height(`${this.contentHeight - display.getDefaultDisplaySync()
+        .width * 0.5629 - display.getDefaultDisplaySync().densityPixels * 48}px`)
     }
   }
 

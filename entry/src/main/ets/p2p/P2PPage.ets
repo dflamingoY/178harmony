@@ -12,6 +12,8 @@ import IConstant from '../utils/IConstant'
 import { ChatMenu } from '../widget/ChatMenu'
 import { ChatButtonState } from '../data/ChatButtonState'
 import { ChatEmoji } from '../widget/ChatEmoji'
+import window from '@ohos.window'
+import LogUtil from '../utils/LogUtil'
 
 @Entry
 @Component
@@ -89,6 +91,7 @@ export struct P2PPage {
         }
         .width('100%')
         .height('48vp')
+
 
         Refresh({ refreshing: $$this.isRefreshing, offset: 20, friction: 100 }) {
           List() {

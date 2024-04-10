@@ -6,6 +6,7 @@ import CommonUtil from '../utils/CommonUtil'
 import LogUtil from '../utils/LogUtil'
 import UserViewModel from './UserViewModel'
 import IConstant from '../utils/IConstant'
+import emitter from '@ohos.events.emitter'
 
 @Entry
 @Component
@@ -201,7 +202,20 @@ export struct ContactPage {
 
   aboutToAppear() {
     //获取好友列表
+    emitter.on(this.innerEvent, (event) => {
+      if (globalThis.user != null) {
+        this.getFriend()
+      }
+    })
     this.getFriend()
     this.getCurrentTime()
+  }
+
+  innerEvent = {
+    eventId: IConstant.LOGIN_EVENT_ID
+  }
+
+  aboutToDisappear() {
+    emitter.off(IConstant.LOGIN_EVENT_ID)
   }
 }

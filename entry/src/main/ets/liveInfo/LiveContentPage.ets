@@ -10,6 +10,8 @@ import { LiveLeagueListPage } from './LiveLeagueListPage'
 import { LiveChatPage } from './LiveChatPage'
 import { LiveDetailBean, LiveInfo, TvUser } from '../data/LiveDetailData'
 import { VideoController } from './VideoController'
+import window from '@ohos.window'
+import LogUtil from '../utils/LogUtil'
 
 @Entry
 @Component
@@ -26,49 +28,54 @@ export struct LiveContentPage {
   @State tournamentId: number = -1
   @State more: Array<TvUser> = []
   @State liveDetails: LiveDetailBean = new LiveDetailBean()
+  @State contentHeight: number = 0
 
   build() {
-    Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        XComponent({ id: '', type: 'surface', libraryname: '', controller: this.xComponentController })
-          .onLoad(async () => {
-            this.xComponentController.setXComponentSurfaceSize({
-              surfaceWidth: display.getDefaultDisplaySync().width,
-              surfaceHeight: display.getDefaultDisplaySync().width * 0.5629
-            });
-            this.surfaceID = this.xComponentController.getXComponentSurfaceId();
-          })
-          .backgroundColor(Color.White)
-          .width('100%')
-          .height(`${display.getDefaultDisplaySync().width * 0.5629}px`)
-        Image($r('app.media.icon_back'))
-          .height('21vp')
-          .width('21vp')
-          .margin({ left: '12vp', top: '12vp' })
-          .onClick(() => {
-            router.back()
-          })
-      }.width('100%')
-      .height(`${display.getDefaultDisplaySync().width * 0.5629}px`)
+    Stack() {
 
-      LiveTabBar({ index: $index, unreadCount: $unreadCount })
+      Column() {
+        Stack({ alignContent: Alignment.TopStart }) {
+          XComponent({ id: '', type: 'surface', libraryname: '', controller: this.xComponentController })
+            .onLoad(async () => {
+              this.xComponentController.setXComponentSurfaceSize({
+                surfaceWidth: display.getDefaultDisplaySync().width,
+                surfaceHeight: display.getDefaultDisplaySync().width * 0.5629
+              });
+              this.surfaceID = this.xComponentController.getXComponentSurfaceId();
+            })
+            .backgroundColor(Color.White)
+            .width('100%')
+            .height(`${display.getDefaultDisplaySync().width * 0.5629}px`)
+          Image($r('app.media.icon_back'))
+            .height('21vp')
+            .width('21vp')
+            .margin({ left: '12vp', top: '12vp' })
+            .onClick(() => {
+              router.back()
+            })
+        }.width('100%')
+        .height(`${display.getDefaultDisplaySync().width * 0.5629}px`)
 
-      Swiper() {
-        ChatRoomPage({ model: this.model, roomId: this.roomId })
-        LiveAnchorPage({ user: $currentUser })
-        // LiveOddPage()
-        // LiveAnalysePage({ type: this.ballType, tournamentId: this.tournamentId })
-        LiveLeagueListPage({ list: $more, details: $liveDetails })
-        // LiveChatPage()
+        LiveTabBar({ index: $index, unreadCount: $unreadCount }).height('48vp')
+
+        Swiper() {
+          ChatRoomPage({ model: this.model, roomId: this.roomId, contentHeight: $contentHeight })
+          LiveAnchorPage({ user: $currentUser })
+          // LiveOddPage()
+          // LiveAnalysePage({ type: this.ballType, tournamentId: this.tournamentId })
+          LiveLeagueListPage({ list: $more, details: $liveDetails, contentHeight: $contentHeight })
+          // LiveChatPage()
+        }
+        .index(this.index)
+        .indicator(false)
+        .disableSwipe(true)
+        .duration(50)
+        .onChange((index) => {
+          this.index = index
+        })
       }
-      .index(this.index)
-      .indicator(false)
-      .disableSwipe(true)
-      .duration(50)
-      .onChange((index) => {
-        this.index = index
-      })
-    }.height('100%').width('100%')
+    }.height(`100%`).width('100%')
+    .backgroundColor(Color.Transparent)
   }
 
   aboutToDisappear() {
@@ -76,14 +83,25 @@ export struct LiveContentPage {
   }
 
   aboutToAppear() {
+    window.getLastWindow(getContext(this)).then((current) => {
+      let rect = current.getWindowProperties().windowRect
+      this.contentHeight = rect.height
+      LogUtil.d("West", `${rect.height}}`)
+      current.on("keyboardHeightChange", (height) => {
+        setTimeout(() => {
+          LogUtil.d("West", ` height ${height}}`)
+          // this.contentHeight = rect.height - height
+        }, 1000)
+      })
+      current.off("keyboardHeightChange", () => {
+        // this.contentHeight = rect.height
+      })
+    })
     let params = router.getParams() as Record<string, object>
     this.tournamentId = params.tournamentId as unknown as number
     this.ballType = params.type as unknown as number
     var memberId = params.memberId as unknown as number
     this.model.getLiveInfo(this.tournamentId, this.ballType, memberId).then((value: LiveInfo) => {
-      // this.currentUser = value.more.find((more) => {
-      //   return more.member_id == `${memberId}`
-      // })
       value.more.forEach((item) => {
         if (item.member_id == value.detail.member_id) {
           item.isPlay = true

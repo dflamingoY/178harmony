@@ -14,7 +14,6 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage) {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'West', '%{public}s', 'Ability onWindowStageCreate');
-
     windowStage.loadContent('pages/StartUp', (err, data) => {
       if (err.code) {
         hilog.error(0x0000, 'West', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
@@ -31,10 +30,13 @@ export default class EntryAbility extends UIAbility {
 
   onForeground() {
     // Ability has brought to foreground
+    globalThis.isFore = true
+    //连接ws
     hilog.info(0x0000, 'West', '%{public}s', 'Ability onForeground');
   }
 
   onBackground() {
+    globalThis.isFore = false
     // Ability has back to background
     hilog.info(0x0000, 'West', '%{public}s', 'Ability onBackground');
   }

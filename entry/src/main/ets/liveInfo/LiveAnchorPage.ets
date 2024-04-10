@@ -52,17 +52,17 @@ export struct LiveAnchorPage {
         .margin({ left: '20vp' })
       }.margin({ top: '20vp' })
 
-      Text('私信主播')
-        .width('141vp')
-        .height('38vp')
-        .borderRadius('15vp')
-        .margin({ top: '20vp' })
-        .backgroundColor(0xffFFFAF7)
-        .borderWidth('1vp')
-        .textAlign(TextAlign.Center)
-        .fontSize('15fp')
-        .fontColor(IColors.colorOrange)
-        .borderColor(IColors.colorOrange)
+      // Text('私信主播')
+      //   .width('141vp')
+      //   .height('38vp')
+      //   .borderRadius('15vp')
+      //   .margin({ top: '20vp' })
+      //   .backgroundColor(0xffFFFAF7)
+      //   .borderWidth('1vp')
+      //   .textAlign(TextAlign.Center)
+      //   .fontSize('15fp')
+      //   .fontColor(IColors.colorOrange)
+      //   .borderColor(IColors.colorOrange)
 
     }
     .width('100%')
@@ -71,7 +71,6 @@ export struct LiveAnchorPage {
   aboutToAppear() {
     cryptoFramework.createRandom().generateRandom(1, (err, random) => {
       this.followCount = random.data[0]
-      LogUtil.d("West", `数据： ${this.followCount}`)
     })
   }
 }

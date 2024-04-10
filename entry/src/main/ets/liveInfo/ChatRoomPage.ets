@@ -1,7 +1,9 @@
 import display from '@ohos.display';
 import { MsgBean } from '../data/MsgBean';
 import IColors from '../utils/IColors';
+import IConstant from '../utils/IConstant';
 import { LiveInfoModel } from './LiveIndoModel'
+import { RoomInputPage } from './RoomInputPage';
 
 @Component
 export struct ChatRoomPage {
@@ -10,6 +12,8 @@ export struct ChatRoomPage {
   private currentPage: number = 1
   @State msgArray: Array<MsgBean> = []
   @State isRefreshing: boolean = false
+  @State showInput: boolean = false
+  @Link contentHeight: number
 
   build() {
     Column() {
@@ -64,14 +68,39 @@ export struct ChatRoomPage {
               .margin({ top: '12vp', right: '12vp' })
             }
           })
-        }.height(`${display.getDefaultDisplaySync().height - display.getDefaultDisplaySync()
-          .width * 0.5629 - display.getDefaultDisplaySync().densityPixels * 158}px`)
+        }
+        .height(`${this.contentHeight - display.getDefaultDisplaySync()
+          .width * 0.5629 - display.getDefaultDisplaySync().densityPixels * (48 + 30 + 40)}px`)
+
       }.onRefreshing(() => {
         this.isRefreshing = true
         this.currentPage++
         this.getRoomList()
       })
+
+      Row() {
+        Image($r('app.media.icon_room_chat_enable')).width('23vp')
+          .height('23vp')
+          .margin({ left: '12vp' })
+
+        TextInput({ placeholder: "说点什么" })
+          .fontSize('13fp')
+          .fontColor(IColors.color999)
+          .margin({ left: '12vp' })
+
+      }
+      .height('40vp')
+      .backgroundColor(IColors.colorF3F3F5)
+      .borderRadius('15vp')
+      .width('90%')
+      .onClick(() => {
+        this.showInput = true
+      })
     }
+    // if (this.showInput) {
+    //   RoomInputPage()
+    // }
+
   }
 
   onRoomIdChange() {
