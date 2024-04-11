@@ -4,6 +4,7 @@ import { UserBean } from '../../data/user'
 import IColors from '../../utils/IColors'
 import IConstant from '../../utils/IConstant'
 import LogUtil from '../../utils/LogUtil'
+import { LoadingPage } from '../LoadingPage'
 import UserViewModel from '../UserViewModel'
 import { EditNamePage } from './EditNamePage'
 
@@ -192,15 +193,7 @@ export struct UserDetailPage {
           .height(IConstant.MATCH_PARENT)
       }
       if (this.loadingState == PageState.Progress) {
-        Column() {
-          LoadingProgress()
-            .color(IColors.color1R1E20)
-            .width('40vp')
-            .height('40vp')
-            .backgroundColor(Color.White)
-            .borderRadius('5vp')
-        }.justifyContent(FlexAlign.Center).width(IConstant.MATCH_PARENT)
-        .height(IConstant.MATCH_PARENT)
+        LoadingPage()
       }
     }.width(IConstant.MATCH_PARENT)
     .height(IConstant.MATCH_PARENT)

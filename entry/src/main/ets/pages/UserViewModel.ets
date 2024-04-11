@@ -254,6 +254,20 @@ class UserViewModel {
       })
     })
   }
+
+  feedback(data: {}): Promise<any> {
+    return new Promise((resolve: Function, reject: Function) => {
+      post("feedback", data).then((value) => {
+        if (value.code == 200) {
+          resolve(value.msg)
+        } else {
+          reject(value.msg)
+        }
+      }).catch((err) => {
+        reject(err.message)
+      })
+    })
+  }
 }
 
 export default new UserViewModel()
