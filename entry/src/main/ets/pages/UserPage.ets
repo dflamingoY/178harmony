@@ -97,7 +97,7 @@ export struct UserPage {
 
 
       Column() {
-        Flex({ direction: FlexDirection.Column }) {
+      /*  Flex({ direction: FlexDirection.Column }) {
           Text('聊天管理')
             .fontSize('15fp')
             .width('100%')
@@ -113,7 +113,7 @@ export struct UserPage {
         }
         .borderRadius('8vp')
         .height('112vp')
-        .backgroundColor(Color.White)
+        .backgroundColor(Color.White)*/
 
         Flex({ direction: FlexDirection.Column }) {
           Text('个人中心')

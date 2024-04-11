@@ -229,4 +229,11 @@ export struct UserDetailPage {
       this.sign = user.sign
     })
   }
+
+  onBackPress() {
+    if (this.isEdit) {
+      this.isEdit = false
+      return true
+    }
+  }
 }

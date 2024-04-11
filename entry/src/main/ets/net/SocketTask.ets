@@ -4,6 +4,7 @@ import { SocketData } from '../data/SocketData';
 import LogUtil from '../utils/LogUtil';
 import HttpIp from './HttpIP';
 import IConstant from '../utils/IConstant';
+import CryptoJS from '@ohos/crypto-js'
 
 var defaultIpAddress = "wss://ws.gqj.live";
 
@@ -42,10 +43,12 @@ export class SocketTask {
   innerEvent = {
     eventId: IConstant.ROOM_WS_ID
   }
+  roomId: string | null = null
 
   constructor() {
     emitter.on(this.innerEvent, (event) => {
       if (event.data.roomId && event.data.roomId != null) {
+        this.roomId = event.data.roomId
         this.ws?.send(generatorBindMsg(event.data.roomId))
       }
     })
@@ -68,15 +71,15 @@ export class SocketTask {
   createWs() {
     this.shutDownWs()
     this.ws = webSocket.createWebSocket()
-    this.ws.on('open', (err, value) => {
+    this.ws.on('open', (_err, value) => {
       LogUtil.d("Socket", "on open, status:" + value['status'] + ", message:" + value['message'])
       this.pingTimerId = setTimeout(this.timer, 10_000)
       //开启定时任务
     });
-    this.ws.on('message', (err, value) => {
+    this.ws.on('message', (_err, value) => {
       this.parseWs(value)
     });
-    this.ws.on('close', (err, value) => {
+    this.ws.on('close', (_err, value) => {
       this.clearTime()
       LogUtil.d("Socket", "on close, code is " + value.code + ", reason is " + value.reason)
     });
@@ -89,7 +92,7 @@ export class SocketTask {
       LogUtil.d("Socket", "on error, error:" + JSON.stringify(err))
     });
     let params = { header: { "Origin": HttpIp.origin, "clientType": 'android' } }
-    this.ws.connect(defaultIpAddress, params, (err, value) => {
+    this.ws.connect(defaultIpAddress, params, (err) => {
       if (!err) {
         LogUtil.d("Socket", "connect success")
       } else {
@@ -165,9 +168,30 @@ export class SocketTask {
             "data": respData.data,
             'type': 'disabledUser'
           } })
-        break
+        break;
+      case "woker:connection_established": // 获取到socketId
+        if (globalThis.token != null) {
+          let data = JSON.parse(respData.data)
+          let md5 = CryptoJS.MD5(data['socket_id'] + globalThis.uid + this.appSecret).toString()
+          let sign = this.appKey + ":" + md5
+          this.ws?.send(initUserSign(globalThis.uid, sign))
+          this.ws?.send(initUserGlobal(globalThis.uid, sign))
+        } else {
+          this.ws?.send(initGlobal())
+        }
+        if (this.roomId != null) {
+          this.ws?.send(generatorBindMsg(this.roomId))
+        }
+        break;
+      case "message": //聊天消息
+
+
+        break;
     }
   }
+
+  private appKey = "5f88825c28c56763eb0d8b270646e4b1"
+  private appSecret = "a2a906fe997867135886e5c4f62b03d2"
 
   destroy() {
     emitter.off(IConstant.ROOM_WS_ID)

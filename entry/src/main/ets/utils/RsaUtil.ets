@@ -1,6 +1,5 @@
 import cryptoFramework from '@ohos.security.cryptoFramework'
 import util from '@ohos.util';
-import LogUtil from './LogUtil';
 
 let pri_pem =
   "MIIJQwIBADANBgkqhkiG9w0BAQEFAASCCS0wggkpAgEAAoICAQCvdQvz/EPL/s13" +
@@ -105,15 +104,17 @@ export class RsaUtil {
         cryptoFramework.createAsyKeyGenerator("RSA1024")
           .convertKey({
             data: value
-          }, null*//*{
-            data: value
-          }*//*, (error, data) => {
-            if (error) {
-              AlertDialog.show({ message: "Convert keypair fail " + error.code });
-            } else
-              AlertDialog.show({ message: "Convert KeyPair success" });
-          })
-      })*/
+          }, null*/
+    /*{
+                data: value
+              }*/
+    /*, (error, data) => {
+                if (error) {
+                  AlertDialog.show({ message: "Convert keypair fail " + error.code });
+                } else
+                  AlertDialog.show({ message: "Convert KeyPair success" });
+              })
+          })*/
     /*.then((pari) => {
       try {
         encrypt.forEach((value: string) => {
