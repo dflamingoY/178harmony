@@ -12,7 +12,7 @@
     "pages/contact/FriendRequestPage",
     "pages/contact/GroupListPage",
     "pages/contact/TagPage",
-    "pages/contact/UserDetailsPage",
+    "pages/contact/FriendDetailsPage",
     "p2p/friend/FriendChatConfig",
     "p2p/group/GroupDetails",
     "pages/other/WebPage",
@@ -22,6 +22,7 @@
     "pages/other/FeedbackPage",
     "pages/other/UserQrPage",
     "pages/user/UserDetailPage",
-    "pages/match/SearchMatchPage"
+    "pages/match/SearchMatchPage",
+    "p2p/PhotoPickerPage"
   ]
 }

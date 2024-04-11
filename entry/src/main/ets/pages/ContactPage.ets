@@ -75,7 +75,7 @@ export struct ContactPage {
           ListItem() {
             this.buildFriendItem(item)
           }.onClick(() => {
-            router.pushUrl({ url: 'pages/contact/UserDetailsPage', params: {
+            router.pushUrl({ url: 'pages/contact/FriendDetailsPage', params: {
               uid: item.uid
             } })
           })

@@ -47,7 +47,7 @@ export struct HomeTabBar {
           .width('19vp')
           .height('19vp')
           .margin({ top: '5vp' })
-        Text('赛事').fontColor(this.index == 1 ? 0xFED8BD : 0x91939A)
+        Text('赛事').fontColor(this.index == 2 ? 0xFED8BD : 0x91939A)
           .fontSize('13fp')
           .margin({ top: '5vp' })
       }.width('20%')
@@ -76,7 +76,7 @@ export struct HomeTabBar {
           .height('19vp')
           .margin({ top: '5vp' })
         Text('我的')
-          .fontColor(this.index == 2 ? 0xFED8BD : 0x91939A)
+          .fontColor(this.index == 4 ? 0xFED8BD : 0x91939A)
           .fontSize('13fp')
           .margin({ top: '5vp' })
       }.onClick(() => {

@@ -1,3 +1,4 @@
+import router from '@ohos.router'
 import IColors from '../utils/IColors'
 
 @Component
@@ -15,6 +16,9 @@ export struct ChatMenu {
           .fontSize('12fp')
           .fontColor(IColors.color666)
       }.width('22%').height('100%')
+      .onClick(() => {
+        router.pushUrl({ url: "p2p/PhotoPickerPage" })
+      })
 
       Column() {
         Image($r('app.media.icon_chat_camera'))
@@ -27,6 +31,9 @@ export struct ChatMenu {
           .fontSize('12fp')
           .fontColor(IColors.color666)
       }.width('22%').height('100%')
+      .onClick(() => {
+        router.pushUrl({ url: "p2p/PhotoPickerPage" })
+      })
 
       Column() {
         Image($r('app.media.icon_chat_file'))
@@ -39,6 +46,9 @@ export struct ChatMenu {
           .fontSize('12fp')
           .fontColor(IColors.color666)
       }.width('22%').height('100%')
+      .onClick(() => {
+        router.pushUrl({ url: "p2p/PhotoPickerPage" })
+      })
 
       Column() {
         Image($r('app.media.icon_chat_collection'))
@@ -51,6 +61,9 @@ export struct ChatMenu {
           .fontSize('12fp')
           .fontColor(IColors.color666)
       }.width('22%').height('100%')
+      .onClick(() => {
+        router.pushUrl({ url: "p2p/PhotoPickerPage" })
+      })
     }.height('123vp').backgroundColor(IColors.colorF3F3F5)
 
   }

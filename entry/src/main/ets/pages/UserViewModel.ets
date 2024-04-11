@@ -226,6 +226,34 @@ class UserViewModel {
 
     })
   }
+
+  getQrCode(type: number, gid: string): Promise<string> {
+    return new Promise((resolve: Function, reject: Function) => {
+      post("get_qrcode", { 'type': type, 'gid': gid }).then((result) => {
+        if (result.code == 200) {
+          resolve(result.data['qr_url'])
+        } else {
+          reject(result.msg)
+        }
+      }).catch((err: Error) => {
+        reject(err.message)
+      })
+    })
+  }
+
+  updateUserInfo(data: {}): Promise<any> {
+    return new Promise((resolve: Function, reject: Function) => {
+      post("update_user", data).then(result => {
+        if (result.code == 200) {
+          resolve(result.data)
+        } else {
+          reject(result.msg)
+        }
+      }).catch((err: Error) => {
+        reject(err.message)
+      })
+    })
+  }
 }
 
 export default new UserViewModel()

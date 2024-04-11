@@ -122,7 +122,7 @@ export struct FriendRequestPage {
         .margin({ left: '73vp' })
     }.height('60vp')
     .width('100%').onClick(() => {
-      router.pushUrl({ url: "pages/contact/UserDetailsPage", params: {
+      router.pushUrl({ url: "pages/contact/FriendDetailsPage", params: {
         uid: item.uid
       } })
     })

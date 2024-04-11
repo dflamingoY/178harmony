@@ -32,6 +32,7 @@ export struct P2PPage {
   @State managerUids: Array<string> | null = null //管理员数组
   @State msgContent: string = ''
   @State chatMenuState: ChatButtonState = ChatButtonState.Default
+  @State phoneFocuseAble: boolean = true
 
   build() {
     Stack({ alignContent: Alignment.Top }) {
@@ -92,7 +93,6 @@ export struct P2PPage {
         .width('100%')
         .height('48vp')
 
-
         Refresh({ refreshing: $$this.isRefreshing, offset: 20, friction: 100 }) {
           List() {
             ForEach(this.msgList, (item: MsgBean) => {
@@ -107,7 +107,7 @@ export struct P2PPage {
 
         Column() {
           RelativeContainer() {
-            Image($r('app.media.icon_record_default'))
+           /* Image($r('app.media.icon_record_default'))
               .width('27vp')
               .height('27vp')
               .padding('2vp')
@@ -116,7 +116,7 @@ export struct P2PPage {
               .alignRules({
                 top: { anchor: "__container__", align: VerticalAlign.Top },
                 left: { anchor: "__container__", align: HorizontalAlign.Start }
-              })
+              })*/
             TextArea({ text: this.msgContent })
               .fontColor(IColors.color1R1E20)
               .fontSize('15fp')
@@ -127,12 +127,21 @@ export struct P2PPage {
               .id('idInputContent')
               .alignRules({
                 top: { anchor: "__container__", align: VerticalAlign.Top },
-                left: { anchor: "idRecord", align: HorizontalAlign.End },
-                right: { anchor: 'idEmoji', align: HorizontalAlign.Start }
+                left: { anchor: "__container__", align: HorizontalAlign.Start },
+                right: { anchor: 'idSendOrMenu', align: HorizontalAlign.Start }
+              })
+              .focusable(this.phoneFocuseAble)
+              .onClick(() => {
+                this.phoneFocuseAble = true
+              })
+              .onTouch((event) => {
+                if (event.type == TouchType.Down) {
+                  this.chatMenuState = ChatButtonState.Default
+                }
               })
               .backgroundColor(IColors.colorF3F3F5)
               .borderRadius('19vp')
-            Image($r('app.media.icon_emoji'))
+            /*Image($r('app.media.icon_emoji'))
               .width('27vp')
               .height('27vp')
               .objectFit(ImageFit.Contain)
@@ -150,7 +159,7 @@ export struct P2PPage {
                 } else {
                   this.chatMenuState = ChatButtonState.Emoji
                 }
-              })
+              })*/
             Row() {
               if (this.msgContent.length > 0) {
                 Text('发送')
@@ -164,7 +173,7 @@ export struct P2PPage {
                   .onClick(() => {
                     this.sendMsg()
                   })
-              } else {
+              } /*else {
                 Image($r('app.media.icon_add_menu'))
                   .width('27vp')
                   .height('27vp')
@@ -175,8 +184,9 @@ export struct P2PPage {
                     } else {
                       this.chatMenuState = ChatButtonState.Menu
                     }
+                    this.phoneFocuseAble = false
                   })
-              }
+              }*/
             }.alignRules({
               top: { anchor: "__container__", align: VerticalAlign.Top },
               right: { anchor: "__container__", align: HorizontalAlign.End }
@@ -188,14 +198,12 @@ export struct P2PPage {
           .borderRadius({ topLeft: '10vp', topRight: '10vp' })
           .height('58vp')
 
-          if (this.chatMenuState == ChatButtonState.Menu) {
+         /* if (this.chatMenuState == ChatButtonState.Menu) {
             ChatMenu()
           }
           else if (this.chatMenuState == ChatButtonState.Emoji) {
             ChatEmoji()
-          } else {
-
-          }
+          }*/
         }
       }
     }
@@ -222,7 +230,7 @@ export struct P2PPage {
               .borderRadius('18.5vp')
               .margin({ left: '12vp', top: '12vp' })
               .onClick(() => {
-                router.pushUrl({ url: 'pages/contact/UserDetailsPage', params: {
+                router.pushUrl({ url: 'pages/contact/FriendDetailsPage', params: {
                   uid: item.from
                 } })
               })
@@ -385,7 +393,7 @@ export struct P2PPage {
               .borderRadius('18.5vp')
               .margin({ right: '12vp', top: '12vp' })
               .onClick(() => {
-                router.pushUrl({ url: 'pages/contact/UserDetailsPage', params: {
+                router.pushUrl({ url: 'pages/contact/FriendDetailsPage', params: {
                   uid: item.from
                 } })
               })

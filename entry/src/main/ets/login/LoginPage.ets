@@ -151,6 +151,7 @@ export struct LoginPage {
     }
     this.isLogin = true
     this.model.login(this.account, this.pwd).then((value: UserBean) => {
+      PreferenceModel.putNormal(IConstant.PHONE_CACHED, this.account)
       PreferenceModel.putNormal("token", value.token)
       PreferenceModel.putNormal("user", JSON.stringify(value))
       globalThis.token = value.token
@@ -171,6 +172,12 @@ export struct LoginPage {
       })
       LogUtil.d("West", err.toString)
       this.isLogin = false
+    })
+  }
+
+  aboutToAppear() {
+    PreferenceModel.getString(IConstant.PHONE_CACHED, '').then((value: string) => {
+      this.account = value
     })
   }
 }

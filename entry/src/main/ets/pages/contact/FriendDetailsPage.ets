@@ -13,7 +13,7 @@ import UserViewModel from '../UserViewModel'
  */
 @Entry
 @Component
-export struct UserDetailsPage {
+export struct FriendDetailsPage {
   @State user: UserBean | null = null
   private uid: string | null = null
   @State isLoading: PageState = PageState.Progress

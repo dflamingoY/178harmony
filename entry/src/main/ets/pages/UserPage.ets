@@ -67,10 +67,34 @@ export struct UserPage {
         })
         .width('50vp')
         .height('21vp')
+        .onClick(() => {
+          router.pushUrl({ url: "pages/other/UserQrPage", params: {
+            uid: this.user.uid,
+            nickname: this.user.nickname,
+            account: this.user.username
+          } })
+        })
         .id('row2')
         .margin({ right: '15vp', top: '23vp' })
 
+        Text(this.user.sign??'')
+          .id('tvSign')
+          .fontSize('15fp')
+          .fontColor(Color.White)
+          .alignRules({
+            left: { anchor: "__container__", align: HorizontalAlign.Start },
+            right: { anchor: "__container__", align: HorizontalAlign.End },
+            top: { anchor: "ivAvatar", align: VerticalAlign.Bottom }
+          })
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .margin({ bottom: '12vp', left: '12vp', right: '12vp', top: '10vp' })
+
       }.width('100%').height('167vp')
+      .onClick(() => {
+        router.pushUrl({ url: 'pages/user/UserDetailPage' })
+      })
+
 
       Column() {
         Flex({ direction: FlexDirection.Column }) {

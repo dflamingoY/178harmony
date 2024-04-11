@@ -13,4 +13,5 @@ export default class IConstant {
 
   //内存变量名
   static readonly FILTER_ROOM_SYSTEM="filter_room_system";
+  static readonly PHONE_CACHED="phone_cached";
 }
