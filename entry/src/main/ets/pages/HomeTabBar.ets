@@ -17,12 +17,12 @@ export struct HomeTabBar {
           .fontColor(this.index == 0 ? 0xFED8BD : 0x91939A)
           .fontSize('13fp')
           .margin({ top: '5vp' })
-      }.width('33%').onClick(() => {
+      }.width('20%').onClick(() => {
         this.index = 0
       })
       .height('100%')
 
-      /*Badge({ count: this.unreadCount, maxCount: 99, style: {
+      Badge({ count: this.unreadCount, maxCount: 99, style: {
         fontSize: '11fp', color: Color.White, badgeColor: Color.Red
       } }) {
         Column() {
@@ -40,22 +40,22 @@ export struct HomeTabBar {
             router.pushUrl({ url: 'login/LoginPage' });
           }
         }).width('100%').height('100%')
-      }.width('20%').height('100%')*/
+      }.width('20%').height('100%')
 
       Column() {
-        Image(this.index == 1 ? $r('app.media.icon_live_selected') : $r('app.media.icon_live_default'))
+        Image(this.index == 2 ? $r('app.media.icon_live_selected') : $r('app.media.icon_live_default'))
           .width('19vp')
           .height('19vp')
           .margin({ top: '5vp' })
         Text('赛事').fontColor(this.index == 1 ? 0xFED8BD : 0x91939A)
           .fontSize('13fp')
           .margin({ top: '5vp' })
-      }.width('33%')
+      }.width('20%')
       .onClick(() => {
-        this.index = 1
+        this.index = 2
       }).height('100%')
 
-      /*Column() {
+      Column() {
         Image(this.index == 3 ? $r('app.media.icon_tab_news_selected') : $r('app.media.icon_tab_news_default'))
           .width('19vp')
           .margin({ top: '5vp' })
@@ -68,10 +68,10 @@ export struct HomeTabBar {
         if (isLogin()) {
           this.index = 3
         } else router.pushUrl({ url: 'login/LoginPage' });
-      }).width('20%').height('100%')*/
+      }).width('20%').height('100%')
 
       Column() {
-        Image(this.index == 2 ? $r('app.media.icon_my_selected') : $r('app.media.icon_my_default'))
+        Image(this.index == 4 ? $r('app.media.icon_my_selected') : $r('app.media.icon_my_default'))
           .width('19vp')
           .height('19vp')
           .margin({ top: '5vp' })
@@ -81,12 +81,12 @@ export struct HomeTabBar {
           .margin({ top: '5vp' })
       }.onClick(() => {
         if (isLogin()) {
-          this.index = 2
+          this.index = 4
         } else {
           router.pushUrl({ url: 'login/LoginPage' });
         }
       })
-      .width('33%').height('100%')
+      .width('20%').height('100%')
     }.height('50vp')
   }
 }

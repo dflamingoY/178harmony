@@ -1,6 +1,7 @@
 import { BaseResp } from '../data/Data'
 import { FriendKeyData } from '../data/FriendKeyData'
 import { GroupBean, GroupDetails } from '../data/GroupData'
+import { MatchSearchData } from '../data/MatchData'
 import { RecentBean } from '../data/MsgBean'
 import { OffLineData } from '../data/OffLineData'
 import { UserBean } from '../data/user'
@@ -201,6 +202,28 @@ class UserViewModel {
         }).catch((err: Error) => {
         reject(err.message)
       })
+    })
+  }
+
+  searchMatch(key: string): Promise<MatchSearchData> {
+    return new Promise((resolve: Function, reject: Function) => {
+      getData(`match_search?keyword=${key}`).then((value) => {
+        if (value.code == 200) {
+          resolve(value.data)
+        } else {
+          reject(value.msg)
+        }
+      }).catch((err: Error) => {
+        reject(err.message)
+      })
+    })
+  }
+
+  async sendRoomMsg(content: string, roomId: string) {
+    post('send_room', { 'to': roomId, 'content': content, 'content_type': 'text' }).then((resp) => {
+
+    }).catch((err) => {
+
     })
   }
 }

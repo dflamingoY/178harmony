@@ -12,6 +12,8 @@ import { LiveDetailBean, LiveInfo, TvUser } from '../data/LiveDetailData'
 import { VideoController } from './VideoController'
 import window from '@ohos.window'
 import LogUtil from '../utils/LogUtil'
+import IConstant from '../utils/IConstant'
+import emitter from '@ohos.events.emitter'
 
 @Entry
 @Component
@@ -86,16 +88,15 @@ export struct LiveContentPage {
     window.getLastWindow(getContext(this)).then((current) => {
       let rect = current.getWindowProperties().windowRect
       this.contentHeight = rect.height
-      LogUtil.d("West", `${rect.height}}`)
-      current.on("keyboardHeightChange", (height) => {
-        setTimeout(() => {
-          LogUtil.d("West", ` height ${height}}`)
-          // this.contentHeight = rect.height - height
-        }, 1000)
-      })
-      current.off("keyboardHeightChange", () => {
-        // this.contentHeight = rect.height
-      })
+      // current.on("keyboardHeightChange", (height) => {
+      //   setTimeout(() => {
+      //     LogUtil.d("West", ` height ${height}}`)
+      //     // this.contentHeight = rect.height - height
+      //   }, 1000)
+      // })
+      // current.off("keyboardHeightChange", () => {
+      //   // this.contentHeight = rect.height
+      // })
     })
     let params = router.getParams() as Record<string, object>
     this.tournamentId = params.tournamentId as unknown as number
@@ -113,6 +114,19 @@ export struct LiveContentPage {
       this.videoController.firstPlay(value.detail.screen_url_m3u8, this.surfaceID)
       this.more = value.more
       this.liveDetails = value.detail
+      this.sendWsRoom()
     })
+  }
+
+  private sendWsRoom() {
+    let eventData = {
+      data: {
+        "roomId": `room-${this.roomId}`
+      } }
+    let innerEvent = {
+      eventId: IConstant.ROOM_WS_ID,
+      priority: emitter.EventPriority.IMMEDIATE
+    };
+    emitter.emit(innerEvent, eventData)
   }
 }

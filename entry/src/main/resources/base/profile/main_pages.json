@@ -21,6 +21,7 @@
     "pages/other/AboutUsPage",
     "pages/other/FeedbackPage",
     "pages/other/UserQrPage",
-    "pages/user/UserDetailPage"
+    "pages/user/UserDetailPage",
+    "pages/match/SearchMatchPage"
   ]
 }

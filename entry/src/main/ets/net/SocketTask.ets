@@ -38,15 +38,26 @@ function generatorReceiptSingle(mid: string) {
   return `{\"event\":\"woker:message_ack\",\"data\":{\"mids\":[\"${mid}\"]}}`
 }
 
-class SocketTask {
+export class SocketTask {
+  innerEvent = {
+    eventId: IConstant.ROOM_WS_ID
+  }
+
+  constructor() {
+    emitter.on(this.innerEvent, (event) => {
+      if (event.data.roomId && event.data.roomId != null) {
+        this.ws?.send(generatorBindMsg(event.data.roomId))
+      }
+    })
+  }
+
   private ping = "{\"event\":\"woker:ping\"}"
   private ws: webSocket.WebSocket | null = null;
   private pingTimerId: number = -1
   private timer: Function = () => {
-    LogUtil.d("Socket", "发送ping ")
     if (this.ws != null)
       this.ws?.send(this.ping).then((result) => {
-        if (!result) { //ws 发送失败。需要重连
+        if (!result) {
           this.createWs()
         } else {
           this.pingTimerId = setTimeout(this.timer, 10_000)
@@ -55,6 +66,7 @@ class SocketTask {
   }
 
   createWs() {
+    this.shutDownWs()
     this.ws = webSocket.createWebSocket()
     this.ws.on('open', (err, value) => {
       LogUtil.d("Socket", "on open, status:" + value['status'] + ", message:" + value['message'])
@@ -70,6 +82,10 @@ class SocketTask {
     });
     this.ws.on('error', (err) => {
       this.clearTime()
+      //断线重连
+      if (globalThis.isFore) { //前台再去重连
+        this.reConnect()
+      }
       LogUtil.d("Socket", "on error, error:" + JSON.stringify(err))
     });
     let params = { header: { "Origin": HttpIp.origin, "clientType": 'android' } }
@@ -82,6 +98,21 @@ class SocketTask {
     });
   }
 
+  private shutDownWs() {
+    this.ws?.close()
+    this.ws = null
+  }
+
+  private reConnect() {
+    setTimeout(() => {
+      this.createWs()
+    }, 2_000)
+  }
+
+  checkWs() {
+    setTimeout(this.timer, 1_000)
+  }
+
   private clearTime() {
     if (this.pingTimerId != -1) {
       clearTimeout(this.pingTimerId)
@@ -90,6 +121,7 @@ class SocketTask {
 
   private parseWs(value: string | ArrayBuffer) {
     var respData: SocketData = JSON.parse(value.toString())
+    LogUtil.d("Socket", "message:" + value + "  " + respData)
     switch (respData.event) {
       case "pushMatch": //match_type   match_id on_time away_score home_score
         let eventData = {
@@ -102,9 +134,43 @@ class SocketTask {
         };
         emitter.emit(innerEvent, eventData)
         break;
+      case "room": //"channel":"room-122968"
+        let roomMsg = {
+          data: {
+            "data": respData.data,
+            'roomId': respData.channel.replace("room-", ''),
+            'type': 'msg'
+          } }
+        emitter.emit({
+          eventId: IConstant.ROOM_MSG_ID,
+          priority: emitter.EventPriority.IMMEDIATE
+        }, roomMsg)
+        break;
+      case "delRoomMsg": //删除群消息
+        emitter.emit({
+          eventId: IConstant.ROOM_MSG_ID,
+          priority: emitter.EventPriority.IMMEDIATE
+        }, {
+          data: {
+            "data": respData.data,
+            'type': 'delRoomMsg'
+          } })
+        break;
+      case "disabledUser": //禁言用户 uid
+        emitter.emit({
+          eventId: IConstant.ROOM_MSG_ID,
+          priority: emitter.EventPriority.IMMEDIATE
+        }, {
+          data: {
+            "data": respData.data,
+            'type': 'disabledUser'
+          } })
+        break
     }
-    LogUtil.d("Socket", "message:" + value + "  " + respData)
+  }
 
+  destroy() {
+    emitter.off(IConstant.ROOM_WS_ID)
   }
 }
 

@@ -7,6 +7,7 @@ import { LoginModel } from './LoginModel'
 import emitter from '@ohos.events.emitter'
 import IConstant from '../utils/IConstant'
 import IColors from '../utils/IColors'
+import HttpIp from '../net/HttpIP'
 
 @Entry
 @Component
@@ -40,6 +41,7 @@ export struct LoginPage {
               .placeholderColor(0x99ffffff)
               .type(InputType.Number)
               .enterKeyType(EnterKeyType.Next)
+              .layoutWeight(1)
               .onChange((value: string) => {
                 this.account = value
               })
@@ -54,7 +56,9 @@ export struct LoginPage {
             Image($r('app.media.icon_pwd')).width('25vp').height('25vp').margin({ left: "16vp" })
             TextInput({ placeholder: "请输入密码" })
               .fontColor(Color.White)
+              .layoutWeight(1)
               .fontSize('22fp')
+              .showPasswordIcon(true)
               .showPasswordIcon(true)
               .placeholderColor(0x99ffffff)
               .type(InputType.Password)
@@ -110,14 +114,14 @@ export struct LoginPage {
             Span('使用协议').fontSize('12fp').fontColor(0xFED8BD)
               .onClick(() => {
                 router.pushUrl({ url: 'pages/other/WebPage', params: {
-                  title: '使用协议', url: 'https://www.baidu.com'
+                  title: '使用协议', url: HttpIp.APP_PROTOCOL
                 } })
               })
             Span('和').fontSize('12fp').fontColor(Color.White)
             Span('隐私政策').fontSize('12fp').fontColor(0xFED8BD)
               .onClick(() => {
                 router.pushUrl({ url: 'pages/other/WebPage', params: {
-                  title: '隐私政策', url: 'https://www.baidu.com'
+                  title: '隐私政策', url: HttpIp.APP_PRIVACY
                 } })
               })
           }.margin({ bottom: '20vp' })

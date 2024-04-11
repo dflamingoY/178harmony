@@ -43,6 +43,9 @@ export struct IndexRecommend {
 
         }.height('48vp')
         .width('100%')
+        .onClick(() => {
+          router.pushUrl({ url: 'pages/match/SearchMatchPage' })
+        })
 
         Refresh({ refreshing: $$this.isRefreshing, offset: 120, friction: 100 }) {
           Scroll() {

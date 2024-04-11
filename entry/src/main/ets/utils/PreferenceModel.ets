@@ -18,6 +18,14 @@ class PreferenceModel {
     preference = await dataPreferences.getPreferences(context, IConstant.SP_NAME)
   }
 
+  async getBoolean(key: string, defaultValue: boolean) {
+    if (!preference) {
+      await this.loadPreference()
+    }
+    var result = await preference.get(key, defaultValue)
+    return result
+  }
+
   async putNormal(key: string, value: number | string | boolean | Array<number> | Array<string> | Array<boolean>) {
     if (!preference) {
       this.loadPreference()

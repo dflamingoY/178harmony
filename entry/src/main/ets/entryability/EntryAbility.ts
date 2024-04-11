@@ -1,6 +1,7 @@
 import UIAbility from '@ohos.app.ability.UIAbility';
 import hilog from '@ohos.hilog';
 import window from '@ohos.window';
+import emitter from '@ohos.events.emitter';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want, launchParam) {
@@ -31,6 +32,11 @@ export default class EntryAbility extends UIAbility {
   onForeground() {
     // Ability has brought to foreground
     globalThis.isFore = true
+    emitter.emit({
+      eventId: 5
+    }, {
+      data: {}
+    })
     //连接ws
     hilog.info(0x0000, 'West', '%{public}s', 'Ability onForeground');
   }

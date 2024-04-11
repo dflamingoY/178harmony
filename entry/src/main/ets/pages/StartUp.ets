@@ -1,7 +1,6 @@
 import router from '@ohos.router'
 import { UserBean } from '../data/user'
 import Dao from '../db/Dao'
-import SocketTask from '../net/SocketTask'
 import PreferenceModel from '../utils/PreferenceModel'
 import UserViewModel from './UserViewModel'
 
@@ -22,7 +21,6 @@ struct StartUp {
   }
 
   onPageShow() {
-    SocketTask.createWs()
     PreferenceModel.getString("user", null).then((value?: string) => {
       // LogUtil.d("West", '获取到缓存数据：' + value)
       if (value != null) {

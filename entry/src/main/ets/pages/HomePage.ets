@@ -8,6 +8,7 @@ import { ContactPage } from './ContactPage';
 import router from '@ohos.router';
 import IConstant from '../utils/IConstant';
 import emitter from '@ohos.events.emitter';
+import SocketTask from '../net/SocketTask';
 
 @Entry
 @Component
@@ -20,9 +21,9 @@ struct HomePage {
     Flex({ direction: FlexDirection.Column }) {
       Swiper() {
         IndexRecommend()
-        // ChatPage()
+        ChatPage()
         MatchPage()
-        // ContactPage()
+        ContactPage()
         UserPage()
       }
       .index(this.currentIndex)
@@ -33,16 +34,21 @@ struct HomePage {
       .onChange((index) => {
         this.currentIndex = index
       })
+
       HomeTabBar({ index: $currentIndex, unreadCount: $unreadCount })
     }.height('100%').width('100%')
   }
 
   aboutToAppear() {
     router.clear()
+    SocketTask.createWs()
     emitter.on(this.innerEvent, () => {
       if (!globalThis.user || globalThis.user == null) {
         this.currentIndex = 0
       }
+    })
+    emitter.on({ eventId: IConstant.APP_IN_FOREGROUND }, () => {
+      SocketTask.checkWs()
     })
   }
 

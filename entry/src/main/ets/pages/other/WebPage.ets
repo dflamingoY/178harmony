@@ -29,7 +29,6 @@ export struct WebPage {
         .width('100%')
         .javaScriptAccess(true)
         .zoomAccess(false)
-        .height('100%')
         .verticalScrollBarAccess(true)
     }
     .backgroundColor(Color.Black)

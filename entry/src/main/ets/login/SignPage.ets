@@ -3,6 +3,7 @@ import IColors from '../utils/IColors'
 import UserViewModel from '../pages/UserViewModel'
 import { LoginStatuePage } from './LoginStatuePage'
 import CommonUtil from '../utils/CommonUtil'
+import HttpIp from '../net/HttpIP'
 
 @Entry
 @Component
@@ -25,6 +26,7 @@ export struct SignPage {
           Image($r('app.media.icon_phone')).width('25vp').height('25vp').margin({ left: "16vp" })
           TextInput({ placeholder: "请输入手机号" })
             .fontColor(Color.White)
+            .layoutWeight(1)
             .fontSize('22fp')
             .placeholderColor(0x99ffffff)
             .type(InputType.Number)
@@ -45,6 +47,7 @@ export struct SignPage {
             .fontColor(Color.White)
             .fontSize('22fp')
             .showPasswordIcon(true)
+            .layoutWeight(1)
             .placeholderColor(0x99ffffff)
             .type(InputType.Password)
             .width('100%')
@@ -65,6 +68,7 @@ export struct SignPage {
             .fontColor(Color.White)
             .fontSize('22fp')
             .showPasswordIcon(true)
+            .layoutWeight(1)
             .placeholderColor(0x99ffffff)
             .enterKeyType(EnterKeyType.Next)
             .onChange((value: string) => {
@@ -84,6 +88,7 @@ export struct SignPage {
               .fontColor(Color.White)
               .fontSize('22fp')
               .placeholderColor(0x99ffffff)
+              .layoutWeight(1)
               .type(InputType.Number)
               .enterKeyType(EnterKeyType.Done)
               .onChange((value: string) => {
@@ -126,7 +131,7 @@ export struct SignPage {
               .fontSize('13fp')
               .onClick(() => {
                 router.pushUrl({ url: 'pages/other/WebPage', params: {
-                  title: '使用协议', url: 'https://www.baidu.com'
+                  title: '使用协议', url: HttpIp.APP_PROTOCOL
                 } })
               })
           }.margin({ left: '12vp' })
