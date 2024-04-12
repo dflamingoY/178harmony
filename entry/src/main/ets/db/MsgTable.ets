@@ -18,7 +18,33 @@ export default class MsgTable {
   }
 
   insert(msg: MsgBean, callback: Function) {
-    this.msgTable.insertData(generatorBucket(msg), callback)
+    this.msgTable.insertData(generatorBucket(msg), callback,)
+  }
+
+  update(msg: MsgBean, callback: Function) {
+    let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+    predicates.equalTo('sendId', msg.sendId)
+    this.msgTable.updateData(predicates, generatorBucket(msg), callback)
+  }
+
+  queryBySendId(sendId: string): Promise<MsgBean> {
+    return new Promise((resolve: Function, reject: Function) => {
+      let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+      predicates.equalTo('sendId', sendId)
+      predicates.limitAs(1)
+      this.msgTable.queryAsync(predicates).then((value) => {
+        let count = value.rowCount
+        if (count == 0) {
+          reject("empty")
+        } else {
+          value.goToFirstRow()
+          let msg = this.parseMsgBean(value)
+          resolve(msg)
+        }
+      }).catch(() => {
+        reject("empty")
+      })
+    })
   }
 
   getAll() {
@@ -69,6 +95,7 @@ export default class MsgTable {
     let msg = new MsgBean()
     msg.from_name_ios = value.getString(value.getColumnIndex('name_from_ios'))
     msg.listId = value.getString(value.getColumnIndex('listId'))
+    msg.id = value.getLong(value.getColumnIndex('id'))
     msg.mid = value.getString(value.getColumnIndex('mid'))
     msg.from = value.getString(value.getColumnIndex('id_from'))
     msg.sub_type = value.getString(value.getColumnIndex('sub_type'))
@@ -128,6 +155,9 @@ function generatorBucketTx(user: MsgBean[]): relationalStore.ValuesBucket[] {
 
 function generatorBucket(item: MsgBean): relationalStore.ValuesBucket {
   let bucket: relationalStore.ValuesBucket = {}
+  // if (item.id != 0) {
+  //   bucket.id = item.id
+  // }
   bucket.mid = `${item.mid}`
   bucket.name_from_ios = item.from_name_ios??''
   bucket.content = item.content??''
@@ -148,8 +178,8 @@ function generatorBucket(item: MsgBean): relationalStore.ValuesBucket {
   bucket.name_from_remark = item.from_name_remark??''
   bucket.sendId = item.sendId??''
   bucket.verifyStatus = item.verifyStatus??'0'
-  if (item.type == IConstant.FRIEND && item.from != globalThis.uid) {
-    bucket.listId = IConstant.FRIEND + item.from
+  if (item.type == IConstant.FRIEND) {
+    bucket.listId = IConstant.FRIEND + (item.from != globalThis.uid ? item.from : item.to)
   } else {
     bucket.listId = IConstant.GROUP + item.to
   }

@@ -75,6 +75,53 @@ export struct SettingPage {
       .height('50vp')
       .borderRadius({ bottomLeft: '10vp', bottomRight: '10vp' })
 
+      Text('聊天设置')
+        .fontSize('12fp')
+        .margin({ left: '12vp' })
+        .width('90%')
+        .margin({ top: '20vp' })
+        .textAlign(TextAlign.Start)
+        .fontColor(IColors.color5B5E68)
+
+      Row() {
+        Text("清除聊天记录")
+          .fontSize('16fp')
+          .margin({ left: '12vp' })
+          .fontColor(IColors.color1R1E20)
+        Blank()
+        Image($r('app.media.icon_item_arrow'))
+          .width('8vp')
+          .fitOriginalSize(true)
+          .margin({ right: '12vp' })
+      }
+      .justifyContent(FlexAlign.SpaceBetween)
+      .backgroundColor(Color.White)
+      .margin({ top: '20vp' })
+      .width('90%')
+      .height('50vp')
+      .borderRadius('10vp')
+      .onClick(() => {
+        AlertDialog.show({
+          title: '提示',
+          message: '确定清除所有个人和群的聊天记录？',
+          autoCancel: false,
+          alignment: DialogAlignment.Center,
+          primaryButton: {
+            value: '取消',
+            fontColor: IColors.color999,
+            action: () => {
+            }
+          },
+          secondaryButton: {
+            value: '确定',
+            fontColor: IColors.colorOrange,
+            action: () => {
+
+            }
+          }
+        })
+      })
+
       Blank()
 
 

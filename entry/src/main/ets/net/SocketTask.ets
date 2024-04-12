@@ -5,6 +5,8 @@ import LogUtil from '../utils/LogUtil';
 import HttpIp from './HttpIP';
 import IConstant from '../utils/IConstant';
 import CryptoJS from '@ohos/crypto-js'
+import { MsgBean } from '../data/MsgBean';
+import Dao from '../db/Dao';
 
 var defaultIpAddress = "wss://ws.gqj.live";
 
@@ -40,16 +42,22 @@ function generatorReceiptSingle(mid: string) {
 }
 
 export class SocketTask {
-  innerEvent = {
-    eventId: IConstant.ROOM_WS_ID
-  }
   roomId: string | null = null
 
   constructor() {
-    emitter.on(this.innerEvent, (event) => {
+    emitter.on({
+      eventId: IConstant.ROOM_WS_ID
+    }, (event) => {
       if (event.data.roomId && event.data.roomId != null) {
         this.roomId = event.data.roomId
         this.ws?.send(generatorBindMsg(event.data.roomId))
+      }
+    })
+    emitter.on({ eventId: IConstant.WS_GROUP_ID }, (event) => {
+      if (event.data.type == 'init') {
+        `${event.data.data}`.split(',').forEach((group) => {
+          this.ws?.send(generatorBindMsg(group))
+        })
       }
     })
   }
@@ -101,6 +109,15 @@ export class SocketTask {
     });
   }
 
+  checkWs() {
+    setTimeout(this.timer, 1_000)
+  }
+
+  receiptMsg(mid: string) {
+    LogUtil.d("West", 'receipt  :' + mid)
+    this.ws?.send(generatorReceipt(mid))
+  }
+
   private shutDownWs() {
     this.ws?.close()
     this.ws = null
@@ -110,10 +127,6 @@ export class SocketTask {
     setTimeout(() => {
       this.createWs()
     }, 2_000)
-  }
-
-  checkWs() {
-    setTimeout(this.timer, 1_000)
   }
 
   private clearTime() {
@@ -184,6 +197,59 @@ export class SocketTask {
         }
         break;
       case "message": //聊天消息
+      //存入数据库
+        let msg: MsgBean = JSON.parse(respData.data)
+      //发送消息回执
+        this.ws?.send(generatorReceiptSingle(msg.mid))
+        msg.listId = msg.type + (IConstant.GROUP == msg.type || msg.from == globalThis.uid ? msg.to : msg.from)
+        if (msg.from == globalThis.uid) { //自己发送
+          //修改自己发送消息状态
+          if (msg.sendId == '' || msg.sendId == null) {
+
+          } else {
+
+          }
+        } else { //收到消息
+
+          Dao.getRdbModel().insertMsg(msg)
+        }
+        emitter.emit({
+          eventId: IConstant.WS_MSG_ID,
+          priority: emitter.EventPriority.IMMEDIATE
+        }, {
+          data: {
+            "data": respData.data,
+          } })
+        break;
+      case 'message_froward':
+
+        break;
+      case 'addGroup':
+
+        break;
+      case 'group_del_msg':
+
+        break;
+      case 'supervise': //变更群成员身份
+        break;
+      case 'readMsg': //已读
+
+        break;
+      case 'pullMessage':
+
+        break;
+      case 'disturb':
+
+        break;
+      case 'outGroup':
+
+        break;
+      case 'friendApply':
+      case 'addFriend':
+      case 'removeFriend':
+      case 'removeGroup':
+      case 'revoke':
+      case 'groupApply':
 
 
         break;

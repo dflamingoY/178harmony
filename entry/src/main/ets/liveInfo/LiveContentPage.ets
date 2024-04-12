@@ -121,7 +121,7 @@ export struct LiveContentPage {
   private sendWsRoom() {
     let eventData = {
       data: {
-        "roomId": `room-${this.roomId}`
+        "roomId": `${IConstant.ROOM_WS_PREFIX}${this.roomId}`
       } }
     let innerEvent = {
       eventId: IConstant.ROOM_WS_ID,

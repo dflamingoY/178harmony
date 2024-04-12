@@ -1,4 +1,5 @@
 export class MsgBean {
+  id: number = 0
   from_name_ios: string = '' //用户备注
   listId: string = ''
   mid: string = ''
@@ -19,7 +20,7 @@ export class MsgBean {
   verifyStatus: string = ''
   role: number = 0
   timestamp: number = 0
-  msgStatus: number = 0
+  msgStatus: number = 0 //消息发送状态  0 成功 1 发送中 2 失败 客户端定义
   unread_count: number = 0
   identity: number = 0
   content: string = ''

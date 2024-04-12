@@ -100,7 +100,6 @@ export struct GroupListPage {
         .margin({ left: '73vp' })
     }.height('60vp')
     .width('100%')
-
   }
 
   aboutToAppear() {

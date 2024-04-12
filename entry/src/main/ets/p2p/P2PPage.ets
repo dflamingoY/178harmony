@@ -14,6 +14,8 @@ import { ChatButtonState } from '../data/ChatButtonState'
 import { ChatEmoji } from '../widget/ChatEmoji'
 import window from '@ohos.window'
 import LogUtil from '../utils/LogUtil'
+import emitter from '@ohos.events.emitter'
+import util from '@ohos.util'
 
 @Entry
 @Component
@@ -33,6 +35,7 @@ export struct P2PPage {
   @State msgContent: string = ''
   @State chatMenuState: ChatButtonState = ChatButtonState.Default
   @State phoneFocuseAble: boolean = true
+  scroll = new Scroller()
 
   build() {
     Stack({ alignContent: Alignment.Top }) {
@@ -94,7 +97,7 @@ export struct P2PPage {
         .height('48vp')
 
         Refresh({ refreshing: $$this.isRefreshing, offset: 20, friction: 100 }) {
-          List() {
+          List({ scroller: this.scroll }) {
             ForEach(this.msgList, (item: MsgBean) => {
               ListItem() {
                 this.buildMsgItem(item)
@@ -107,16 +110,16 @@ export struct P2PPage {
 
         Column() {
           RelativeContainer() {
-           /* Image($r('app.media.icon_record_default'))
-              .width('27vp')
-              .height('27vp')
-              .padding('2vp')
-              .id('idRecord')
-              .margin({ left: '12vp', top: '12vp' })
-              .alignRules({
-                top: { anchor: "__container__", align: VerticalAlign.Top },
-                left: { anchor: "__container__", align: HorizontalAlign.Start }
-              })*/
+            /* Image($r('app.media.icon_record_default'))
+               .width('27vp')
+               .height('27vp')
+               .padding('2vp')
+               .id('idRecord')
+               .margin({ left: '12vp', top: '12vp' })
+               .alignRules({
+                 top: { anchor: "__container__", align: VerticalAlign.Top },
+                 left: { anchor: "__container__", align: HorizontalAlign.Start }
+               })*/
             TextArea({ text: this.msgContent })
               .fontColor(IColors.color1R1E20)
               .fontSize('15fp')
@@ -198,12 +201,12 @@ export struct P2PPage {
           .borderRadius({ topLeft: '10vp', topRight: '10vp' })
           .height('58vp')
 
-         /* if (this.chatMenuState == ChatButtonState.Menu) {
-            ChatMenu()
-          }
-          else if (this.chatMenuState == ChatButtonState.Emoji) {
-            ChatEmoji()
-          }*/
+          /* if (this.chatMenuState == ChatButtonState.Menu) {
+             ChatMenu()
+           }
+           else if (this.chatMenuState == ChatButtonState.Emoji) {
+             ChatEmoji()
+           }*/
         }
       }
     }
@@ -268,121 +271,133 @@ export struct P2PPage {
                 }
               }.justifyContent(item.from == globalThis.uid ? FlexAlign.End : FlexAlign.Start)
             } else {
-              Divider().color(Color.Transparent).height('18vp')
+              Divider().color(Color.Transparent).height('8vp')
             }
-            Column() { //内容展示区
-              if (item.content_type == "img") {
-                Image(item.content)
-                  .width('154vp')
+
+            Flex({
+              direction: FlexDirection.Row,
+              justifyContent: (item.from == globalThis.uid ? FlexAlign.End : FlexAlign.Start),
+              alignItems: ItemAlign.Center
+            }) {
+              if (item.msgStatus == 2) {
+                Image($r('app.media.nim_ic_failed'))
+                  .width('20vp')
+                  .height('20vp')
+                  .margin({ right: '8vp' })
+              }
+              Column() { //内容展示区
+                if (item.content_type == "img") {
+                  Image(item.content)
+                    .width('154vp')
+                    .height('86vp')
+                    .borderRadius('6vp')
+                } else if (item.content_type == "voice") {
+                  Row() {
+                    Image(item.isPlay ? $r('app.media.icon_audio_play_right_pause') : $r('app.media.icon_audio_play_right_start'))
+                      .width('23vp')
+                      .height('23vp')
+                      .margin({ left: '8vp' })
+
+                    Divider().width('50vp')
+                      .color(Color.Transparent)
+
+                    Text(item.remark??"1'")
+                      .fontColor(item.from == globalThis.uid ? Color.White : IColors.colorOrange)
+                      .margin({ right: '8vp' })
+                      .fontSize('14fp')
+                  }.height('36vp')
+                  .backgroundColor(item.from == globalThis.uid ? IColors.color1R1E20 : Color.White)
+                  .borderRadius('6vp')
+                } else if (item.content_type == "video") {
+                  Stack({ alignContent: Alignment.Center }) {
+                    Image(item.remark)
+                      .width('100%')
+                      .height('100%')
+                      .borderRadius('6vp')
+
+                    Rect().borderRadius('6vp')
+                      .backgroundColor(0x7f000000)
+                      .fill(0x7f000000)
+
+                    Image($r('app.media.icon_video_play'))
+                      .width('34vp')
+                      .height('34vp')
+                  }.width('154vp')
                   .height('86vp')
                   .borderRadius('6vp')
-              } else if (item.content_type == "voice") {
-                Row() {
-                  Image(item.isPlay ? $r('app.media.icon_audio_play_right_pause') : $r('app.media.icon_audio_play_right_start'))
-                    .width('23vp')
-                    .height('23vp')
-                    .margin({ left: '8vp' })
+                } else if (item.content_type == "file") {
+                  Flex({ direction: FlexDirection.Row }) {
+                    if (item.from != globalThis.uid) {
+                      Image(this.getFileType(item.remark))
+                        .width('30vp')
+                        .height('39vp')
+                        .margin({ left: '8vp', top: '10vp' })
+                    }
+                    Column() {
+                      Text(this.getFileName(item.remark))
+                        .fontSize('12fp')
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .maxLines(2)
+                        .margin({ top: '5vp', right: '10vp' })
+                        .fontColor(item.from != globalThis.uid ? IColors.color1R1E20 : Color.White)
+                      Blank()
+                      Text(this.getFileSize(item.remark))
+                        .fontSize('11fp')
+                        .width('100%')
+                        .textAlign(TextAlign.End)
+                        .fontColor(IColors.color666)
+                        .margin({ bottom: '5vp', right: '10vp' })
 
-                  Divider().width('50vp')
-                    .color(Color.Transparent)
+                    }.margin({ left: '8vp', right: '8vp' }).width('100%')
 
-                  Text(item.remark??"1'")
-                    .fontColor(item.from == globalThis.uid ? Color.White : IColors.colorOrange)
-                    .margin({ right: '8vp' })
-                    .fontSize('14fp')
-                }.height('36vp')
-                .backgroundColor(item.from == globalThis.uid ? IColors.color1R1E20 : Color.White)
-                .borderRadius('6vp')
-              } else if (item.content_type == "video") {
-                Stack({ alignContent: Alignment.Center }) {
-                  Image(item.remark)
-                    .width('100%')
-                    .height('100%')
-                    .borderRadius('6vp')
-
-                  Rect().borderRadius('6vp')
-                    .backgroundColor(0x7f000000)
-                    .fill(0x7f000000)
-
-                  Image($r('app.media.icon_video_play'))
-                    .width('34vp')
-                    .height('34vp')
-                }.width('154vp')
-                .height('86vp')
-                .borderRadius('6vp')
-              } else if (item.content_type == "file") {
-                Flex({ direction: FlexDirection.Row }) {
-                  if (item.from != globalThis.uid) {
-                    Image(this.getFileType(item.remark))
-                      .width('30vp')
-                      .height('39vp')
-                      .margin({ left: '8vp', top: '10vp' })
-                  }
-                  Column() {
-                    Text(this.getFileName(item.remark))
-                      .fontSize('12fp')
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                      .maxLines(2)
-                      .margin({ top: '5vp', right: '10vp' })
-                      .fontColor(item.from != globalThis.uid ? IColors.color1R1E20 : Color.White)
-                    Blank()
-                    Text(this.getFileSize(item.remark))
-                      .fontSize('11fp')
-                      .width('100%')
-                      .textAlign(TextAlign.End)
-                      .fontColor(IColors.color666)
-                      .margin({ bottom: '5vp', right: '10vp' })
-
-                  }.margin({ left: '8vp', right: '8vp' }).width('100%')
-
-                  if (item.from == globalThis.uid) {
-                    Image(this.getFileType(item.remark))
-                      .width('30vp')
-                      .height('39vp')
-                      .margin({ left: '8vp', top: '10vp' })
-                  }
-                }.width('200vp')
-                .height('59vp')
-                .borderRadius('5vp')
-                .backgroundColor(item.from == globalThis.uid ? IColors.color1R1E20 : Color.White)
-              } else if (item.content_type == 'call' || item.content_type == 'VOICE_CALL') { //语音通话
-                Row() {
-                  if (item.from != globalThis.uid) {
-                    Image($r('app.media.icon_chat_voice_from'))
-                      .fitOriginalSize(true)
-                  }
-
-                  Text('语音通话')
-                    .fontSize('14fp')
-                    .margin({ left: '5vp', right: '5vp' })
-                    .fontColor(item.from == globalThis.uid ? Color.White : IColors.color1R1E20)
-                  if (item.from == globalThis.uid) {
-                    Image($r('app.media.icon_chat_voice_to'))
-                      .fitOriginalSize(true)
-                  }
-
-                }.borderRadius('5vp')
-                .backgroundColor(item.from == globalThis.uid ? IColors.color1R1E20 : Color.White)
-                .padding({ left: '8vp', top: '10vp', right: '8vp', bottom: '10vp' })
-
-              } else { //所有未处理的类型默认为txt文本
-                Text(item.content)
-                  .fontSize('14fp')
-                  .padding({ left: '8vp', top: '10vp', right: '8vp', bottom: '10vp' })
-                  .fontColor(item.from == globalThis.uid ? Color.White : IColors.color1R1E20)
+                    if (item.from == globalThis.uid) {
+                      Image(this.getFileType(item.remark))
+                        .width('30vp')
+                        .height('39vp')
+                        .margin({ left: '8vp', top: '10vp' })
+                    }
+                  }.width('200vp')
+                  .height('59vp')
                   .borderRadius('5vp')
                   .backgroundColor(item.from == globalThis.uid ? IColors.color1R1E20 : Color.White)
+                } else if (item.content_type == 'call' || item.content_type == 'VOICE_CALL') { //语音通话
+                  Row() {
+                    if (item.from != globalThis.uid) {
+                      Image($r('app.media.icon_chat_voice_from'))
+                        .fitOriginalSize(true)
+                    }
+
+                    Text('语音通话')
+                      .fontSize('14fp')
+                      .margin({ left: '5vp', right: '5vp' })
+                      .fontColor(item.from == globalThis.uid ? Color.White : IColors.color1R1E20)
+                    if (item.from == globalThis.uid) {
+                      Image($r('app.media.icon_chat_voice_to'))
+                        .fitOriginalSize(true)
+                    }
+
+                  }.borderRadius('5vp')
+                  .backgroundColor(item.from == globalThis.uid ? IColors.color1R1E20 : Color.White)
+                  .padding({ left: '8vp', top: '10vp', right: '8vp', bottom: '10vp' })
+                } else { //所有未处理的类型默认为txt文本
+                  Text(item.content)
+                    .fontSize('14fp')
+                    .padding({ left: '8vp', top: '10vp', right: '8vp', bottom: '10vp' })
+                    .fontColor(item.from == globalThis.uid ? Color.White : IColors.color1R1E20)
+                    .borderRadius('5vp')
+                    .backgroundColor(item.from == globalThis.uid ? IColors.color1R1E20 : Color.White)
+                }
               }
+              .gesture(LongPressGesture().onAction(() => {
+                promptAction.showToast({ message: "获取到长按事件", duration: 500 })
+              }))
             }
             .width('80%')
             .margin({ left: '8vp', right: '8vp', top: '4vp' })
-            .alignItems(item.from == globalThis.uid ? HorizontalAlign.End : HorizontalAlign.Start)
-            .gesture(LongPressGesture().onAction(() => {
-              promptAction.showToast({ message: "获取到长按事件", duration: 500 })
-            }))
           }
           .margin({ top: '12vp' })
           .width('100%')
+          // .backgroundColor(0x7f1ff199)
           .alignItems(item.from == globalThis.uid ? HorizontalAlign.End : HorizontalAlign.Start)
 
           if (item.from == globalThis.uid) {
@@ -447,20 +462,28 @@ export struct P2PPage {
     }
   }
 
-  private sendMsg() {
+  private async sendMsg() {
     let msgBean = new MsgBean()
     msgBean.content_type = 'txt'
     msgBean.content = this.msgContent
     msgBean.listId = this.type + this.chatId
     msgBean.sub_type = "message"
     msgBean.to = this.chatId
+    msgBean.type = this.type
     msgBean.from = globalThis.uid
     msgBean.from_name = globalThis.user['nickname']
     msgBean.from_avatar = globalThis.user['avatar']
-    // msgBean.timestamp=
+    msgBean.sendId = util.generateRandomUUID(false) + ':' + msgBean.to //创建不重复的UUID
+    msgBean.mid = msgBean.sendId
+    msgBean.msgStatus = 1
+    await systemDateTime.getCurrentTime(false).then((time) => {
+      msgBean.timestamp = time / 1000
+    })
     this.msgList.push(msgBean)
-
+    UserViewModel.sendMsg(msgBean)
     this.msgContent = ''
+    Dao.getRdbModel().insertMsg(msgBean)
+    this.scroll.scrollToIndex(this.msgList.length - 1)
   }
 
   aboutToAppear() {
@@ -473,9 +496,8 @@ export struct P2PPage {
       this.currentTime = time
     })
     Dao.getRdbModel()?.getMsgByChatId(`${type + id}`, 20).then((msg) => {
-      msg.forEach((item) => {
-        this.msgList.push(item)
-      })
+      this.msgList = this.msgList.concat(msg)
+      this.scroll.scrollToIndex(this.msgList.length - 1)
     }).catch((e: Error) => {
 
     })
@@ -489,6 +511,18 @@ export struct P2PPage {
         this.name = group.group.groupname
       })
     }
+    emitter.on({ eventId: IConstant.WS_MSG_ID }, (event) => {
+      let msgBean: MsgBean = JSON.parse(event.data.data)
+      if (msgBean.from == globalThis.uid) {
+        //更新状态，没有此条就加入
+        
+      } else {
+        this.msgList.push(msgBean)
+      }
+    })
+  }
 
+  aboutToDisappear() {
+    emitter.off(IConstant.WS_MSG_ID)
   }
 }

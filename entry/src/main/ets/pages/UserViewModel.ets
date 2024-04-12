@@ -1,12 +1,15 @@
+import emitter from '@ohos.events.emitter'
 import { BaseResp } from '../data/Data'
 import { FriendKeyData } from '../data/FriendKeyData'
 import { GroupBean, GroupDetails } from '../data/GroupData'
 import { MatchSearchData } from '../data/MatchData'
-import { RecentBean } from '../data/MsgBean'
+import { MsgBean, RecentBean } from '../data/MsgBean'
 import { OffLineData } from '../data/OffLineData'
 import { UserBean } from '../data/user'
 import Dao from '../db/Dao'
 import { getData, post } from '../net/HttpUtils'
+import SocketTask from '../net/SocketTask'
+import IConstant from '../utils/IConstant'
 import LogUtil from '../utils/LogUtil'
 
 class UserViewModel {
@@ -65,12 +68,37 @@ class UserViewModel {
     })
   }
 
+  async getGroupSaveCached() {
+    await getData('lists_group').then((resp: BaseResp) => {
+      if (resp.code == 200) {
+        try {
+          let groups: Array<GroupBean> = resp.data as Array<GroupBean>
+          let allWsIds = groups?.map((item) => {
+            return `${IConstant.GROUP_WS_PREFIX}${item.gid}`
+          })
+          emitter.emit({ eventId: IConstant.WS_GROUP_ID, priority: emitter.EventPriority.IMMEDIATE }, { data: {
+            "data": allWsIds.join(','),
+            'type': 'init'
+          } })
+        } catch (e) {
+        }
+      }
+    })
+  }
+
   async getOffline() {
     getData("get_off_line_msg").then((resp: BaseResp) => {
       if (resp.code == 200) {
         let result: OffLineData = JSON.parse(JSON.stringify(resp.data))
         //数据库存储
         Dao.getRdbModel()?.insertMsgs(result)
+        //发送已收回执
+        let mids = result.msg?.map((item) => {
+          return item.mid
+        })
+        if (mids && mids != null) {
+          SocketTask.receiptMsg(JSON.stringify(mids))
+        }
       }
     }).catch((e: Error) => {
       LogUtil.d("West", `getOffline ${e.message}`)
@@ -140,19 +168,28 @@ class UserViewModel {
   /*
   发送消息
    */
-  async sendMsg(to: string, type: string, content_type: string, content: string, remark: string, verify: string) {
+  async sendMsg(msgBean: MsgBean) {
     let msg = {
-      "to": to,
-      'type': type,
-      'content_type': content_type,
-      'content': content,
-      'remark': remark,
-      'verify': verify
+      "to": msgBean.to,
+      'type': msgBean.type == IConstant.GROUP ? '2' : '1',
+      'content_type': msgBean.content_type,
+      'content': msgBean.content,
+      'remark': msgBean.remark??'',
+      'verify': msgBean.sendId
     }
-    post("send", msg).then((MsgBean) => {
-
+    await  post("send", msg).then((value) => {
+      if (value.code == 200) {
+        let result: MsgBean = value.data as MsgBean
+        //更新本地mid 和发送状态
+        msgBean.mid = result.mid
+        msgBean.msgStatus = 0
+      } else {
+        msgBean.msgStatus = 2
+        Dao.getRdbModel().updateMsg(msgBean)
+      }
     }).catch(() => {
-
+      msgBean.msgStatus = 2
+      Dao.getRdbModel().updateMsg(msgBean)
     })
   }
 

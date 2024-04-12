@@ -128,7 +128,7 @@ export default class Rdb {
   updateData(predicates: relationalStore.RdbPredicates, data: relationalStore.ValuesBucket, callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
-      LogUtil.d("Dao", this.tableName + 'updateDate() has no callback!');
+      LogUtil.d("Dao", this.tableName + '  updateDate() has no callback!');
       return;
     }
     let resFlag: boolean = false;
@@ -136,11 +136,11 @@ export default class Rdb {
     if (this.rdbStore) {
       this.rdbStore.update(valueBucket, predicates, (err, ret) => {
         if (err) {
-          LogUtil.d("Dao", this.tableName + `updateData() failed, err: ${err}`);
+          LogUtil.d("Dao", this.tableName + ` updateData() failed, err: ${err}`);
           callback(resFlag);
           return;
         }
-        LogUtil.d("Dao", this.tableName + `updateData() finished: ${ret}`);
+        LogUtil.d("Dao", this.tableName + ` updateData() finished: ${ret}`);
         callback(!resFlag);
       });
     }
@@ -190,4 +190,5 @@ export default class Rdb {
       return this.rdbStore.query(predicates, this.columns)
     } else return null
   }
+
 }

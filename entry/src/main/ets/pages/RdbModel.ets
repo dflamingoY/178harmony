@@ -22,7 +22,6 @@ export class RdbModel {
     new Promise(() => {
       this.friendTable.deleteAll()
       this.friendTable.insertTx(user, () => {
-
       })
     })
   }
@@ -40,7 +39,6 @@ export class RdbModel {
           item.listId = IConstant.GROUP + item.to
         }
       })
-      this.msgTable.deleteAll()
       this.msgTable.insertTx(offline.msg, () => {
       })
       //插入数据之后更新最近聊天列表
@@ -125,6 +123,20 @@ export class RdbModel {
 
   getMsgByChatId(key: string, offset: number): Promise<Array<MsgBean>> {
     return this.msgTable.getChatListByKey(key)
+  }
+
+  async insertMsg(msg: MsgBean) {
+    this.msgTable.insert(msg, () => {
+    })
+  }
+
+  queryMsgByMid(mid: string) {
+    return this.msgTable.queryBySendId(mid)
+  }
+
+  async updateMsg(msg: MsgBean) {
+    this.msgTable.update(msg, () => {
+    })
   }
 
   getRecentList() {

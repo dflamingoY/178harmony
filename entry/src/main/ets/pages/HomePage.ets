@@ -9,6 +9,8 @@ import router from '@ohos.router';
 import IConstant from '../utils/IConstant';
 import emitter from '@ohos.events.emitter';
 import SocketTask from '../net/SocketTask';
+import { isLogin } from '../login/LoginPlugin';
+import UserViewModel from './UserViewModel';
 
 @Entry
 @Component
@@ -42,14 +44,24 @@ struct HomePage {
   aboutToAppear() {
     router.clear()
     SocketTask.createWs()
+    if (isLogin()) {
+      this.getLoginData()
+    }
     emitter.on(this.innerEvent, () => {
       if (!globalThis.user || globalThis.user == null) {
         this.currentIndex = 0
+      } else {
+        this.getLoginData()
       }
     })
     emitter.on({ eventId: IConstant.APP_IN_FOREGROUND }, () => {
       SocketTask.checkWs()
     })
+  }
+  //登陆之后需要获取的数据
+  private getLoginData() {
+    UserViewModel.getGroupSaveCached()
+    UserViewModel.getOffline()
   }
 
   innerEvent = {
