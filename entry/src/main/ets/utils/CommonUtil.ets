@@ -39,6 +39,10 @@ class CommonUtil {
     }
   }
 
+  isCloseEnough(time: number): boolean {
+    return time < 60_000
+  }
+
   showToast(message: string) {
     promptAction.showToast({ message: message, duration: 500 })
   }

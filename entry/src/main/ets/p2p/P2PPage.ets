@@ -16,6 +16,7 @@ import window from '@ohos.window'
 import LogUtil from '../utils/LogUtil'
 import emitter from '@ohos.events.emitter'
 import util from '@ohos.util'
+import { DialogPressMsg } from '../dialog/DialogPressMsg'
 
 @Entry
 @Component
@@ -98,9 +99,9 @@ export struct P2PPage {
 
         Refresh({ refreshing: $$this.isRefreshing, offset: 20, friction: 100 }) {
           List({ scroller: this.scroll }) {
-            ForEach(this.msgList, (item: MsgBean) => {
+            ForEach(this.msgList, (item: MsgBean, index: number) => {
               ListItem() {
-                this.buildMsgItem(item)
+                this.buildMsgItem(item, index + 1 < this.msgList.length ? this.msgList[index-1] : null)
               }
             })
           }.height('100%')
@@ -214,11 +215,12 @@ export struct P2PPage {
   }
 
   @Builder
-  private buildMsgItem(item: MsgBean) {
+  private buildMsgItem(item: MsgBean, next: MsgBean | null) {
     Column() {
-      Text(CommonUtil.parseTime(this.currentTime - item.timestamp, item.timestamp))
-        .fontSize(IColors.color999)
-        .fontSize('12fp').margin({ top: '8vp' })
+      if (next == null || !CommonUtil.isCloseEnough(item.timestamp - next.timestamp))
+        Text(CommonUtil.parseTime(this.currentTime - item.timestamp, item.timestamp))
+          .fontColor(IColors.color91939A)
+          .fontSize('12fp').margin({ top: '8vp' })
       if (item.content_type == "notice" || item.sub_type == "notice") {
         Text(item.content).fontSize('12fp')
           .fontColor(IColors.color999)
@@ -282,6 +284,16 @@ export struct P2PPage {
               if (item.msgStatus == 2) {
                 Image($r('app.media.nim_ic_failed'))
                   .width('20vp')
+                  .height('20vp')
+                  .margin({ right: '8vp' })
+                  .onClick(() => { //重新发送
+                    item.msgStatus = 1
+                    UserViewModel.sendMsg(item)
+                  })
+              } else if (item.msgStatus == 1) {
+                LoadingProgress()
+                  .width('20vp')
+                  .color(IColors.colorOrange)
                   .height('20vp')
                   .margin({ right: '8vp' })
               }
@@ -389,7 +401,8 @@ export struct P2PPage {
                 }
               }
               .gesture(LongPressGesture().onAction(() => {
-                promptAction.showToast({ message: "获取到长按事件", duration: 500 })
+                this.operatorBean = item
+                this.dialogController.open()
               }))
             }
             .width('80%')
@@ -416,6 +429,64 @@ export struct P2PPage {
         }.width('100%')
       }
     }.justifyContent(FlexAlign.Center).width('100%')
+  }
+
+  @State operatorBean: MsgBean | null = null
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: DialogPressMsg({
+      msgBean: this.operatorBean,
+      onRevoke: this.onRevoke,
+      onCollect: this.onCollect,
+      onDelete: (msg) => {
+        this.onDelete(msg)
+      }
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Bottom,
+    customStyle: false,
+    offset: { dx: 0, dy: -20 },
+    gridCount: 4
+  })
+
+  onRevoke(msg: MsgBean) {
+    if (msg != null) {
+      UserViewModel.revoke(this.operatorBean.mid, '1', this.chatId)
+    }
+  }
+
+  onCollect(msg: MsgBean) {
+
+  }
+
+  onDelete(msg: MsgBean) {
+    AlertDialog.show({
+      message: '是否删除该消息？',
+      primaryButton: {
+        value: '取消',
+        fontColor: IColors.color91939A,
+        action: () => {
+
+        }
+      },
+      secondaryButton: {
+        value: '删除',
+        fontColor: IColors.colorOrange,
+        action: () => {
+          if (msg != null) {
+            Dao.getRdbModel()
+              .executeSql(`DELETE FROM msg WHERE mid = ${msg.mid.includes(':') ? `'${msg.mid}'` : msg.mid}`)
+            this.filterRemove(msg.mid)
+          }
+        }
+      }
+    })
+  }
+
+  private filterRemove(mid: string) {
+    let filter = this.msgList.filter((item) => {
+      return item.mid != mid
+    })
+    this.msgList = filter
   }
 
   private getFileType(remark: string): Resource {
@@ -486,20 +557,23 @@ export struct P2PPage {
     this.scroll.scrollToIndex(this.msgList.length - 1)
   }
 
+  onPageShow() {
+    systemDateTime.getCurrentTime(false).then((time: number) => {
+      this.currentTime = Math.ceil(time / 1000)
+    })
+  }
+
   aboutToAppear() {
     let params = router.getParams() as Record<string, object>
     let type = params.type as unknown as string
     let id = params.id
     this.chatId = id as unknown as string
     this.type = type
-    systemDateTime.getCurrentTime(false).then((time: number) => {
-      this.currentTime = time
-    })
+
     Dao.getRdbModel()?.getMsgByChatId(`${type + id}`, 20).then((msg) => {
       this.msgList = this.msgList.concat(msg)
       this.scroll.scrollToIndex(this.msgList.length - 1)
     }).catch((e: Error) => {
-
     })
     if (type == IConstant.FRIEND) {
       UserViewModel.getFriendInfo(id.toString()).then((user) => {
@@ -515,7 +589,14 @@ export struct P2PPage {
       let msgBean: MsgBean = JSON.parse(event.data.data)
       if (msgBean.from == globalThis.uid) {
         //更新状态，没有此条就加入
-        
+        let emitMsg = this.msgList.find((item) => {
+          item.mid == msgBean.mid || item.sendId == msgBean.sendId
+        })
+        if (emitMsg && emitMsg != null) {
+          emitMsg = msgBean
+        } else {
+          this.msgList.push(msgBean)
+        }
       } else {
         this.msgList.push(msgBean)
       }

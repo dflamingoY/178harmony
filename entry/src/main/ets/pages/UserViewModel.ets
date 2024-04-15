@@ -87,7 +87,7 @@ class UserViewModel {
   }
 
   async getOffline() {
-    getData("get_off_line_msg").then((resp: BaseResp) => {
+    await getData("get_off_line_msg").then((resp: BaseResp) => {
       if (resp.code == 200) {
         let result: OffLineData = JSON.parse(JSON.stringify(resp.data))
         //数据库存储
@@ -183,13 +183,15 @@ class UserViewModel {
         //更新本地mid 和发送状态
         msgBean.mid = result.mid
         msgBean.msgStatus = 0
+        Dao.getRdbModel()
+          .executeSql(`UPDATE msg SET msgStatus = 0,mid = '${result.mid}' WHERE sendId = '${msgBean.sendId}' `)
       } else {
         msgBean.msgStatus = 2
-        Dao.getRdbModel().updateMsg(msgBean)
+        Dao.getRdbModel().executeSql(`UPDATE msg SET msgStatus = 2 WHERE sendId = '${msgBean.sendId}' `)
       }
     }).catch(() => {
       msgBean.msgStatus = 2
-      Dao.getRdbModel().updateMsg(msgBean)
+      Dao.getRdbModel().executeSql(`UPDATE msg SET msgStatus = 2 WHERE sendId = '${msgBean.sendId}' `)
     })
   }
 
@@ -303,6 +305,17 @@ class UserViewModel {
       }).catch((err) => {
         reject(err.message)
       })
+    })
+  }
+
+  /*
+  消息撤回
+   */
+  async revoke(mid: string, type: string, to: string) {
+    await post('revoke', { 'mid': 'type', type: 'to', to }).then((value) => {
+      if (value.code == 200) { //更新聊天框ui
+        Dao.getRdbModel().revoke(mid)
+      }
     })
   }
 }

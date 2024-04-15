@@ -11,6 +11,7 @@ import emitter from '@ohos.events.emitter';
 import SocketTask from '../net/SocketTask';
 import { isLogin } from '../login/LoginPlugin';
 import UserViewModel from './UserViewModel';
+import Dao from '../db/Dao';
 
 @Entry
 @Component
@@ -46,6 +47,7 @@ struct HomePage {
     SocketTask.createWs()
     if (isLogin()) {
       this.getLoginData()
+      Dao.getRdbModel().updateMsgSendToFail()
     }
     emitter.on(this.innerEvent, () => {
       if (!globalThis.user || globalThis.user == null) {

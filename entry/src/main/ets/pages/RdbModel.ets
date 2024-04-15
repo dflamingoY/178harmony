@@ -142,5 +142,20 @@ export class RdbModel {
   getRecentList() {
     return this.recentTable.getAll()
   }
+
+  /*
+   * 执行sql语句
+   */
+  executeSql(sql: string) {
+    this.msgTable.executeSql(sql)
+  }
+
+  revoke(mid: string) {
+    this.msgTable.executeSql(`UPDATE msg SET content = '此消息已撤回' , content_type = 'notice' WHERE mid = ${mid} `)
+  }
+
+  updateMsgSendToFail() {
+    this.msgTable.executeSql(`UPDATE msg SET msgStatus = 2 WHERE msgStatus = 1 `)
+  }
 }
 

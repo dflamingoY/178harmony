@@ -21,7 +21,9 @@ let STORE_CONFIG: relationalStore.StoreConfig = {
   name: globalThis.uid + IConstant.db_name,
   securityLevel: relationalStore.SecurityLevel.S1
 };
-
+/* 更新语句：UPDATE tableName SET xx=xx WHERE condition
+   删除语句：DELETE FROM tableName WHERE condition
+ */
 export default class Rdb {
   private rdbStore: relationalStore.RdbStore | null = null;
   private tableName: string;
@@ -159,7 +161,6 @@ export default class Rdb {
     }
   }
 
-
   query(predicates: relationalStore.RdbPredicates, callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
@@ -191,4 +192,15 @@ export default class Rdb {
     } else return null
   }
 
+  executeSql(sql: string) {
+    if (this.rdbStore) {
+      this.rdbStore.executeSql(sql, [], (err, data) => {
+        if (err) {
+          LogUtil.d("Dao", this.tableName + ` executeSql() failed, err:  ${err.message}`);
+          return;
+        }
+        LogUtil.d("Dao", this.tableName + '  executeSql() finished.');
+      })
+    }
+  }
 }

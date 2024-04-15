@@ -74,9 +74,16 @@ export default class MsgTable {
       })
     })
   }
+  /**
+   * 执行sql 语句删除或者更新数据
+   * @param sql 操作语句
+   */
+  executeSql(sql: string) {
+    this.msgTable.executeSql(sql)
+  }
 
-  deleteFromMid() {
-
+  deleteFromMid(mid: string) {
+    this.msgTable.executeSql('DELETE FROM msg WHERE mid = ' + mid)
   }
 
   getByMid(mid: string) {

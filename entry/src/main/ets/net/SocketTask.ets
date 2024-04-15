@@ -7,6 +7,7 @@ import IConstant from '../utils/IConstant';
 import CryptoJS from '@ohos/crypto-js'
 import { MsgBean } from '../data/MsgBean';
 import Dao from '../db/Dao';
+import UserViewModel from '../pages/UserViewModel';
 
 var defaultIpAddress = "wss://ws.gqj.live";
 
@@ -136,7 +137,7 @@ export class SocketTask {
   }
 
   private parseWs(value: string | ArrayBuffer) {
-    var respData: SocketData = JSON.parse(value.toString())
+    let respData: SocketData = JSON.parse(value.toString())
     LogUtil.d("Socket", "message:" + value + "  " + respData)
     switch (respData.event) {
       case "pushMatch": //match_type   match_id on_time away_score home_score
@@ -205,12 +206,11 @@ export class SocketTask {
         if (msg.from == globalThis.uid) { //自己发送
           //修改自己发送消息状态
           if (msg.sendId == '' || msg.sendId == null) {
-
-          } else {
+            //直接存入
+          } else { //查询数据库是否有数据 ，则单独另外存储
 
           }
         } else { //收到消息
-
           Dao.getRdbModel().insertMsg(msg)
         }
         emitter.emit({
@@ -239,10 +239,10 @@ export class SocketTask {
 
         break;
       case 'disturb':
-
+        UserViewModel.getOffline()
         break;
       case 'outGroup':
-
+      // this.ws?.send(generatorUnbindGroup())
         break;
       case 'friendApply':
       case 'addFriend':
@@ -250,8 +250,10 @@ export class SocketTask {
       case 'removeGroup':
       case 'revoke':
       case 'groupApply':
-
-
+        let socket = JSON.parse(respData.data)
+        if ('revoke' == respData.event) {
+          Dao.getRdbModel().revoke(socket.mid)
+        }
         break;
     }
   }
