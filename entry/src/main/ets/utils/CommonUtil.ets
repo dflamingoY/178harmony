@@ -31,7 +31,7 @@ class CommonUtil {
       Math.floor(dTime / 60)
       return Math.floor(dTime / 60) + "分钟前";
     } else if (dTime < 86400) {
-      return Math.floor(dTime / 3600).valueOf() + "小时前在线";
+      return Math.floor(dTime / 3600).valueOf() + "小时前";
     } else {
       let datefmt = new Intl.DateTimeFormat();
       let result = datefmt.format(time * 1000)

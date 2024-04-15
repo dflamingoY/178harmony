@@ -407,6 +407,13 @@ export struct P2PPage {
             }
             .width('80%')
             .margin({ left: '8vp', right: '8vp', top: '4vp' })
+
+            if (this.type == IConstant.FRIEND && globalThis.uid == item.from && item.msgStatus == 0) {
+              Text(item.isRead == 0 ? '未读' : '已读')
+                .fontSize('13fp')
+                .margin({ right: '12vp', top: '10vp' })
+                .fontColor(item.isRead == 0 ? IColors.colorOrange : IColors.color999)
+            }
           }
           .margin({ top: '12vp' })
           .width('100%')
@@ -435,8 +442,12 @@ export struct P2PPage {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: DialogPressMsg({
       msgBean: this.operatorBean,
-      onRevoke: this.onRevoke,
-      onCollect: this.onCollect,
+      onRevoke: (msg) => {
+        this.onRevoke(msg)
+      },
+      onCollect: (msg) => {
+        this.onCollect(msg)
+      },
       onDelete: (msg) => {
         this.onDelete(msg)
       }
@@ -448,17 +459,17 @@ export struct P2PPage {
     gridCount: 4
   })
 
-  onRevoke(msg: MsgBean) {
+  private onRevoke(msg: MsgBean) {
     if (msg != null) {
       UserViewModel.revoke(this.operatorBean.mid, '1', this.chatId)
     }
   }
 
-  onCollect(msg: MsgBean) {
+  private onCollect(msg: MsgBean) {
 
   }
 
-  onDelete(msg: MsgBean) {
+  private onDelete(msg: MsgBean) {
     AlertDialog.show({
       message: '是否删除该消息？',
       primaryButton: {
@@ -569,7 +580,6 @@ export struct P2PPage {
     let id = params.id
     this.chatId = id as unknown as string
     this.type = type
-
     Dao.getRdbModel()?.getMsgByChatId(`${type + id}`, 20).then((msg) => {
       this.msgList = this.msgList.concat(msg)
       this.scroll.scrollToIndex(this.msgList.length - 1)
@@ -585,12 +595,19 @@ export struct P2PPage {
         this.name = group.group.groupname
       })
     }
+    this.registerWs()
+    this.registerMsgStatus()
+  }
+
+  //监听ws推送的消息
+  private registerWs() {
     emitter.on({ eventId: IConstant.WS_MSG_ID }, (event) => {
       let msgBean: MsgBean = JSON.parse(event.data.data)
       if (msgBean.from == globalThis.uid) {
         //更新状态，没有此条就加入
+        LogUtil.d("West", `长度： ${this.msgList.length}`)
         let emitMsg = this.msgList.find((item) => {
-          item.mid == msgBean.mid || item.sendId == msgBean.sendId
+          return item.mid == msgBean.mid || item.sendId == msgBean.verify
         })
         if (emitMsg && emitMsg != null) {
           emitMsg = msgBean
@@ -603,7 +620,31 @@ export struct P2PPage {
     })
   }
 
+  //处理消息相关的通用事件
+  private registerMsgStatus() {
+    emitter.on({ eventId: IConstant.MSG_OPERATOR_ID }, (event) => {
+      if (event.data.type == 'revoke') {
+        let filter = this.msgList.find((item) => {
+          return item.mid == event.data.mid
+        })
+        filter.content_type = 'notice'
+        filter.content = '此消息已撤回'
+        this.msgList = [...this.msgList]
+      } else if (event.data.type == 'send') {
+        let filter = this.msgList.find((item) => {
+          return item.sendId == event.data.sendId
+        })
+        filter.msgStatus = event.data.msgStatus
+        if (event.data.mid && event.data.mid != null) {
+          filter.mid = event.data.mid
+        }
+        this.msgList = [...this.msgList]
+      }
+    })
+  }
+
   aboutToDisappear() {
     emitter.off(IConstant.WS_MSG_ID)
+    emitter.off(IConstant.MSG_OPERATOR_ID)
   }
 }

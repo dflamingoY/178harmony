@@ -16,7 +16,7 @@ export default class IConstant {
   static readonly APP_IN_FOREGROUND = 5; //应用前后台切换
   static readonly WS_MSG_ID = 6; //ws推送消息
   static readonly WS_GROUP_ID = 7; //绑定群的数据
-
+  static readonly MSG_OPERATOR_ID = 8 //单条消息相关的处理
 
   //内存变量名
   static readonly FILTER_ROOM_SYSTEM = "filter_room_system";

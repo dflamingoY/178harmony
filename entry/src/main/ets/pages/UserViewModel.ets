@@ -185,13 +185,29 @@ class UserViewModel {
         msgBean.msgStatus = 0
         Dao.getRdbModel()
           .executeSql(`UPDATE msg SET msgStatus = 0,mid = '${result.mid}' WHERE sendId = '${msgBean.sendId}' `)
+        this.sendEmitEvent(IConstant.MSG_OPERATOR_ID, {
+          'msgStatus': 0,
+          'mid': `${result.mid}`,
+          'type': 'send',
+          'sendId': msgBean.sendId
+        })
       } else {
         msgBean.msgStatus = 2
         Dao.getRdbModel().executeSql(`UPDATE msg SET msgStatus = 2 WHERE sendId = '${msgBean.sendId}' `)
+        this.sendEmitEvent(IConstant.MSG_OPERATOR_ID, {
+          'msgStatus': 2,
+          'type': 'send',
+          'sendId': msgBean.sendId
+        })
       }
     }).catch(() => {
       msgBean.msgStatus = 2
       Dao.getRdbModel().executeSql(`UPDATE msg SET msgStatus = 2 WHERE sendId = '${msgBean.sendId}' `)
+      this.sendEmitEvent(IConstant.MSG_OPERATOR_ID, {
+        'msgStatus': 2,
+        'type': 'send',
+        'sendId': msgBean.sendId
+      })
     })
   }
 
@@ -312,10 +328,21 @@ class UserViewModel {
   消息撤回
    */
   async revoke(mid: string, type: string, to: string) {
-    await post('revoke', { 'mid': 'type', type: 'to', to }).then((value) => {
+    post('revoke', { 'mid': mid, 'type': type, 'to': to }).then((value) => {
       if (value.code == 200) { //更新聊天框ui
         Dao.getRdbModel().revoke(mid)
+        this.sendEmitEvent(IConstant.MSG_OPERATOR_ID, {
+          "mid": mid,
+          'type': 'revoke',
+          'id': to
+        })
       }
+    })
+  }
+
+  private sendEmitEvent(id: number, data: {}) {
+    emitter.emit({ eventId: id }, {
+      data: data
     })
   }
 }

@@ -16,7 +16,7 @@ export class MsgBean {
   to_name: string = ''
   groupName: string = ''
   from_name_remark: string = '' //用户在群里的备注
-  sendId: string = ''
+  sendId: string = '' //本地创建校验消息唯一
   verifyStatus: string = ''
   role: number = 0
   timestamp: number = 0
@@ -24,9 +24,10 @@ export class MsgBean {
   unread_count: number = 0
   identity: number = 0
   content: string = ''
-  isRead: number = 0
+  isRead: number = 0 // 1 已读 0 未读
   isPlay: boolean = false //是否正在播放
   nickname: string = ''
+  verify: string = '' //接口返回参数 校验消息唯一
 }
 
 export class RecentBean {

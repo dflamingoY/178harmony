@@ -251,8 +251,18 @@ export class SocketTask {
       case 'revoke':
       case 'groupApply':
         let socket = JSON.parse(respData.data)
-        if ('revoke' == respData.event) {
+        if ('revoke' == respData.event) { //{"type":"friend","id":168,"mid":"67277119","uid":147381}
           Dao.getRdbModel().revoke(socket.mid)
+          if (socket.uid == globalThis.uid) {
+            return
+          }
+          emitter.emit({ eventId: IConstant.MSG_OPERATOR_ID }, {
+            data: {
+              "mid": socket.mid,
+              'type': 'revoke',
+              'id': socket.type == IConstant.GROUP ? `${socket.id}` : `${socket.uid}`
+            }
+          })
         }
         break;
     }
