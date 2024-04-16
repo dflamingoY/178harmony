@@ -23,6 +23,7 @@
     "pages/other/UserQrPage",
     "pages/user/UserDetailPage",
     "pages/match/SearchMatchPage",
-    "p2p/PhotoPickerPage"
+    "p2p/PhotoPickerPage",
+    "p2p/ShowMediaPage"
   ]
 }

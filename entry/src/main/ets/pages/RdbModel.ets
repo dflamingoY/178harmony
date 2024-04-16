@@ -39,7 +39,10 @@ export class RdbModel {
           item.listId = IConstant.GROUP + item.to
         }
       })
+      //过滤本地有的mid
+
       this.msgTable.insertTx(offline.msg, () => {
+
       })
       //插入数据之后更新最近聊天列表
       let result = offline.msg.map((item) => {
@@ -121,8 +124,8 @@ export class RdbModel {
     }
   }
 
-  getMsgByChatId(key: string, offset: number): Promise<Array<MsgBean>> {
-    return this.msgTable.getChatListByKey(key)
+  getMsgByChatId(key: string, id: number): Promise<Array<MsgBean>> {
+    return this.msgTable.getChatListByKey(key, id)
   }
 
   async insertMsg(msg: MsgBean) {
@@ -156,6 +159,15 @@ export class RdbModel {
 
   updateMsgSendToFail() {
     this.msgTable.executeSql(`UPDATE msg SET msgStatus = 2 WHERE msgStatus = 1 `)
+  }
+
+  async insertMsgList(arr: Array<MsgBean>) {
+    this.msgTable.insertTx(arr, () => {
+    })
+  }
+
+  getRecentMsg(listId: string, endId: number) {
+    return this.msgTable.getRecentList(listId, endId)
   }
 }
 

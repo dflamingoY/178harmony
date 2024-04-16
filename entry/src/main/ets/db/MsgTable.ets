@@ -17,6 +17,11 @@ export default class MsgTable {
     this.msgTable.insertDataTx(generatorBucketTx(msg), callback)
   }
 
+  queryAllMid() {
+    let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+    this.msgTable.query()
+  }
+
   insert(msg: MsgBean, callback: Function) {
     this.msgTable.insertData(generatorBucket(msg), callback,)
   }
@@ -126,10 +131,15 @@ export default class MsgTable {
     return msg
   }
 
-  getChatListByKey(listId: string): Promise<Array<MsgBean>> {
+  getChatListByKey(listId: string, limitId: number): Promise<Array<MsgBean>> {
     return new Promise(async (resolve: Function, reject: Function) => {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
       predicates.equalTo("listId", listId)
+      predicates.orderByDesc('id')
+      if (limitId != -1) {
+        predicates.lessThan('id', limitId)
+      }
+      predicates.limitAs(20)
       this.msgTable.queryAsync(predicates).then((value) => {
         let count = value.rowCount
         LogUtil.d("Dao", `查询到的数据量${count}`)
@@ -143,7 +153,40 @@ export default class MsgTable {
             result.push(msg)
             value.goToNextRow()
           }
-          resolve(result)
+          resolve(result.reverse())
+        }
+      }).catch((e: Error) => {
+        reject(e.message)
+      })
+    })
+  }
+
+  /**
+   * 获取截止 endId 到最新的消息历史记录
+   * @param listId
+   * @param endId
+   * @returns
+   */
+  getRecentList(listId: string, endId: number): Promise<Array<MsgBean>> {
+    return new Promise((resolve: Function, reject: Function) => {
+      let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+      predicates.equalTo("listId", listId)
+      predicates.orderByDesc('id')
+      predicates.greaterThan('id', endId)
+      this.msgTable.queryAsync(predicates).then((value) => {
+        let count = value.rowCount
+        LogUtil.d("Dao", `查询到的数据量${count}`)
+        if (count == 0) {
+          reject('empty')
+        } else {
+          value.goToFirstRow()
+          const result: MsgBean[] = []
+          for (let index = 0; index < count; index++) {
+            let msg = this.parseMsgBean(value)
+            result.push(msg)
+            value.goToNextRow()
+          }
+          resolve(result.reverse())
         }
       }).catch((e: Error) => {
         reject(e.message)

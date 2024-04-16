@@ -86,7 +86,13 @@ class UserViewModel {
     })
   }
 
+  private isLoading = false
+
   async getOffline() {
+    if (this.isLoading) {
+      return
+    }
+    this.isLoading = true
     await getData("get_off_line_msg").then((resp: BaseResp) => {
       if (resp.code == 200) {
         let result: OffLineData = JSON.parse(JSON.stringify(resp.data))
@@ -100,8 +106,9 @@ class UserViewModel {
           SocketTask.receiptMsg(JSON.stringify(mids))
         }
       }
+      this.isLoading = false
     }).catch((e: Error) => {
-      LogUtil.d("West", `getOffline ${e.message}`)
+      this.isLoading = false
     })
   }
 
@@ -337,6 +344,15 @@ class UserViewModel {
           'id': to
         })
       }
+    })
+  }
+
+  /*
+   * 发送已读回执
+   */
+  async sendReadReceipt(to: string, mid: string) {
+    await  post('read_msg', { 'uid': to, 'mid': mid }).then(() => {
+
     })
   }
 

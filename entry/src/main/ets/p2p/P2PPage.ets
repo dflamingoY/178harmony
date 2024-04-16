@@ -37,6 +37,7 @@ export struct P2PPage {
   @State chatMenuState: ChatButtonState = ChatButtonState.Default
   @State phoneFocuseAble: boolean = true
   scroll = new Scroller()
+  private queryId: number = -1
 
   build() {
     Stack({ alignContent: Alignment.Top }) {
@@ -105,8 +106,10 @@ export struct P2PPage {
               }
             })
           }.height('100%')
+
         }.onRefreshing(() => {
           this.isRefreshing = true
+          this.getChatList()
         }).height('100%')
 
         Column() {
@@ -408,7 +411,7 @@ export struct P2PPage {
             .width('80%')
             .margin({ left: '8vp', right: '8vp', top: '4vp' })
 
-            if (this.type == IConstant.FRIEND && globalThis.uid == item.from && item.msgStatus == 0) {
+            if (this.type == IConstant.FRIEND && globalThis.uid == item.from && item.msgStatus == 0 && item.content_type != 'VOICE_CALL') {
               Text(item.isRead == 0 ? '未读' : '已读')
                 .fontSize('13fp')
                 .margin({ right: '12vp', top: '10vp' })
@@ -580,11 +583,7 @@ export struct P2PPage {
     let id = params.id
     this.chatId = id as unknown as string
     this.type = type
-    Dao.getRdbModel()?.getMsgByChatId(`${type + id}`, 20).then((msg) => {
-      this.msgList = this.msgList.concat(msg)
-      this.scroll.scrollToIndex(this.msgList.length - 1)
-    }).catch((e: Error) => {
-    })
+    this.getChatList()
     if (type == IConstant.FRIEND) {
       UserViewModel.getFriendInfo(id.toString()).then((user) => {
         this.name = user.remark == null || user.remark == '' ? user.nickname : user.remark
@@ -599,13 +598,35 @@ export struct P2PPage {
     this.registerMsgStatus()
   }
 
+  private getChatList() {
+    Dao.getRdbModel()?.getMsgByChatId(`${this.type + this.chatId}`, this.queryId).then((msg) => {
+      this.msgList = msg.concat(this.msgList)
+      if (this.queryId == -1) {
+        this.scroll.scrollToIndex(this.msgList.length - 1)
+      }
+      if (this.type == IConstant.FRIEND && this.msgList.length > 0 && this.queryId == -1) {
+        let filter = this.msgList.filter((item) => {
+          return item.from == this.chatId
+        })
+        if (filter.length > 0) {
+          UserViewModel.sendReadReceipt(this.chatId, filter.pop().mid)
+        }
+      }
+      if (msg.length > 0) {
+        this.queryId = msg[0].id
+      }
+      this.isRefreshing = false
+    }).catch((e: Error) => {
+      this.isRefreshing = false
+    })
+  }
+
   //监听ws推送的消息
   private registerWs() {
     emitter.on({ eventId: IConstant.WS_MSG_ID }, (event) => {
       let msgBean: MsgBean = JSON.parse(event.data.data)
       if (msgBean.from == globalThis.uid) {
         //更新状态，没有此条就加入
-        LogUtil.d("West", `长度： ${this.msgList.length}`)
         let emitMsg = this.msgList.find((item) => {
           return item.mid == msgBean.mid || item.sendId == msgBean.verify
         })
@@ -624,9 +645,15 @@ export struct P2PPage {
   private registerMsgStatus() {
     emitter.on({ eventId: IConstant.MSG_OPERATOR_ID }, (event) => {
       if (event.data.type == 'revoke') {
+        if (event.data.id != this.chatId || event.data.chatType != this.type) {
+          return
+        }
         let filter = this.msgList.find((item) => {
           return item.mid == event.data.mid
         })
+        if (!filter && filter == null) {
+          return
+        }
         filter.content_type = 'notice'
         filter.content = '此消息已撤回'
         this.msgList = [...this.msgList]
@@ -634,11 +661,37 @@ export struct P2PPage {
         let filter = this.msgList.find((item) => {
           return item.sendId == event.data.sendId
         })
+        if (!filter && filter == null) {
+          return
+        }
         filter.msgStatus = event.data.msgStatus
         if (event.data.mid && event.data.mid != null) {
           filter.mid = event.data.mid
         }
         this.msgList = [...this.msgList]
+      } else if (event.data.type == 'readMsg') {
+        if (event.data.id != this.chatId) {
+          return
+        }
+        this.msgList.forEach((item) => {
+          if (item.isRead == 0 && item.from != this.chatId) {
+            item.isRead = 1
+          }
+        })
+        this.msgList = [...this.msgList]
+      } else if (event.data.type == 'message_froward') {
+        if (event.data.id != this.chatId || event.data.chatType != this.type) {
+          return
+        }
+        //获取最新的聊天记录
+        Dao.getRdbModel().getRecentMsg(`${this.type + this.chatId}`, this.msgList[this.msgList.length-1].id)
+          .then((value) => {
+            if (value.length > 0) {
+              this.msgList.push(...value)
+            }
+          }).catch((err) => {
+
+        })
       }
     })
   }

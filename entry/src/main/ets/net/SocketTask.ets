@@ -120,7 +120,7 @@ export class SocketTask {
   }
 
   private shutDownWs() {
-    this.ws?.close()
+    this.ws?.close({ code: 1001, reason: 'shut down' })
     this.ws = null
   }
 
@@ -138,52 +138,37 @@ export class SocketTask {
 
   private parseWs(value: string | ArrayBuffer) {
     let respData: SocketData = JSON.parse(value.toString())
-    LogUtil.d("Socket", "message:" + value + "  " + respData)
+    // LogUtil.d("Socket", "message:" + value + "  " + respData)
     switch (respData.event) {
-      case "pushMatch": //match_type   match_id on_time away_score home_score
-        let eventData = {
-          data: {
-            "data": respData.data
-          } }
-        let innerEvent = {
-          eventId: IConstant.EVENT_ID_MATCH,
-          priority: emitter.EventPriority.IMMEDIATE
-        };
-        emitter.emit(innerEvent, eventData)
+      case "pushMatch": { //match_type   match_id on_time away_score home_score
+        this.sendEmit(IConstant.EVENT_ID_MATCH, {
+          "data": respData.data
+        })
         break;
-      case "room": //"channel":"room-122968"
-        let roomMsg = {
-          data: {
-            "data": respData.data,
-            'roomId': respData.channel.replace("room-", ''),
-            'type': 'msg'
-          } }
-        emitter.emit({
-          eventId: IConstant.ROOM_MSG_ID,
-          priority: emitter.EventPriority.IMMEDIATE
-        }, roomMsg)
+      }
+      case "room": { //"channel":"room-122968"
+        this.sendEmit(IConstant.ROOM_MSG_ID, {
+          "data": respData.data,
+          'roomId': respData.channel.replace("room-", ''),
+          'type': 'msg'
+        })
         break;
-      case "delRoomMsg": //删除群消息
-        emitter.emit({
-          eventId: IConstant.ROOM_MSG_ID,
-          priority: emitter.EventPriority.IMMEDIATE
-        }, {
-          data: {
-            "data": respData.data,
-            'type': 'delRoomMsg'
-          } })
+      }
+      case "delRoomMsg": { //删除群消息
+        this.sendEmit(IConstant.ROOM_MSG_ID, {
+          "data": respData.data,
+          'type': 'delRoomMsg'
+        })
         break;
-      case "disabledUser": //禁言用户 uid
-        emitter.emit({
-          eventId: IConstant.ROOM_MSG_ID,
-          priority: emitter.EventPriority.IMMEDIATE
-        }, {
-          data: {
-            "data": respData.data,
-            'type': 'disabledUser'
-          } })
+      }
+      case "disabledUser": { //禁言用户 uid
+        this.sendEmit(IConstant.ROOM_MSG_ID, {
+          "data": respData.data,
+          'type': 'disabledUser'
+        })
         break;
-      case "woker:connection_established": // 获取到socketId
+      }
+      case "woker:connection_established": { // 获取到socketId
         if (globalThis.token != null) {
           let data = JSON.parse(respData.data)
           let md5 = CryptoJS.MD5(data['socket_id'] + globalThis.uid + this.appSecret).toString()
@@ -197,10 +182,11 @@ export class SocketTask {
           this.ws?.send(generatorBindMsg(this.roomId))
         }
         break;
-      case "message": //聊天消息
-      //存入数据库
+      }
+      case "message": { //聊天消息
+        //存入数据库
         let msg: MsgBean = JSON.parse(respData.data)
-      //发送消息回执
+        //发送消息回执
         this.ws?.send(generatorReceiptSingle(msg.mid))
         msg.listId = msg.type + (IConstant.GROUP == msg.type || msg.from == globalThis.uid ? msg.to : msg.from)
         if (msg.from == globalThis.uid) { //自己发送
@@ -213,33 +199,59 @@ export class SocketTask {
         } else { //收到消息
           Dao.getRdbModel().insertMsg(msg)
         }
-        emitter.emit({
-          eventId: IConstant.WS_MSG_ID,
-          priority: emitter.EventPriority.IMMEDIATE
-        }, {
-          data: {
-            "data": respData.data,
-          } })
+        this.sendEmit(IConstant.WS_MSG_ID,
+          { "data": respData.data, })
         break;
-      case 'message_froward':
-
+      }
+      case 'message_froward': { //批量处理转发消息
+        let msg: Array<MsgBean> = JSON.parse(respData.data)
+        msg.forEach((item) => {
+          if (item.type == IConstant.GROUP || item.from == globalThis.uid) {
+            item.listId = item.type + item.to
+          } else {
+            item.listId = item.type + item.from
+          }
+        })
+        Dao.getRdbModel().insertMsgList(msg)
+        //更新主界面
+        let last = msg[msg.length-1]
+        this.sendEmit(IConstant.MSG_OPERATOR_ID, {
+          'id': last.type == IConstant.GROUP || last.from == globalThis.uid ? `${last.to}` : `${last.from}`,
+          'length': msg.length,
+          'type': 'message_froward',
+          'chatType': last.type
+        })
+        //发送保存回执
+        this.receiptMsg(JSON.stringify(msg.map((item) => {
+          return item.mid
+        })))
         break;
+      }
       case 'addGroup':
 
         break;
-      case 'group_del_msg':
+      case 'group_del_msg': { //群删除某条消息
+
 
         break;
+      }
       case 'supervise': //变更群成员身份
         break;
-      case 'readMsg': //已读
-
+      case 'readMsg': { //已读
+        let socketRead = JSON.parse(respData.data)
+        let sql = `UPDATE msg SET isRead = 1 WHERE listId = '${IConstant.FRIEND + socketRead.from}' and isRead = 0 and id_from = ${globalThis.uid} `
+        Dao.getRdbModel().executeSql(sql)
+        this.sendEmit(IConstant.MSG_OPERATOR_ID, { 'type': 'readMsg',
+          'id': `${socketRead.from}` }
+        )
         break;
-      case 'pullMessage':
-
+      }
+      case 'pullMessage': {
+        // UserViewModel.getOffline()
         break;
+      }
       case 'disturb':
-        UserViewModel.getOffline()
+
         break;
       case 'outGroup':
       // this.ws?.send(generatorUnbindGroup())
@@ -249,23 +261,29 @@ export class SocketTask {
       case 'removeFriend':
       case 'removeGroup':
       case 'revoke':
-      case 'groupApply':
+      case 'groupApply': {
         let socket = JSON.parse(respData.data)
         if ('revoke' == respData.event) { //{"type":"friend","id":168,"mid":"67277119","uid":147381}
           Dao.getRdbModel().revoke(socket.mid)
           if (socket.uid == globalThis.uid) {
             return
           }
-          emitter.emit({ eventId: IConstant.MSG_OPERATOR_ID }, {
-            data: {
-              "mid": socket.mid,
+          this.sendEmit(IConstant.MSG_OPERATOR_ID,
+            { "mid": `${socket.mid}`,
               'type': 'revoke',
-              'id': socket.type == IConstant.GROUP ? `${socket.id}` : `${socket.uid}`
-            }
-          })
+              'chatType': socket.type,
+              'id': socket.type == IConstant.GROUP ? `${socket.id}` : `${socket.uid}` }
+          )
         }
         break;
+      }
     }
+  }
+
+  private sendEmit(eventId, data: {}) {
+    emitter.emit({ eventId: eventId }, {
+      data: data
+    })
   }
 
   private appKey = "5f88825c28c56763eb0d8b270646e4b1"
