@@ -169,5 +169,9 @@ export class RdbModel {
   getRecentMsg(listId: string, endId: number) {
     return this.msgTable.getRecentList(listId, endId)
   }
+
+  getAllMid() {
+    return this.msgTable.queryAllMid()
+  }
 }
 

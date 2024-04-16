@@ -194,7 +194,7 @@ export default class Rdb {
 
   executeSql(sql: string) {
     if (this.rdbStore) {
-      this.rdbStore.executeSql(sql, [], (err, data) => {
+      this.rdbStore.executeSql(sql, [], (err, _data) => {
         if (err) {
           LogUtil.d("Dao", this.tableName + ` executeSql() failed, err:  ${err.message}`);
           return;
@@ -202,5 +202,11 @@ export default class Rdb {
         LogUtil.d("Dao", this.tableName + '  executeSql() finished.');
       })
     }
+  }
+
+  querySome(predicates: relationalStore.RdbPredicates, columns: Array<string>) {
+    if (this.rdbStore) {
+      return this.rdbStore.query(predicates, columns);
+    } else return null
   }
 }

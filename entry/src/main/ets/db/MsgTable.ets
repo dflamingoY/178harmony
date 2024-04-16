@@ -17,13 +17,28 @@ export default class MsgTable {
     this.msgTable.insertDataTx(generatorBucketTx(msg), callback)
   }
 
-  queryAllMid() {
-    let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
-    this.msgTable.query()
+  queryAllMid(): Promise<Array<string>> {
+    return new Promise((resolve: Function, reject: Function) => {
+      let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+      this.msgTable.querySome(predicates, new Array()['mid'])?.then((value) => {
+        let count = value.rowCount
+        let mids = new Array<string>()
+        if (count > 0) {
+          for (let index = 0; index < count; index++) {
+            let mid = value.getString(value.getColumnIndex('mid'))
+            mids.push(mid)
+            value.goToNextRow()
+          }
+        }
+        resolve(mids)
+      }).catch(() => {
+        reject('error')
+      })
+    })
   }
 
   insert(msg: MsgBean, callback: Function) {
-    this.msgTable.insertData(generatorBucket(msg), callback,)
+    this.msgTable.insertData(generatorBucket(msg), callback)
   }
 
   update(msg: MsgBean, callback: Function) {
@@ -37,7 +52,7 @@ export default class MsgTable {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
       predicates.equalTo('sendId', sendId)
       predicates.limitAs(1)
-      this.msgTable.queryAsync(predicates).then((value) => {
+      this.msgTable.queryAsync(predicates)?.then((value) => {
         let count = value.rowCount
         if (count == 0) {
           reject("empty")
@@ -46,7 +61,8 @@ export default class MsgTable {
           let msg = this.parseMsgBean(value)
           resolve(msg)
         }
-      }).catch(() => {
+        value.close()
+      })?.catch(() => {
         reject("empty")
       })
     })
@@ -54,9 +70,10 @@ export default class MsgTable {
 
   getAll() {
     let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
-    this.msgTable.queryAsync(predicates).then((value) => {
+    this.msgTable.queryAsync(predicates)?.then((value) => {
       let count = value.rowCount
       LogUtil.d("Dao", `查询到的数据量${count}`)
+      value.close()
     })
   }
 
@@ -65,7 +82,7 @@ export default class MsgTable {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
       predicates.equalTo("listId", listId)
       predicates.limitAs(1)
-      this.msgTable.queryAsync(predicates).then((value) => {
+      this.msgTable.queryAsync(predicates)?.then((value) => {
         let count = value.rowCount
         if (count == 0) {
           reject("empty")
@@ -74,7 +91,8 @@ export default class MsgTable {
           let msg = this.parseMsgBean(value)
           resolve(msg)
         }
-      }).catch(() => {
+        value.close()
+      })?.catch(() => {
         reject("empty")
       })
     })
@@ -92,9 +110,10 @@ export default class MsgTable {
   }
 
   getByMid(mid: string) {
-    this.msgTable.querySql(`selecte * from ${SqlConstant.MSG_TABLE.tableName} where mid = ${mid}`).then((value) => {
+    this.msgTable.querySql(`selecte * from ${SqlConstant.MSG_TABLE.tableName} where mid = ${mid}`)?.then((value) => {
       let count = value.rowCount
       LogUtil.d("Dao", `查询到的数据量${count}`)
+      value.close()
     })
   }
 
@@ -140,7 +159,7 @@ export default class MsgTable {
         predicates.lessThan('id', limitId)
       }
       predicates.limitAs(20)
-      this.msgTable.queryAsync(predicates).then((value) => {
+      this.msgTable.queryAsync(predicates)?.then((value) => {
         let count = value.rowCount
         LogUtil.d("Dao", `查询到的数据量${count}`)
         if (count == 0) {
@@ -154,8 +173,9 @@ export default class MsgTable {
             value.goToNextRow()
           }
           resolve(result.reverse())
+          value.close()
         }
-      }).catch((e: Error) => {
+      })?.catch((e: Error) => {
         reject(e.message)
       })
     })
@@ -173,7 +193,7 @@ export default class MsgTable {
       predicates.equalTo("listId", listId)
       predicates.orderByDesc('id')
       predicates.greaterThan('id', endId)
-      this.msgTable.queryAsync(predicates).then((value) => {
+      this.msgTable.queryAsync(predicates)?.then((value) => {
         let count = value.rowCount
         LogUtil.d("Dao", `查询到的数据量${count}`)
         if (count == 0) {
@@ -188,7 +208,7 @@ export default class MsgTable {
           }
           resolve(result.reverse())
         }
-      }).catch((e: Error) => {
+      })?.catch((e: Error) => {
         reject(e.message)
       })
     })

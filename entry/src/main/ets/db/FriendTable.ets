@@ -35,7 +35,7 @@ export default class FriendTable {
   getAll(): Promise<Array<UserBean>> {
     return new Promise(async (resolve: Function, reject: Function) => {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.FRIEND_TABLE.tableName)
-      this.friendTab.queryAsync(predicates).then((value) => {
+      this.friendTab.queryAsync(predicates)?.then((value) => {
         let count = value.rowCount
         if (count == 0) {
           reject("empty")
@@ -60,7 +60,8 @@ export default class FriendTable {
           }
           resolve(result)
         }
-      }).catch((err:Error)=>{
+        value.close()
+      })?.catch((err:Error)=>{
         LogUtil.d("Dao", `查询出错：${err}`)
       })
     })

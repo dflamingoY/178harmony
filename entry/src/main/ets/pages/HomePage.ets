@@ -16,7 +16,6 @@ import Dao from '../db/Dao';
 @Entry
 @Component
 struct HomePage {
-  @State message: string = 'Hello World'
   @State currentIndex: number = 0
   @State unreadCount: number = 1
 
@@ -48,6 +47,7 @@ struct HomePage {
     if (isLogin()) {
       this.getLoginData()
       Dao.getRdbModel().updateMsgSendToFail()
+      Dao.getRdbModel().getAllFriend()
     }
     emitter.on(this.innerEvent, () => {
       if (!globalThis.user || globalThis.user == null) {

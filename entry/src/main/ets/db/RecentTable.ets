@@ -31,7 +31,7 @@ export default class RecentTable {
     return new Promise((resolve: Function, reject: Function) => {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.RECENT_TABLE.tableName)
       predicates.in('listId', array)
-      this.recent.queryAsync(predicates).then((value) => {
+      this.recent.queryAsync(predicates)?.then((value) => {
         let count = value.rowCount
         const result: RecentBean[] = []
         if (count > 0) {
@@ -43,7 +43,8 @@ export default class RecentTable {
           }
         }
         resolve(result)
-      }).catch(() => {
+        value.close()
+      })?.catch(() => {
         reject("empty")
       })
     })
@@ -52,7 +53,7 @@ export default class RecentTable {
   getAll(): Promise<Array<RecentBean>> {
     return new Promise((resolve: Function, reject: Function) => {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.RECENT_TABLE.tableName)
-      this.recent.queryAsync(predicates).then((value) => {
+      this.recent.queryAsync(predicates)?.then((value) => {
         let count = value.rowCount
         if (count == 0) {
           reject('empty')
@@ -66,8 +67,9 @@ export default class RecentTable {
           }
           resolve(result)
         }
+        value.close()
         LogUtil.d("Dao", `查询到的数据量${count}`)
-      }).catch((err: Error) => {
+      })?.catch((err: Error) => {
         reject(err.message)
       })
     })

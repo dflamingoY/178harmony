@@ -13,6 +13,8 @@ import IConstant from '../utils/IConstant'
 import LogUtil from '../utils/LogUtil'
 
 class UserViewModel {
+  private localMid: Array<string> = []
+
   getUserInfo(): Promise<UserBean> {
     return new Promise(async (resolve: Function, reject: Function) => {
       getData("get_user").then((resp: BaseResp) => {
@@ -24,6 +26,12 @@ class UserViewModel {
       }).catch((err: Error) => {
         reject(err)
       })
+    })
+  }
+
+  getLocalMid() {
+    Dao.getRdbModel().getAllMid().then((value) => {
+      this.localMid.concat(value)
     })
   }
 
@@ -97,6 +105,14 @@ class UserViewModel {
       if (resp.code == 200) {
         let result: OffLineData = JSON.parse(JSON.stringify(resp.data))
         //数据库存储
+        if (result.msg != null) {
+          result.msg = result.msg.filter((item) => {
+            return item.mid ! in this.localMid
+          })
+          this.localMid.concat(result.msg.map((item) => {
+            return item.mid
+          }))
+        }
         Dao.getRdbModel()?.insertMsgs(result)
         //发送已收回执
         let mids = result.msg?.map((item) => {
