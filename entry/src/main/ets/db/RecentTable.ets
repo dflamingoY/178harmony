@@ -53,6 +53,7 @@ export default class RecentTable {
   getAll(): Promise<Array<RecentBean>> {
     return new Promise((resolve: Function, reject: Function) => {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.RECENT_TABLE.tableName)
+      predicates.orderByDesc('timestamp')
       this.recent.queryAsync(predicates)?.then((value) => {
         let count = value.rowCount
         if (count == 0) {

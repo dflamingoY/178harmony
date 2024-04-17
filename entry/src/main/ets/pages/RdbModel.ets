@@ -32,15 +32,21 @@ export class RdbModel {
 
   async insertMsgs(offline: OffLineData) {
     if (offline.msg != null) {
+      let revokes = offline.revoke?.map((item) => {
+        return item.mid
+      })
       offline.msg.forEach((item) => {
         if (item.type == IConstant.FRIEND && item.from != globalThis.uid) {
           item.listId = IConstant.FRIEND + item.from
         } else {
           item.listId = IConstant.GROUP + item.to
         }
+        if (revokes && revokes != null && item.mid in revokes) {
+          item.content = `${$r('app.string.revoke_msg')}`
+          item.content_type = 'notice'
+        }
       })
       //过滤本地有的mid
-
       this.msgTable.insertTx(offline.msg, () => {
 
       })
@@ -50,8 +56,7 @@ export class RdbModel {
           return item.type + item.to
         else
           return item.type + item.from
-      }
-      )
+      })
       //数组去重
       let set = new Set(result)
       this.recentTable.getNeedUpdateRecentList(Array.from(set))
@@ -65,7 +70,6 @@ export class RdbModel {
             recent.content_type = find.content_type
             recent.sub_type = find.sub_type
             recent.chat_type = find.type
-            recent.timestamp = find.timestamp
             recent.mid = find.mid
             if (find.from == globalThis.uid || find.type == IConstant.GROUP) {
               recent.name = find.to_name
@@ -76,9 +80,7 @@ export class RdbModel {
               recent.avatar = find.from_avatar
               recent.chatId = find.from.toString()
             }
-            // recent.unread_count = recent.unread_count + offline.msg.filter((item) => {
-            //   return item.listId == recent.listId && item.from != globalThis.uid
-            // }).length
+            //计算未读熟 加上离线库中的数据
             this.recentTable.update(recent, () => {
             })
             set.delete(recent.listId)
@@ -118,8 +120,8 @@ export class RdbModel {
         .then(() => {
           LogUtil.d("Dao", 'RdbModel 再次执行then')
         })
-        .catch(() => {
-          LogUtil.d("Dao", 'RdbModel 异常')
+        .catch((err) => {
+          LogUtil.d("Dao", 'RdbModel 异常 : ' + err)
         })
     }
   }
@@ -172,6 +174,20 @@ export class RdbModel {
 
   getAllMid() {
     return this.msgTable.queryAllMid()
+  }
+
+  async deleteMsgByMid(mid: string) {
+    this.msgTable.deleteFromMid(mid)
+  }
+
+  updateRecent(recent: RecentBean) {
+    this.recentTable.update(recent, () => {
+    })
+  }
+
+  async insertRecent(recent: RecentBean) {
+    this.recentTable.insert(recent, () => {
+    })
   }
 }
 

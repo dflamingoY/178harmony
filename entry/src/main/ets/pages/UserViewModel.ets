@@ -104,26 +104,42 @@ class UserViewModel {
     await getData("get_off_line_msg").then((resp: BaseResp) => {
       if (resp.code == 200) {
         let result: OffLineData = JSON.parse(JSON.stringify(resp.data))
-        //数据库存储
+        //发送已收回执
+        let mids = result.msg?.map((item) => {
+          return item.mid
+        })??[]
+        //群删除消息id
+        let group_del_msg = result.group_del_msg?.map((item) => {
+          return item.mid
+        })??[]
+        let revoke = result.revoke?.map((item) => {
+          return item.mid
+        })
         if (result.msg != null) {
           result.msg = result.msg.filter((item) => {
-            return item.mid ! in this.localMid
+            return!(item.mid in this.localMid) && !(item.mid in group_del_msg)
           })
           this.localMid.concat(result.msg.map((item) => {
             return item.mid
           }))
         }
+        //清除已读mid记录
         Dao.getRdbModel()?.insertMsgs(result)
-        //发送已收回执
-        let mids = result.msg?.map((item) => {
-          return item.mid
-        })
-        if (mids && mids != null) {
+        if (mids && mids != null && mids.length > 0) {
           SocketTask.receiptMsg(JSON.stringify(mids))
+        }
+        if (group_del_msg && group_del_msg != null && group_del_msg.length > 0) {
+          //删除最近删除列表
+          let deleteMsgSql = `DELETE FROM msg WHERE mid in ${group_del_msg}`
+          Dao.getRdbModel().executeSql(deleteMsgSql)
+          SocketTask.receiptMsg(JSON.stringify(group_del_msg))
+        }
+        if (revoke && revoke != null) {
+          SocketTask.receiptMsg(JSON.stringify(revoke))
         }
       }
       this.isLoading = false
-    }).catch((e: Error) => {
+    }).catch(() => {
       this.isLoading = false
     })
   }
@@ -376,6 +392,23 @@ class UserViewModel {
     emitter.emit({ eventId: id }, {
       data: data
     })
+  }
+
+  /*
+  保存本地产生的mid到集合，判断是否存在本地
+   */
+  updateMids(mid: string[]) {
+    this.localMid.push(...mid)
+  }
+
+  updateMid(mid: string) {
+    this.localMid.push(mid)
+  }
+
+  inertVerifyMsg(msg: MsgBean) {
+    if (!this.localMid.concat(msg.mid)) {
+      Dao.getRdbModel().insertMsg(msg)
+    }
   }
 }
 

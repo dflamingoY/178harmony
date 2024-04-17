@@ -47,7 +47,7 @@ struct HomePage {
     if (isLogin()) {
       this.getLoginData()
       Dao.getRdbModel().updateMsgSendToFail()
-      Dao.getRdbModel().getAllFriend()
+      UserViewModel.getLocalMid()
     }
     emitter.on(this.innerEvent, () => {
       if (!globalThis.user || globalThis.user == null) {

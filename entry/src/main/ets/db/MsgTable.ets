@@ -1,7 +1,6 @@
 import relationalStore from '@ohos.data.relationalStore';
 import { MsgBean } from '../data/MsgBean';
 import IConstant from '../utils/IConstant';
-import LogUtil from '../utils/LogUtil';
 import SqlConstant from './DatabaseSqlCommont'
 import Rdb from './Rdb'
 
@@ -20,18 +19,23 @@ export default class MsgTable {
   queryAllMid(): Promise<Array<string>> {
     return new Promise((resolve: Function, reject: Function) => {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
-      this.msgTable.querySome(predicates, new Array()['mid'])?.then((value) => {
+      this.msgTable.querySome(predicates, ['mid'])?.then((value) => {
         let count = value.rowCount
         let mids = new Array<string>()
         if (count > 0) {
           for (let index = 0; index < count; index++) {
-            let mid = value.getString(value.getColumnIndex('mid'))
-            mids.push(mid)
+            try {
+              let mid = value.getString(value.getColumnIndex('mid'))
+              if (mid && mid != null) {
+                mids.push(mid)
+              }
+            } catch (e) {
+            }
             value.goToNextRow()
           }
         }
         resolve(mids)
-      }).catch(() => {
+      }).catch((err) => {
         reject('error')
       })
     })
@@ -68,15 +72,6 @@ export default class MsgTable {
     })
   }
 
-  getAll() {
-    let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
-    this.msgTable.queryAsync(predicates)?.then((value) => {
-      let count = value.rowCount
-      LogUtil.d("Dao", `查询到的数据量${count}`)
-      value.close()
-    })
-  }
-
   getTopByListId(listId: string): Promise<MsgBean> {
     return new Promise((resolve: Function, reject: Function) => {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
@@ -107,14 +102,6 @@ export default class MsgTable {
 
   deleteFromMid(mid: string) {
     this.msgTable.executeSql('DELETE FROM msg WHERE mid = ' + mid)
-  }
-
-  getByMid(mid: string) {
-    this.msgTable.querySql(`selecte * from ${SqlConstant.MSG_TABLE.tableName} where mid = ${mid}`)?.then((value) => {
-      let count = value.rowCount
-      LogUtil.d("Dao", `查询到的数据量${count}`)
-      value.close()
-    })
   }
 
   deleteAll(callback?: Function) {
@@ -161,7 +148,6 @@ export default class MsgTable {
       predicates.limitAs(20)
       this.msgTable.queryAsync(predicates)?.then((value) => {
         let count = value.rowCount
-        LogUtil.d("Dao", `查询到的数据量${count}`)
         if (count == 0) {
           reject('empty')
         } else {
@@ -195,7 +181,6 @@ export default class MsgTable {
       predicates.greaterThan('id', endId)
       this.msgTable.queryAsync(predicates)?.then((value) => {
         let count = value.rowCount
-        LogUtil.d("Dao", `查询到的数据量${count}`)
         if (count == 0) {
           reject('empty')
         } else {

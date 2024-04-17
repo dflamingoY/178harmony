@@ -188,14 +188,11 @@ export class SocketTask {
         let msg: MsgBean = JSON.parse(respData.data)
         //发送消息回执
         this.ws?.send(generatorReceiptSingle(msg.mid))
+        UserViewModel.updateMid(msg.mid)
         msg.listId = msg.type + (IConstant.GROUP == msg.type || msg.from == globalThis.uid ? msg.to : msg.from)
         if (msg.from == globalThis.uid) { //自己发送
           //修改自己发送消息状态
-          if (msg.sendId == '' || msg.sendId == null) {
-            //直接存入
-          } else { //查询数据库是否有数据 ，则单独另外存储
-
-          }
+          UserViewModel.inertVerifyMsg(msg)
         } else { //收到消息
           Dao.getRdbModel().insertMsg(msg)
         }
@@ -205,6 +202,9 @@ export class SocketTask {
       }
       case 'message_froward': { //批量处理转发消息
         let msg: Array<MsgBean> = JSON.parse(respData.data)
+        UserViewModel.updateMids(msg.map((item) => {
+          return item.mid
+        }))
         msg.forEach((item) => {
           if (item.type == IConstant.GROUP || item.from == globalThis.uid) {
             item.listId = item.type + item.to
@@ -231,8 +231,14 @@ export class SocketTask {
 
         break;
       case 'group_del_msg': { //群删除某条消息
-
-
+        let resp = JSON.parse(respData.data)
+        Dao.getRdbModel().deleteMsgByMid(resp.mid)
+        this.sendEmit(IConstant.MSG_OPERATOR_ID, {
+          'chatType': IConstant.GROUP,
+          'type': 'group_del_msg',
+          'id': respData.channel.replace('group-', ''),
+          'mid': resp.mid
+        })
         break;
       }
       case 'supervise': //变更群成员身份
@@ -247,11 +253,10 @@ export class SocketTask {
         break;
       }
       case 'pullMessage': {
-        // UserViewModel.getOffline()
+        UserViewModel.getOffline()
         break;
       }
       case 'disturb':
-
         break;
       case 'outGroup':
       // this.ws?.send(generatorUnbindGroup())

@@ -27,6 +27,10 @@
     {
       "name": "LoginAbility_label",
       "value": "label"
+    },
+    {
+      "name": "revoke_msg",
+      "value": "此消息已撤回"
     }
   ]
 }

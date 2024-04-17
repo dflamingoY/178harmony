@@ -127,6 +127,7 @@ export struct P2PPage {
             TextArea({ text: this.msgContent })
               .fontColor(IColors.color1R1E20)
               .fontSize('15fp')
+
               .onChange((value: string) => {
                 this.msgContent = value
               })
@@ -655,9 +656,10 @@ export struct P2PPage {
           return
         }
         filter.content_type = 'notice'
-        filter.content = '此消息已撤回'
+        filter.content = `${$r('app.string.revoke_msg')}`
         this.msgList = [...this.msgList]
-      } else if (event.data.type == 'send') {
+      }
+      else if (event.data.type == 'send') {
         let filter = this.msgList.find((item) => {
           return item.sendId == event.data.sendId
         })
@@ -669,7 +671,8 @@ export struct P2PPage {
           filter.mid = event.data.mid
         }
         this.msgList = [...this.msgList]
-      } else if (event.data.type == 'readMsg') {
+      }
+      else if (event.data.type == 'readMsg') {
         if (event.data.id != this.chatId) {
           return
         }
@@ -679,7 +682,8 @@ export struct P2PPage {
           }
         })
         this.msgList = [...this.msgList]
-      } else if (event.data.type == 'message_froward') {
+      }
+      else if (event.data.type == 'message_froward') {
         if (event.data.id != this.chatId || event.data.chatType != this.type) {
           return
         }
@@ -693,11 +697,18 @@ export struct P2PPage {
 
         })
       }
+      else if (event.data.type == 'group_del_msg') { //群主删除消息
+        if (event.data.id == this.chatId && event.data.chatType == this.type) {
+          this.msgList = this.msgList.filter((item) => {
+            return item.mid != event.data.mid
+          })
+        }
+      }
     })
   }
 
   aboutToDisappear() {
-    emitter.off(IConstant.WS_MSG_ID)
-    emitter.off(IConstant.MSG_OPERATOR_ID)
+    // emitter.off(IConstant.WS_MSG_ID)
+    // emitter.off(IConstant.MSG_OPERATOR_ID)
   }
 }

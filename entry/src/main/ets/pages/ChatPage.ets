@@ -1,17 +1,20 @@
 import display from '@ohos.display'
 import systemDateTime from '@ohos.systemDateTime'
 import router from '@ohos.router'
-import { RecentBean } from '../data/MsgBean'
+import { MsgBean, RecentBean } from '../data/MsgBean'
 import CommonUtil from '../utils/CommonUtil'
 import UserViewModel from './UserViewModel'
 import promptAction from '@ohos.promptAction'
 import IConstant from '../utils/IConstant'
+import emitter from '@ohos.events.emitter'
+import Dao from '../db/Dao'
 
 @Entry
 @Component
 export struct ChatPage {
   @State recentList: Array<RecentBean> = []
   @State currentTime: number = 0
+  @State pageNumber: number = 0
 
   build() {
     Column() {
@@ -121,7 +124,7 @@ export struct ChatPage {
             .maxLines(1)
           Blank()
 
-          Text(item.content)
+          Text(this.getContentType(item.content, item.content_type))
             .fontSize('13fp')
             .fontColor(0xff999999)
             .margin({ bottom: '5vp' })
@@ -174,6 +177,25 @@ export struct ChatPage {
     }))
   }
 
+  private getContentType(content: string, content_type: string): string {
+    switch (content_type) {
+      case 'img':
+        return "[图片]";
+      case 'voice':
+        return '[语音]';
+      case 'video':
+        return '[视频]';
+      case 'file':
+        return '[文件]';
+      case 'group_notice':
+        return '[群公告]';
+      case 'VOICE_CALL':
+        return '[语音通话]';
+      default:
+        return content;
+    }
+  }
+
   aboutToAppear() {
     try {
       UserViewModel.getRecentList()?.then((recents) => {
@@ -191,5 +213,53 @@ export struct ChatPage {
     systemDateTime.getCurrentTime(false).then((time: number) => {
       this.currentTime = time / 1000
     })
+    this.registerWs()
+  }
+
+  private registerWs() {
+    emitter.on({ eventId: IConstant.WS_MSG_ID }, (event) => {
+      //更新当条消息
+      let msg: MsgBean = JSON.parse(event.data.data)
+      msg.listId = msg.type + (IConstant.GROUP == msg.type || msg.from == globalThis.uid ? msg.to : msg.from)
+      let find = this.recentList.find((item) => {
+        return item.listId == msg.listId
+      })
+      if (find && find != null) {
+        find.content = msg.content
+        find.content_type = msg.content_type
+        find.timestamp = msg.timestamp
+        find.remark = msg.remark
+        find.mid = msg.mid
+        find.unread_count = find.unread_count + 1
+        this.recentList = [...this.recentList]
+        Dao.getRdbModel()?.updateRecent(find)
+      } else {
+        let recent = new RecentBean()
+        recent.listId = msg.listId
+        recent.content = msg.content
+        recent.content_type = msg.content_type
+        recent.sub_type = msg.sub_type
+        recent.chat_type = msg.type
+        recent.timestamp = msg.timestamp
+        recent.mid = msg.mid
+        if (msg.from == globalThis.uid || msg.type == IConstant.GROUP) {
+          recent.name = msg.to_name
+          recent.avatar = msg.to_avatar
+          recent.chatId = msg.to
+        } else {
+          recent.name = msg.from_name_ios
+          recent.avatar = msg.from_avatar
+          recent.chatId = msg.from
+        }
+        recent.unread_count = 1
+        //插入数据
+        this.recentList.unshift(recent)
+        Dao.getRdbModel()?.insertRecent(recent)
+      }
+    })
+  }
+
+  aboutToDisappear() {
+    emitter.off(IConstant.WS_MSG_ID)
   }
 }

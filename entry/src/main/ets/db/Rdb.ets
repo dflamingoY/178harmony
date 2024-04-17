@@ -204,9 +204,9 @@ export default class Rdb {
     }
   }
 
-  querySome(predicates: relationalStore.RdbPredicates, columns: Array<string>) {
+  querySome(predicates: relationalStore.RdbPredicates, column: Array<string>) {
     if (this.rdbStore) {
-      return this.rdbStore.query(predicates, columns);
+      return this.rdbStore.query(predicates, column);
     } else return null
   }
 }
