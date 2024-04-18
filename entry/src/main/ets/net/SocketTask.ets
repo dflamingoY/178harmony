@@ -115,7 +115,6 @@ export class SocketTask {
   }
 
   receiptMsg(mid: string) {
-    LogUtil.d("West", 'receipt  :' + mid)
     this.ws?.send(generatorReceipt(mid))
   }
 

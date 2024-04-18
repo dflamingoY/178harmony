@@ -1,6 +1,7 @@
 import relationalStore from '@ohos.data.relationalStore';
 import { MsgBean } from '../data/MsgBean';
 import IConstant from '../utils/IConstant';
+import LogUtil from '../utils/LogUtil';
 import SqlConstant from './DatabaseSqlCommont'
 import Rdb from './Rdb'
 
@@ -111,13 +112,27 @@ export default class MsgTable {
 
   getSomeUnread(listId: string, id: number): Promise<number> {
     return new Promise((resolve: Function, reject: Function) => {
-      this.msgTable.querySql(`select * from msg where listId = ${listId} and id > ${id} `)
-        .then((value) => {
-          let count = value.rowCount
-          resolve(count)
-        }).catch(() => {
+      let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+      predicates.equalTo("listId", listId)
+      predicates.equalTo('from', listId.replace(IConstant.FRIEND, '').replace(IConstant.GROUP, ''))
+      predicates.greaterThan("id", id)
+      try {
+        this.msgTable.query(predicates, (resultSet: relationalStore.ResultSet) => {
+          resolve(resultSet.rowCount)
+          resultSet.close()
+        })
+      } catch (e) {
         reject(0)
-      })
+      }
+      /* this.msgTable.querySql(`SELECT * FROM msg WHERE listId = ${listId} and id > ${id} `)
+         .then((value) => {
+           let count = value.rowCount
+           LogUtil.d("West", "getSomeUnread  " + count)
+           resolve(count)
+         }).catch(() => {
+         LogUtil.d("West", "getSomeUnread  查询出错")
+         reject(0)
+       })*/
     })
   }
 

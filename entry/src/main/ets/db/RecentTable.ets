@@ -20,8 +20,14 @@ export default class RecentTable {
     this.recent.insertData(generatorBucket(msg), callback)
   }
 
+  deleteAll(callback?: Function) {
+    let predicates = new relationalStore.RdbPredicates(SqlConstant.RECENT_TABLE.tableName)
+    this.recent.deleteData(predicates, callback)
+  }
+
   async update(recentBean: RecentBean, callback: Function) {
     let predicates = new relationalStore.RdbPredicates(SqlConstant.RECENT_TABLE.tableName)
+    predicates.equalTo('listId', recentBean.listId)
     let data = generatorBucket(recentBean)
     this.recent.updateData(predicates, data, callback)
   }
@@ -69,7 +75,6 @@ export default class RecentTable {
           resolve(result)
         }
         value.close()
-        LogUtil.d("Dao", `查询到的数据量${count}`)
       })?.catch((err: Error) => {
         reject(err.message)
       })

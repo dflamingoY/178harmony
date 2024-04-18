@@ -3,6 +3,7 @@ import emitter from '@ohos.events.emitter'
 import IConstant from '../utils/IConstant'
 import PreferenceModel from '../utils/PreferenceModel'
 import IColors from '../utils/IColors'
+import Dao from '../db/Dao'
 
 @Entry
 @Component
@@ -116,7 +117,7 @@ export struct SettingPage {
             value: '确定',
             fontColor: IColors.colorOrange,
             action: () => {
-
+              Dao.getRdbModel().clearChatList()
             }
           }
         })

@@ -115,14 +115,15 @@ class UserViewModel {
         let revoke = result.revoke?.map((item) => {
           return item.mid
         })
+
+        LogUtil.d("West", `local mid : ${this.localMid.join()}`)
         if (result.msg != null) {
           result.msg = result.msg.filter((item) => {
             return!(item.mid in this.localMid) && !(item.mid in group_del_msg)
           })
-          this.localMid.concat(result.msg.map((item) => {
-            return item.mid
-          }))
+          this.localMid = this.localMid.concat(mids)
         }
+        LogUtil.d("West", `local mid 添加 : ${this.localMid.join()}`)
         //清除已读mid记录
         Dao.getRdbModel()?.insertMsgs(result)
         if (mids && mids != null && mids.length > 0) {

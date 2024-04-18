@@ -68,7 +68,7 @@ export default class Rdb {
   insertDataTx(data: relationalStore.ValuesBucket[], callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
-      LogUtil.d("Dao", this.tableName + 'insertData() has no callback!');
+      LogUtil.d("Dao", this.tableName + ' insertDataTx() has no callback!');
       return;
     }
     let resFlag: boolean = false;
@@ -76,11 +76,11 @@ export default class Rdb {
     if (this.rdbStore) {
       this.rdbStore.batchInsert(this.tableName, valueBucket, (err, ret) => {
         if (err) {
-          LogUtil.d("Dao", this.tableName + `insertData() failed, err: ${err}`);
+          LogUtil.d("Dao", this.tableName + `insertDataTx() failed, err: ${err}`);
           callback(resFlag);
           return;
         }
-        LogUtil.d("Dao", this.tableName + `insertData() finished: ${ret}`);
+        LogUtil.d("Dao", this.tableName + ` insertDataTx() finished: ${ret}`);
         callback(ret);
       });
     }
@@ -89,7 +89,7 @@ export default class Rdb {
   insertData(data: relationalStore.ValuesBucket, callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
-      LogUtil.d("Dao", this.tableName + 'insertData() has no callback!');
+      LogUtil.d("Dao", this.tableName + ' insertData() has no callback!');
       return;
     }
     let resFlag: boolean = false;
@@ -97,11 +97,11 @@ export default class Rdb {
     if (this.rdbStore) {
       this.rdbStore.insert(this.tableName, valueBucket, (err, ret) => {
         if (err) {
-          LogUtil.d("Dao", this.tableName + `insertData() failed, err: ${err}`);
+          LogUtil.d("Dao", this.tableName + ` insertData() failed, err: ${err}`);
           callback(resFlag);
           return;
         }
-        LogUtil.d("Dao", this.tableName + `insertData() finished: ${ret}`);
+        LogUtil.d("Dao", this.tableName + ` insertData() finished: ${ret}`);
         callback(ret);
       });
     }
@@ -110,18 +110,18 @@ export default class Rdb {
   deleteData(predicates: relationalStore.RdbPredicates, callback: Function = () => {
   }) {
     if (!callback || typeof callback === 'undefined' || callback === undefined) {
-      LogUtil.d("Dao", this.tableName + 'deleteData() has no callback!');
+      LogUtil.d("Dao", this.tableName + ' deleteData() has no callback!');
       return;
     }
     let resFlag: boolean = false;
     if (this.rdbStore) {
       this.rdbStore.delete(predicates, (err, ret) => {
         if (err) {
-          LogUtil.d("Dao", this.tableName + `deleteData() failed, err: ${err}`);
+          LogUtil.d("Dao", this.tableName + ` deleteData() failed, err: ${err}`);
           callback(resFlag);
           return;
         }
-        LogUtil.d("Dao", this.tableName + `deleteData() finished: ${ret}`);
+        LogUtil.d("Dao", this.tableName + ` deleteData() finished: ${ret}`);
         callback(!resFlag);
       });
     }

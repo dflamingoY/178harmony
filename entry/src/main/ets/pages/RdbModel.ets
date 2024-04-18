@@ -65,27 +65,7 @@ export class RdbModel {
             let find = offline.msg.reverse().find((item) => {
               return item.listId == recent.listId
             }) //存在数据进行赋值
-            recent.timestamp = find.timestamp
-            recent.content = find.content
-            recent.content_type = find.content_type
-            recent.sub_type = find.sub_type
-            recent.chat_type = find.type
-            recent.mid = find.mid
-            if (find.from == globalThis.uid || find.type == IConstant.GROUP) {
-              recent.name = find.to_name
-              recent.avatar = find.to_avatar
-              recent.chatId = find.to.toString()
-            } else {
-              recent.name = find.from_name_ios
-              recent.avatar = find.from_avatar
-              recent.chatId = find.from.toString()
-            }
-            this.msgTable.getSomeUnread(recent.listId, recent.readMid).then((count) => {
-              recent.unread_count = count
-            })
-            //计算未读熟 加上离线库中的数据
-            this.recentTable.update(recent, () => {
-            })
+            this.updateRecentOffline(recent, find)
             set.delete(recent.listId)
           })
           //没有最近聊天记录的进行赋值
@@ -109,7 +89,7 @@ export class RdbModel {
               } else {
                 recent.name = find.from_name_ios
                 recent.avatar = find.from_avatar
-                recent.chatId = find.from
+                recent.chatId = `${find.from}`
               }
               recent.unread_count = 1
               if (find.content_type == "voice" && find.from != globalThis.uid) {
@@ -124,6 +104,30 @@ export class RdbModel {
           LogUtil.d("Dao", 'RdbModel 异常 : ' + err)
         })
     }
+  }
+
+  private async updateRecentOffline(recent: RecentBean, find: MsgBean) {
+    recent.timestamp = find.timestamp
+    recent.content = find.content
+    recent.content_type = find.content_type
+    recent.sub_type = find.sub_type
+    recent.chat_type = find.type
+    recent.mid = find.mid
+    if (find.from == globalThis.uid || find.type == IConstant.GROUP) {
+      recent.name = find.to_name
+      recent.avatar = find.to_avatar
+      recent.chatId = find.to
+    } else {
+      recent.name = find.from_name_ios
+      recent.avatar = find.from_avatar
+      recent.chatId = `${find.from}`
+    }
+    await this.msgTable.getSomeUnread(recent.listId, recent.readMid).then((count) => {
+      recent.unread_count = count
+    })
+    //计算未读熟 加上离线库中的数据
+    this.recentTable.update(recent, () => {
+    })
   }
 
   getMsgByChatId(key: string, id: number): Promise<Array<MsgBean>> {
@@ -188,6 +192,11 @@ export class RdbModel {
   async insertRecent(recent: RecentBean) {
     this.recentTable.insert(recent, () => {
     })
+  }
+
+  async clearChatList() {
+    this.msgTable.deleteAll()
+    this.recentTable.deleteAll()
   }
 }
 

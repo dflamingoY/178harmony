@@ -251,7 +251,7 @@ export struct ChatPage {
         } else {
           recent.name = msg.from_name_ios
           recent.avatar = msg.from_avatar
-          recent.chatId = msg.from
+          recent.chatId = `${msg.from}`
         }
         recent.unread_count = 1
         //插入数据
