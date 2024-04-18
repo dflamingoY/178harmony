@@ -98,7 +98,7 @@ export default class RecentTable {
     recent.isOnline = value.getLong(value.getColumnIndex('isOnline'))
     recent.fromUserName = value.getString(value.getColumnIndex('fromUserName'))
     recent.isReadAudio = value.getLong(value.getColumnIndex('isReadAudio'))
-    recent.readMid = value.getString(value.getColumnIndex('readMid'))
+    recent.readMid = value.getLong(value.getColumnIndex('readMid'))
     recent.updateTime = value.getLong(value.getColumnIndex('updateTime'))
     recent.listId = value.getString(value.getColumnIndex('listId'))
     recent.role = value.getLong(value.getColumnIndex('role'))
@@ -136,7 +136,7 @@ function generatorBucket(item: RecentBean): relationalStore.ValuesBucket {
   bucket.isOnline == item.isOnline??0
   bucket.fromUserName = item.fromUserName??''
   bucket.isReadAudio = item.isReadAudio??0
-  bucket.readMid = item.readMid??''
+  bucket.readMid = item.readMid??0
   bucket.updateTime = item.updateTime??0
   bucket.listId = item.listId??''
   bucket.role = item.role??4

@@ -80,6 +80,9 @@ export class RdbModel {
               recent.avatar = find.from_avatar
               recent.chatId = find.from.toString()
             }
+            this.msgTable.getSomeUnread(recent.listId, recent.readMid).then((count) => {
+              recent.unread_count = count
+            })
             //计算未读熟 加上离线库中的数据
             this.recentTable.update(recent, () => {
             })
@@ -117,9 +120,6 @@ export class RdbModel {
             })
           }
         })
-        .then(() => {
-          LogUtil.d("Dao", 'RdbModel 再次执行then')
-        })
         .catch((err) => {
           LogUtil.d("Dao", 'RdbModel 异常 : ' + err)
         })
@@ -151,15 +151,15 @@ export class RdbModel {
   /*
    * 执行sql语句
    */
-  executeSql(sql: string) {
+  async executeSql(sql: string) {
     this.msgTable.executeSql(sql)
   }
 
-  revoke(mid: string) {
+  async revoke(mid: string) {
     this.msgTable.executeSql(`UPDATE msg SET content = '此消息已撤回' , content_type = 'notice' WHERE mid = ${mid} `)
   }
 
-  updateMsgSendToFail() {
+  async updateMsgSendToFail() {
     this.msgTable.executeSql(`UPDATE msg SET msgStatus = 2 WHERE msgStatus = 1 `)
   }
 

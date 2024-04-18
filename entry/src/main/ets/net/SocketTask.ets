@@ -219,7 +219,14 @@ export class SocketTask {
           'id': last.type == IConstant.GROUP || last.from == globalThis.uid ? `${last.to}` : `${last.from}`,
           'length': msg.length,
           'type': 'message_froward',
-          'chatType': last.type
+          'chatType': last.type,
+          'count': msg.length,
+          'content': last.content,
+          'content_type': last.content_type,
+          'name': last.type == IConstant.GROUP || last.from == globalThis.uid ? last.to_name : last.from_name,
+          'avatar': last.type == IConstant.GROUP || last.from == globalThis.uid ?last.to_avatar:last.from_avatar,
+          'sub_type': last.sub_type,
+          'timestamp': last.timestamp
         })
         //发送保存回执
         this.receiptMsg(JSON.stringify(msg.map((item) => {

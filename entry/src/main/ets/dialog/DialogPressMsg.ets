@@ -7,9 +7,9 @@ import IConstant from '../utils/IConstant'
 export struct DialogPressMsg {
   controller?: CustomDialogController
   msgBean: MsgBean | null
-  onRevoke: (msg:MsgBean) => void
-  onCollect: (msg:MsgBean)  => void
-  onDelete: (msg:MsgBean) => void
+  onRevoke: (msg: MsgBean) => void
+  onCollect: (msg: MsgBean) => void
+  onDelete: (msg: MsgBean) => void
   @State currentTime: number = 0
 
   build() {

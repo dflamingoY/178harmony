@@ -51,7 +51,7 @@ export class RecentBean {
   isOnline: number = 0
   fromUserName: string = ''
   isReadAudio: number = 0
-  readMid: string = ''
+  readMid: number = 0
   updateTime: number = 0
   listId: string = ''
   role: number = 0

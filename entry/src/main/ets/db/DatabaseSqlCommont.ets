@@ -70,7 +70,7 @@ export default class SqlConstant {
     'isOnline INTEGER,' +
     'fromUserName TEXT,' +
     'isReadAudio INTEGER,' +
-    'readMid TEXT,' +
+    'readMid INTEGER,' +
     'updateTime INTEGER,' +
     'listId TEXT unique,' +
     'role INTEGER)',

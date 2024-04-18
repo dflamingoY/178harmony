@@ -603,7 +603,11 @@ export struct P2PPage {
     Dao.getRdbModel()?.getMsgByChatId(`${this.type + this.chatId}`, this.queryId).then((msg) => {
       this.msgList = msg.concat(this.msgList)
       if (this.queryId == -1) {
-        this.scroll.scrollToIndex(this.msgList.length - 1)
+        try {
+          this.scroll.scrollToIndex(this.msgList.length - 1)
+          this.updateRecent(this.msgList[this.msgList.length - 1].id)
+        } catch (e) {
+        }
       }
       if (this.type == IConstant.FRIEND && this.msgList.length > 0 && this.queryId == -1) {
         let filter = this.msgList.filter((item) => {
@@ -705,6 +709,17 @@ export struct P2PPage {
         }
       }
     })
+  }
+
+  //更新最新一条mid 和 未读数
+  private updateRecent(id: number) {
+    let sql = `UPDATE recent SET readMid = ${id} , unread_count = 0 WHERE listId = '${this.type + this.chatId}'`
+    Dao.getRdbModel()?.executeSql(sql)
+    emitter.emit({ eventId: IConstant.RECENT_UPDATE_ID }, { data: {
+      'type': this.type,
+      'id': this.chatId,
+      'readId': id
+    } })
   }
 
   aboutToDisappear() {

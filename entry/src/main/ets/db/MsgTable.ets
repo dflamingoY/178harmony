@@ -109,6 +109,18 @@ export default class MsgTable {
     this.msgTable.deleteData(predicates, callback)
   }
 
+  getSomeUnread(listId: string, id: number): Promise<number> {
+    return new Promise((resolve: Function, reject: Function) => {
+      this.msgTable.querySql(`select * from msg where listId = ${listId} and id > ${id} `)
+        .then((value) => {
+          let count = value.rowCount
+          resolve(count)
+        }).catch(() => {
+        reject(0)
+      })
+    })
+  }
+
   parseMsgBean(value: relationalStore.ResultSet): MsgBean {
     let msg = new MsgBean()
     msg.from_name_ios = value.getString(value.getColumnIndex('name_from_ios'))

@@ -1,7 +1,6 @@
 {
   "src": [
     "pages/StartUp",
-    "pages/ChatPage",
     "pages/HomePage",
     "pages/UserPage",
     "liveInfo/LiveContentPage",

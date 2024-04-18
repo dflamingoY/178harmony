@@ -9,7 +9,6 @@ import IConstant from '../utils/IConstant'
 import emitter from '@ohos.events.emitter'
 import Dao from '../db/Dao'
 
-@Entry
 @Component
 export struct ChatPage {
   @State recentList: Array<RecentBean> = []
@@ -231,7 +230,10 @@ export struct ChatPage {
         find.remark = msg.remark
         find.mid = msg.mid
         find.unread_count = find.unread_count + 1
-        this.recentList = [...this.recentList]
+        this.recentList = this.recentList.filter((item) => {
+          return item.listId != msg.listId
+        })
+        this.recentList.unshift(find)
         Dao.getRdbModel()?.updateRecent(find)
       } else {
         let recent = new RecentBean()
@@ -257,9 +259,52 @@ export struct ChatPage {
         Dao.getRdbModel()?.insertRecent(recent)
       }
     })
+    emitter.on({ eventId: IConstant.RECENT_UPDATE_ID }, (event) => {
+      let find = this.recentList.find((item) => {
+        return item.chat_type == event.data.type && item.chatId == event.data.id
+      })
+      if (find) {
+        find.unread_count = 0
+        find.readMid = event.data.readId
+        this.recentList = [...this.recentList]
+      }
+    })
+    emitter.on({ eventId: IConstant.MSG_OPERATOR_ID }, (event) => {
+      if (event.data.type == 'message_froward') {
+        let find = this.recentList.find((item) => {
+          return item.chat_type == event.data.chatType && item.chatId == event.data.id
+        })
+        if (find) {
+          find.content = event.data.content
+          find.content_type = event.data.content_type
+          find.unread_count = find.unread_count + event.data.count
+          this.recentList = this.recentList.filter((item) => {
+            return item.listId != find.listId
+          })
+          this.recentList.unshift(find)
+        } else { //新建一条数据
+          let recent = new RecentBean()
+          recent.listId = event.data.chatType + event.data.id
+          recent.content = event.data.content
+          recent.content_type = event.data.content_type
+          recent.sub_type = event.data.sub_type
+          recent.chat_type = event.data.chatType
+          recent.timestamp = event.data.timestamp
+          recent.name = event.data.name
+          recent.avatar = event.data.avatar
+          recent.chatId = event.data.id
+          recent.unread_count = event.data.count
+          //插入数据
+          this.recentList.unshift(recent)
+          Dao.getRdbModel()?.insertRecent(recent)
+        }
+      }
+    })
   }
 
   aboutToDisappear() {
     emitter.off(IConstant.WS_MSG_ID)
+    emitter.off(IConstant.RECENT_UPDATE_ID)
+    emitter.off(IConstant.MSG_OPERATOR_ID)
   }
 }
