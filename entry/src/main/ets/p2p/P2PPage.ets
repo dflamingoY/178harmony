@@ -307,6 +307,12 @@ export struct P2PPage {
                     .width('154vp')
                     .height('86vp')
                     .borderRadius('6vp')
+                    .onClick(() => {
+                      router.pushUrl({ url: 'p2p/ShowMediaPage', params: {
+                        'listId': this.type + this.chatId,
+                        'id': item.id
+                      } })
+                    })
                 } else if (item.content_type == "voice") {
                   Row() {
                     Image(item.isPlay ? $r('app.media.icon_audio_play_right_pause') : $r('app.media.icon_audio_play_right_start'))
@@ -340,6 +346,12 @@ export struct P2PPage {
                       .height('34vp')
                   }.width('154vp')
                   .height('86vp')
+                  .onClick(() => {
+                    router.pushUrl({ url: 'p2p/ShowMediaPage', params: {
+                      'listId': this.type + this.chatId,
+                      'id': item.id
+                    } })
+                  })
                   .borderRadius('6vp')
                 } else if (item.content_type == "file") {
                   Flex({ direction: FlexDirection.Row }) {

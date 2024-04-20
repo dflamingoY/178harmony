@@ -134,7 +134,6 @@ export class RdbModel {
     this.recentTable.update(recent, () => {
     })
     this.recentUpdateList.delete(recent.listId)
-    LogUtil.d("West", '执行完成一次  ' + this.recentUpdateList.size + "    " + recent.unread_count)
     if (this.recentUpdateList.size == 0) { //通知界面刷新
       emitter.emit({ eventId: IConstant.MSG_OPERATOR_ID }, { data: {
         'type': 'syncLoad'
@@ -149,6 +148,10 @@ export class RdbModel {
   async insertMsg(msg: MsgBean) {
     this.msgTable.insert(msg, () => {
     })
+  }
+
+  getResByListId(listId: string): Promise<Array<MsgBean>> {
+    return this.msgTable.getResByListId(listId)
   }
 
   queryMsgByMid(mid: string) {

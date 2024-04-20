@@ -149,6 +149,9 @@ export struct IndexRecommend {
                       .width('155vp')
                       .margin({ left: '10vp' })
                       .borderRadius('8vp')
+                      .onClick(() => {
+                        this.jumpDetails(item)
+                      })
                     }.height('100%')
                   }, (item: MatchBean, index?: number) => {
                     return JSON.stringify(item)
@@ -194,16 +197,16 @@ export struct IndexRecommend {
                             .fontColor(Color.White)
                             .margin({ left: '5vp' })
                           Blank()
-
-                          Image($r('app.media.icon_live_count_user'))
-                            .width('10vp')
-                            .height('14vp')
-
-                          Text(`${item.viewer}`)
-                            .fontColor(Color.White)
-                            .margin({ left: '5vp' })
-                            .margin({ right: '8vp' })
-                            .fontSize('12vp')
+                          if (this.model.is_video == 0) {
+                            Image($r('app.media.icon_live_count_user'))
+                              .width('10vp')
+                              .height('14vp')
+                            Text(`${item.viewer}`)
+                              .fontColor(Color.White)
+                              .margin({ left: '5vp' })
+                              .margin({ right: '8vp' })
+                              .fontSize('12vp')
+                          }
 
                         }
                         .width(`${this.matchWidth - display.getDefaultDisplaySync().densityPixels * 6}px`)
@@ -214,10 +217,11 @@ export struct IndexRecommend {
 
                       }.alignContent(Alignment.Bottom)
 
-                      Text(`${item.league_name_zh} ${item.home_team_zh} VS ${item.away_team_zh}`)
+                      Text(this.model.is_video == 0 ? `${item.league_name_zh} ${item.home_team_zh} VS ${item.away_team_zh}` : item.title)
                         .textAlign(TextAlign.Start)
                         .width('100%')
-                        .margin({ top: '10vp' })
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .margin({ top: '10vp', left: '5vp', right: '5vp' })
                         .maxLines(1)
                     }.margin({ top: '10vp' })
                   }
@@ -265,12 +269,15 @@ export struct IndexRecommend {
   }
 
   jumpDetails(item: MatchBean) {
-    router.pushUrl({ url: "liveInfo/LiveContentPage", params: {
-      "tournamentId": item.tournament_id,
-      "url": item.url,
-      "type": item.type,
-      "memberId": item.member_id } })
-
+    if (this.model.is_video == 0) {
+      router.pushUrl({ url: "liveInfo/LiveContentPage", params: {
+        "tournamentId": item.tournament_id,
+        "url": item.url,
+        "type": item.type,
+        "memberId": item.member_id } })
+    } else {
+      router.pushUrl({ url: 'pages/other/ReplayPage', params: { 'id': item.id } })
+    }
     //跳转Ability
     // const want: Want = {
     //   bundleName: getContext(this).applicationInfo.name,

@@ -13,7 +13,7 @@ export default class RecommendData {
   banner: Array<MatchBean> = []
   recommend: Array<MatchBean> = []
   hot_matches: Array<MatchBean> = []
-  is_video: number
+  is_video: number //0 直播 1 回放
 }
 //
 export class MatchBean {
@@ -43,6 +43,8 @@ export class MatchBean {
   list_type: number = 0
   tournament_type: number = 0
   anchor: Array<TvUser> = []
+  title: string = ''
+  id: number = 0
 }
 
 export class TvUser {
@@ -55,7 +57,6 @@ export class TvUser {
   tournament_id: number = 0
   viewer: number = 0 //人气
   cover: string = ''
-
 }
 
 export class MatchListData {

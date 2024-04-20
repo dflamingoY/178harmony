@@ -218,6 +218,33 @@ export default class MsgTable {
       })
     })
   }
+
+  getResByListId(listId: string): Promise<Array<MsgBean>> {
+    return new Promise((resolve: Function, reject: Function) => {
+      let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+      predicates.equalTo("listId", listId)
+      predicates.orderByDesc('id')
+      predicates.in('content_type', ['img', 'video'])
+      this.msgTable.queryAsync(predicates).then((value) => {
+        let count = value.rowCount
+        if (count == 0) {
+          reject('empty')
+        } else {
+          value.goToFirstRow()
+          const result: MsgBean[] = []
+          for (let index = 0; index < count; index++) {
+            let msg = this.parseMsgBean(value)
+            result.push(msg)
+            value.goToNextRow()
+          }
+          resolve(result.reverse())
+        }
+      }).catch(() => {
+        reject('empty')
+      })
+    })
+
+  }
 }
 
 function generatorBucketTx(user: MsgBean[]): relationalStore.ValuesBucket[] {
