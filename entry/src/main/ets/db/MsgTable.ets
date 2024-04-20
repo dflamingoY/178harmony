@@ -24,6 +24,7 @@ export default class MsgTable {
         let count = value.rowCount
         let mids = new Array<string>()
         if (count > 0) {
+          value.goToFirstRow()
           for (let index = 0; index < count; index++) {
             try {
               let mid = value.getString(value.getColumnIndex('mid'))
@@ -114,8 +115,9 @@ export default class MsgTable {
     return new Promise((resolve: Function, reject: Function) => {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
       predicates.equalTo("listId", listId)
-      predicates.equalTo('from', listId.replace(IConstant.FRIEND, '').replace(IConstant.GROUP, ''))
-      predicates.greaterThan("id", id)
+        .and()
+        .notEqualTo('id_from', globalThis.uid)
+        .greaterThan("id", id)
       try {
         this.msgTable.query(predicates, (resultSet: relationalStore.ResultSet) => {
           resolve(resultSet.rowCount)
@@ -124,15 +126,6 @@ export default class MsgTable {
       } catch (e) {
         reject(0)
       }
-      /* this.msgTable.querySql(`SELECT * FROM msg WHERE listId = ${listId} and id > ${id} `)
-         .then((value) => {
-           let count = value.rowCount
-           LogUtil.d("West", "getSomeUnread  " + count)
-           resolve(count)
-         }).catch(() => {
-         LogUtil.d("West", "getSomeUnread  查询出错")
-         reject(0)
-       })*/
     })
   }
 

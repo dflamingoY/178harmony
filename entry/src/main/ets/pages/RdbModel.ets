@@ -1,3 +1,4 @@
+import emitter from '@ohos.events.emitter'
 import { MsgBean, RecentBean } from '../data/MsgBean'
 import { OffLineData } from '../data/OffLineData'
 import { UserBean } from '../data/user'
@@ -31,7 +32,7 @@ export class RdbModel {
   }
 
   async insertMsgs(offline: OffLineData) {
-    if (offline.msg != null) {
+    if (offline.msg != null && offline.msg.length > 0) {
       let revokes = offline.revoke?.map((item) => {
         return item.mid
       })
@@ -61,7 +62,9 @@ export class RdbModel {
       let set = new Set(result)
       this.recentTable.getNeedUpdateRecentList(Array.from(set))
         .then((recents) => {
+
           recents.forEach((recent) => { //更新最新内容， 更新最新未读数
+            this.recentUpdateList.add(recent.listId)
             let find = offline.msg.reverse().find((item) => {
               return item.listId == recent.listId
             }) //存在数据进行赋值
@@ -101,10 +104,12 @@ export class RdbModel {
           }
         })
         .catch((err) => {
-          LogUtil.d("Dao", 'RdbModel 异常 : ' + err)
+          LogUtil.d("West", 'RdbModel 异常 : ' + err)
         })
     }
   }
+
+  private recentUpdateList: Set<String> = new Set()
 
   private async updateRecentOffline(recent: RecentBean, find: MsgBean) {
     recent.timestamp = find.timestamp
@@ -128,6 +133,13 @@ export class RdbModel {
     //计算未读熟 加上离线库中的数据
     this.recentTable.update(recent, () => {
     })
+    this.recentUpdateList.delete(recent.listId)
+    LogUtil.d("West", '执行完成一次  ' + this.recentUpdateList.size + "    " + recent.unread_count)
+    if (this.recentUpdateList.size == 0) { //通知界面刷新
+      emitter.emit({ eventId: IConstant.MSG_OPERATOR_ID }, { data: {
+        'type': 'syncLoad'
+      } })
+    }
   }
 
   getMsgByChatId(key: string, id: number): Promise<Array<MsgBean>> {
@@ -174,6 +186,10 @@ export class RdbModel {
 
   getRecentMsg(listId: string, endId: number) {
     return this.msgTable.getRecentList(listId, endId)
+  }
+
+  getUnreadCount(): Promise<number> {
+    return this.recentTable.getUnread()
   }
 
   getAllMid() {

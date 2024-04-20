@@ -17,7 +17,7 @@ import Dao from '../db/Dao';
 @Component
 struct HomePage {
   @State currentIndex: number = 0
-  @State unreadCount: number = 1
+  @State unreadCount: number = 0
 
   build() {
     Flex({ direction: FlexDirection.Column }) {
@@ -49,7 +49,9 @@ struct HomePage {
       Dao.getRdbModel().updateMsgSendToFail()
       UserViewModel.getLocalMid()
     }
-    emitter.on(this.innerEvent, () => {
+    emitter.on({
+      eventId: IConstant.LOGIN_EVENT_ID
+    }, () => {
       if (!globalThis.user || globalThis.user == null) {
         this.currentIndex = 0
       } else {
@@ -59,6 +61,13 @@ struct HomePage {
     emitter.on({ eventId: IConstant.APP_IN_FOREGROUND }, () => {
       SocketTask.checkWs()
     })
+    emitter.on({ eventId: IConstant.MSG_OPERATOR_ID }, (event) => {
+      if (event.data.type == 'syncLoad') {
+        UserViewModel.getUnreadCount().then((count) => {
+          this.unreadCount = count
+        })
+      }
+    })
   }
   //登陆之后需要获取的数据
   private getLoginData() {
@@ -66,11 +75,9 @@ struct HomePage {
     UserViewModel.getOffline()
   }
 
-  innerEvent = {
-    eventId: IConstant.LOGIN_EVENT_ID
-  }
-
   aboutToDisappear() {
     emitter.off(IConstant.LOGIN_EVENT_ID)
+    emitter.off(IConstant.MSG_OPERATOR_ID)
+    emitter.off(IConstant.APP_IN_FOREGROUND)
   }
 }

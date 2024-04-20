@@ -5,16 +5,16 @@ import emitter from '@ohos.events.emitter';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want, launchParam) {
-    hilog.info(0x0000, 'West', '%{public}s', 'Ability onCreate');
+    // hilog.info(0x0000, 'West', '%{public}s', 'Ability onCreate');
   }
 
   onDestroy() {
-    hilog.info(0x0000, 'West', '%{public}s', 'Ability onDestroy');
+    // hilog.info(0x0000, 'West', '%{public}s', 'Ability onDestroy');
   }
 
   onWindowStageCreate(windowStage: window.WindowStage) {
     // Main window is created, set main page for this ability
-    hilog.info(0x0000, 'West', '%{public}s', 'Ability onWindowStageCreate');
+    // hilog.info(0x0000, 'West', '%{public}s', 'Ability onWindowStageCreate');
     windowStage.loadContent('pages/StartUp', (err, data) => {
       if (err.code) {
         hilog.error(0x0000, 'West', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
@@ -26,7 +26,7 @@ export default class EntryAbility extends UIAbility {
 
   onWindowStageDestroy() {
     // Main window is destroyed, release UI related resources
-    hilog.info(0x0000, 'West', '%{public}s', 'Ability onWindowStageDestroy');
+    // hilog.info(0x0000, 'West', '%{public}s', 'Ability onWindowStageDestroy');
   }
 
   onForeground() {
@@ -38,12 +38,12 @@ export default class EntryAbility extends UIAbility {
       data: {}
     })
     //连接ws
-    hilog.info(0x0000, 'West', '%{public}s', 'Ability onForeground');
+    // hilog.info(0x0000, 'West', '%{public}s', 'Ability onForeground');
   }
 
   onBackground() {
     globalThis.isFore = false
     // Ability has back to background
-    hilog.info(0x0000, 'West', '%{public}s', 'Ability onBackground');
+    // hilog.info(0x0000, 'West', '%{public}s', 'Ability onBackground');
   }
 }

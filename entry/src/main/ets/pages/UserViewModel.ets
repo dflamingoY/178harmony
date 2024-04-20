@@ -31,7 +31,7 @@ class UserViewModel {
 
   getLocalMid() {
     Dao.getRdbModel().getAllMid().then((value) => {
-      this.localMid.concat(value)
+      this.localMid = this.localMid.concat(value)
     })
   }
 
@@ -100,6 +100,7 @@ class UserViewModel {
     if (this.isLoading) {
       return
     }
+    LogUtil.d("West", '开始请求离线消息')
     this.isLoading = true
     await getData("get_off_line_msg").then((resp: BaseResp) => {
       if (resp.code == 200) {
@@ -115,15 +116,12 @@ class UserViewModel {
         let revoke = result.revoke?.map((item) => {
           return item.mid
         })
-
-        LogUtil.d("West", `local mid : ${this.localMid.join()}`)
         if (result.msg != null) {
           result.msg = result.msg.filter((item) => {
-            return!(item.mid in this.localMid) && !(item.mid in group_del_msg)
+            return this.localMid.indexOf(item.mid.toString()) < 0 && group_del_msg.indexOf(item.mid.toString())
           })
           this.localMid = this.localMid.concat(mids)
         }
-        LogUtil.d("West", `local mid 添加 : ${this.localMid.join()}`)
         //清除已读mid记录
         Dao.getRdbModel()?.insertMsgs(result)
         if (mids && mids != null && mids.length > 0) {
@@ -143,6 +141,10 @@ class UserViewModel {
     }).catch(() => {
       this.isLoading = false
     })
+  }
+
+  getUnreadCount() {
+    return Dao.getRdbModel().getUnreadCount()
   }
 
   getFriend(uid: string): Promise<UserBean> {
@@ -407,7 +409,7 @@ class UserViewModel {
   }
 
   inertVerifyMsg(msg: MsgBean) {
-    if (!this.localMid.concat(msg.mid)) {
+    if (!(msg.mid in this.localMid)) {
       Dao.getRdbModel().insertMsg(msg)
     }
   }

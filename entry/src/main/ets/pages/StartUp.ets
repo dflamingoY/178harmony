@@ -30,7 +30,6 @@ struct StartUp {
         globalThis.user = user
       }
       Dao.getRdbModel()
-      UserViewModel.getOffline()
       setTimeout(() => {
         router.pushUrl({ url: 'pages/HomePage' },);
       }, 1000)

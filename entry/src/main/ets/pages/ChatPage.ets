@@ -196,6 +196,14 @@ export struct ChatPage {
   }
 
   aboutToAppear() {
+    this.loadData()
+    systemDateTime.getCurrentTime(false).then((time: number) => {
+      this.currentTime = time / 1000
+    })
+    this.registerWs()
+  }
+
+  private loadData() {
     try {
       UserViewModel.getRecentList()?.then((recents) => {
         if (recents != null && recents.length > 0) {
@@ -208,11 +216,6 @@ export struct ChatPage {
       })
     } catch (e) {
     }
-
-    systemDateTime.getCurrentTime(false).then((time: number) => {
-      this.currentTime = time / 1000
-    })
-    this.registerWs()
   }
 
   private registerWs() {
@@ -298,6 +301,9 @@ export struct ChatPage {
           this.recentList.unshift(recent)
           Dao.getRdbModel()?.insertRecent(recent)
         }
+      }
+      else if (event.data.type == 'syncLoad') {
+        this.loadData()
       }
     })
   }

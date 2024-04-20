@@ -1,6 +1,5 @@
 import relationalStore from '@ohos.data.relationalStore';
 import { RecentBean } from '../data/MsgBean';
-import LogUtil from '../utils/LogUtil';
 import SqlConstant from './DatabaseSqlCommont';
 import Rdb from './Rdb';
 
@@ -81,7 +80,30 @@ export default class RecentTable {
     })
   }
 
-  parseRecentByResultSet(value: relationalStore.ResultSet): RecentBean {
+  getUnread(): Promise<number> {
+    return new Promise((resolve: Function) => {
+      let predicates = new relationalStore.RdbPredicates(SqlConstant.RECENT_TABLE.tableName)
+      predicates.greaterThan('unread_count', 0)
+      this.recent.querySome(predicates, ['unread_count']).then((value) => {
+        let rowCount = value.rowCount
+        var allCount = 0
+        if (rowCount > 0) {
+          value.goToFirstRow()
+          for (let index = 0; index < rowCount; index++) {
+            try {
+              allCount += value.getLong(value.getColumnIndex('unread_count'))
+            } catch (e) {
+            }
+          }
+        }
+        resolve(allCount)
+      }).catch(() => {
+        resolve(0)
+      })
+    })
+  }
+
+  private parseRecentByResultSet(value: relationalStore.ResultSet): RecentBean {
     let recent = new RecentBean()
     recent.avatar = value.getString(value.getColumnIndex('avatar'))
     recent.content = value.getString(value.getColumnIndex('content'))
