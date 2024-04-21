@@ -9,7 +9,7 @@ import { LiveAnalysePage } from './LiveAnalysePage'
 import { LiveLeagueListPage } from './LiveLeagueListPage'
 import { LiveChatPage } from './LiveChatPage'
 import { LiveDetailBean, LiveInfo, TvUser } from '../data/LiveDetailData'
-import { VideoController } from './VideoController'
+import { VideoPresenter } from './VideoPresenter'
 import window from '@ohos.window'
 import LogUtil from '../utils/LogUtil'
 import IConstant from '../utils/IConstant'
@@ -22,7 +22,7 @@ export struct LiveContentPage {
   @State index: number = 0
   @State unreadCount: number = 0
   private xComponentController = new XComponentController();
-  private videoController: VideoController = new VideoController()
+  private videoController: VideoPresenter = new VideoPresenter()
   private surfaceID: string = '';
   @State currentUser: TvUser | null = null
   @State roomId: string = ''
@@ -102,20 +102,23 @@ export struct LiveContentPage {
     this.tournamentId = params.tournamentId as unknown as number
     this.ballType = params.type as unknown as number
     var memberId = params.memberId as unknown as number
-    this.model.getLiveInfo(this.tournamentId, this.ballType, memberId).then((value: LiveInfo) => {
-      value.more.forEach((item) => {
-        if (item.member_id == value.detail.member_id) {
-          item.isPlay = true
-          this.currentUser = item
-          return
-        }
+    (this.tournamentId !== undefined && this.ballType !== undefined ?
+    this.model.getLiveInfo(this.tournamentId, this.ballType, memberId) :
+    this.model.getLiveInfoByMemberId(memberId))
+      .then((value: LiveInfo) => {
+        value.more.forEach((item) => {
+          if (item.member_id == value.detail.member_id) {
+            item.isPlay = true
+            this.currentUser = item
+            return
+          }
+        })
+        this.roomId = value.detail.room_id
+        this.videoController.firstPlay(value.detail.screen_url_m3u8, this.surfaceID)
+        this.more = value.more
+        this.liveDetails = value.detail
+        this.sendWsRoom()
       })
-      this.roomId = value.detail.room_id
-      this.videoController.firstPlay(value.detail.screen_url_m3u8, this.surfaceID)
-      this.more = value.more
-      this.liveDetails = value.detail
-      this.sendWsRoom()
-    })
   }
 
   private sendWsRoom() {

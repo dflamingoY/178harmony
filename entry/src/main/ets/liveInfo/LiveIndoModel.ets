@@ -18,6 +18,21 @@ export class LiveInfoModel {
       })
     })
   }
+  
+  //V3
+  getLiveInfoByMemberId(memberId: number): Promise<LiveInfo> {
+    return new Promise((resolve: Function, reject: Function) => {
+      post("anchor/live/detail", { "member_id": memberId }).then((value: BaseResp) => {
+        if (value.code == 200) {
+          resolve(value.data)
+        } else {
+          reject(value.msg)
+        }
+      }).catch((err: Error) => {
+        reject(err.message)
+      })
+    })
+  }
 
   getRoomHistory(roomId: string, currentPage: number): Promise<ChatRoomBean> {
     return new Promise((resolve: Function, reject: Function) => {

@@ -2,6 +2,7 @@ import RecommendData, { MatchBean } from '../data/Data';
 import display from '@ohos.display';
 import router from '@ohos.router';
 import IndexRecommendModel from './IndexRecommendModel';
+import common from '@ohos.app.ability.common';
 
 //new_index
 @Component
@@ -197,7 +198,7 @@ export struct IndexRecommend {
                             .fontColor(Color.White)
                             .margin({ left: '5vp' })
                           Blank()
-                          if (this.model.is_video == 0) {
+                          if (item.is_video !== undefined || item.is_video == 0) {
                             Image($r('app.media.icon_live_count_user'))
                               .width('10vp')
                               .height('14vp')
@@ -207,7 +208,6 @@ export struct IndexRecommend {
                               .margin({ right: '8vp' })
                               .fontSize('12vp')
                           }
-
                         }
                         .width(`${this.matchWidth - display.getDefaultDisplaySync().densityPixels * 6}px`)
                         .height('30vp')
@@ -217,7 +217,7 @@ export struct IndexRecommend {
 
                       }.alignContent(Alignment.Bottom)
 
-                      Text(this.model.is_video == 0 ? `${item.league_name_zh} ${item.home_team_zh} VS ${item.away_team_zh}` : item.title)
+                      Text(item.is_video !== undefined || item.is_video == 0 ? `${item.league_name_zh} ${item.home_team_zh} VS ${item.away_team_zh}` : item.title)
                         .textAlign(TextAlign.Start)
                         .width('100%')
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -269,14 +269,32 @@ export struct IndexRecommend {
   }
 
   jumpDetails(item: MatchBean) {
-    if (this.model.is_video == 0) {
+    if (item.jump_type !== undefined) {
+      if (item.jump_type == 1) { //进入直播间
+        // router.pushUrl({ url: "liveInfo/LiveContentPage", params: {
+        //   "memberId": item.member_id } })
+      } else { //跳外部浏览器
+        let want = {
+          "action": "ohos.want.action.viewData",
+          "entities": ["entity.system.browsable"],
+          "uri": item.url,
+          "type": "text/plain"
+        }
+        let context = getContext(this) as common.UIAbilityContext;
+        context.startAbility(want)
+      }
+    }
+    else if (item.is_video !== undefined || item.is_video == 0) {
       router.pushUrl({ url: "liveInfo/LiveContentPage", params: {
         "tournamentId": item.tournament_id,
         "url": item.url,
         "type": item.type,
         "memberId": item.member_id } })
     } else {
-      router.pushUrl({ url: 'pages/other/ReplayPage', params: { 'id': item.id } })
+      router.pushUrl({ url: 'pages/other/ReplayPage', params: { 'id': item.id,
+        'url': item.video_url,
+        "data": JSON.stringify(this.model.recommend)
+      } })
     }
     //跳转Ability
     // const want: Want = {

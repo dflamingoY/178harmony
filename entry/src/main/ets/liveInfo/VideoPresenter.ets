@@ -20,7 +20,7 @@ import resourceManager from '@ohos.resourceManager';
 import LogUtil from '../utils/LogUtil';
 
 @Observed
-export class VideoController {
+export class VideoPresenter {
   private avPlayer: media.AVPlayer | null = null;
   private duration: number = 0;
   private status: number = -1;

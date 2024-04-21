@@ -6,7 +6,8 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "@ohos/crypto-js":"2.0.0"
+    "@ohos/crypto-js":"2.0.0",
+
   }
 }
 

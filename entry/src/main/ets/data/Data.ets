@@ -45,6 +45,8 @@ export class MatchBean {
   anchor: Array<TvUser> = []
   title: string = ''
   id: number = 0
+  video_url: string = ''
+  jump_type: number = 0
 }
 
 export class TvUser {
