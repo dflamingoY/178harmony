@@ -3,6 +3,7 @@ import display from '@ohos.display';
 import router from '@ohos.router';
 import IndexRecommendModel from './IndexRecommendModel';
 import common from '@ohos.app.ability.common';
+import IColors from '../utils/IColors';
 
 //new_index
 @Component
@@ -198,7 +199,7 @@ export struct IndexRecommend {
                             .fontColor(Color.White)
                             .margin({ left: '5vp' })
                           Blank()
-                          if (item.is_video !== undefined || item.is_video == 0) {
+                          if (item.is_video === undefined || item.is_video == 0) {
                             Image($r('app.media.icon_live_count_user'))
                               .width('10vp')
                               .height('14vp')
@@ -215,9 +216,22 @@ export struct IndexRecommend {
                         .backgroundColor(0xb3000000)
                         .borderRadius({ bottomLeft: '10vp', bottomRight: '10vp' })
 
+                        if (item.is_video === undefined || item.is_video == 0) {
+                          Image($r('app.media.icon_playing'))
+                            .width('40vp')
+                            .height('20vp')
+                            .objectFit(ImageFit.Cover)
+                            .padding('5vp')
+                            .backgroundColor(0x7f000000)
+                            .borderRadius('10vp')
+                            .margin({
+                              left: `${this.matchWidth - display.getDefaultDisplaySync().densityPixels * 60}px`,
+                              bottom: `${this.matchHeight - display.getDefaultDisplaySync().densityPixels * 30}px`
+                            })
+                        }
                       }.alignContent(Alignment.Bottom)
 
-                      Text(item.is_video !== undefined || item.is_video == 0 ? `${item.league_name_zh} ${item.home_team_zh} VS ${item.away_team_zh}` : item.title)
+                      Text(item.is_video === undefined || item.is_video == 0 ? `${item.league_name_zh} ${item.home_team_zh} VS ${item.away_team_zh}` : item.title)
                         .textAlign(TextAlign.Start)
                         .width('100%')
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -245,6 +259,7 @@ export struct IndexRecommend {
         })
       }
     }
+    .backgroundColor(IColors.colorf6f6f6)
   }
   //宽高 16:9 初始化项目
   initMatchScreen() {
@@ -270,7 +285,7 @@ export struct IndexRecommend {
 
   jumpDetails(item: MatchBean) {
     if (item.jump_type !== undefined) {
-      if (item.jump_type == 1) { //进入直播间
+      if (item.jump_type == 1) { //进入直播间  v2 不支持此跳转
         // router.pushUrl({ url: "liveInfo/LiveContentPage", params: {
         //   "memberId": item.member_id } })
       } else { //跳外部浏览器
@@ -284,7 +299,7 @@ export struct IndexRecommend {
         context.startAbility(want)
       }
     }
-    else if (item.is_video !== undefined || item.is_video == 0) {
+    else if (item.is_video === undefined || item.is_video == 0) {
       router.pushUrl({ url: "liveInfo/LiveContentPage", params: {
         "tournamentId": item.tournament_id,
         "url": item.url,

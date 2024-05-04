@@ -3,6 +3,7 @@ import display from '@ohos.display';
 import { VideoPresenter } from '../../liveInfo/VideoPresenter';
 import IConstant from '../../utils/IConstant';
 import { MatchBean } from '../../data/Data';
+import { VideoBottom } from '../../widget/VideoBottom';
 
 @Component
 @Entry //视频回放
@@ -29,14 +30,23 @@ export struct ReplayPage {
           .backgroundColor(Color.White)
           .width(IConstant.MATCH_PARENT)
           .height(`${display.getDefaultDisplaySync().width * 0.5629}px`)
-        Image($r('app.media.icon_black_back'))
-          .height('21vp')
-          .width('21vp')
-          .margin({ left: '12vp', top: '12vp' })
-          .onClick(() => {
-            router.back()
-          })
-        //展示视频长度等信息
+
+        Column() {
+          Image($r('app.media.icon_black_back'))
+            .height('21vp')
+            .align(Alignment.TopStart)
+            .width('21vp')
+            .margin({ left: '12vp', top: '12vp' })
+            .onClick(() => {
+              router.back()
+            })
+          Blank()
+          //展示视频长度等信息
+          VideoBottom()
+        }
+        .alignItems(HorizontalAlign.Start)
+        .height(IConstant.MATCH_PARENT)
+
       }.width('100%')
       .height(`${display.getDefaultDisplaySync().width * 0.5629}px`)
 
@@ -136,7 +146,9 @@ export struct ReplayPage {
     try {
       let arr: Array<MatchBean> = JSON.parse(params.data)
       if (arr !== undefined) {
-        this.list = arr
+        this.list = arr.filter((item) => {
+          return item.is_video !== undefined && item.is_video == 1
+        })
       }
     } catch (e) {
     }

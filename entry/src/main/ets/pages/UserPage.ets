@@ -29,6 +29,11 @@ export struct UserPage {
             top: { anchor: "__container__", align: VerticalAlign.Top },
             left: { anchor: "__container__", align: HorizontalAlign.Start }
           })
+          .onClick(() => {
+            router.pushUrl({ url: "p2p/ShowPicPage", params: {
+              url: this.user.avatar
+            } })
+          })
           .id('ivAvatar')
 
         Column() {
@@ -97,23 +102,23 @@ export struct UserPage {
 
 
       Column() {
-      /*  Flex({ direction: FlexDirection.Column }) {
-          Text('聊天管理')
-            .fontSize('15fp')
-            .width('100%')
-            .margin({ left: '15vp' })
-            .height('42vp')
-            .fontColor(0x1E2024)
+        /*  Flex({ direction: FlexDirection.Column }) {
+            Text('聊天管理')
+              .fontSize('15fp')
+              .width('100%')
+              .margin({ left: '15vp' })
+              .height('42vp')
+              .fontColor(0x1E2024)
 
-          Row() {
-            this.buildItem('我的表情', $r('app.media.icon_user_emoji'), ClickType.Emoji)
-            this.buildItem('我的收藏', $r('app.media.icon_collection'), ClickType.Collection)
+            Row() {
+              this.buildItem('我的表情', $r('app.media.icon_user_emoji'), ClickType.Emoji)
+              this.buildItem('我的收藏', $r('app.media.icon_collection'), ClickType.Collection)
+            }
+            .width('100%').height('96%')
           }
-          .width('100%').height('96%')
-        }
-        .borderRadius('8vp')
-        .height('112vp')
-        .backgroundColor(Color.White)*/
+          .borderRadius('8vp')
+          .height('112vp')
+          .backgroundColor(Color.White)*/
 
         Flex({ direction: FlexDirection.Column }) {
           Text('个人中心')

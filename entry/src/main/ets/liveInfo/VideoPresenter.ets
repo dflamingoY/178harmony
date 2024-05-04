@@ -14,8 +14,6 @@
  */
 
 import media from '@ohos.multimedia.media';
-import prompt from '@ohos.promptAction';
-import window from '@ohos.window';
 import resourceManager from '@ohos.resourceManager';
 import LogUtil from '../utils/LogUtil';
 
@@ -175,48 +173,12 @@ export class VideoPresenter {
   }
 
   /**
-   * Previous video.
-   */
-  previousVideo() {
-    if (this.avPlayer === null) {
-      return;
-    }
-    // if (CommonConstants.OPERATE_STATE.indexOf(this.avPlayer.state) === -1) {
-    //   return;
-    // }
-    // this.titleThis.playSpeed = 1;
-    // let globalVideoList = GlobalContext.getContext().getObject('globalVideoList') as VideoItem[];
-    // let curIndex = this.index - PlayConstants.CONTROL_NEXT;
-    // this.index = (curIndex === -PlayConstants.CONTROL_NEXT) ?
-    //   (globalVideoList.length - PlayConstants.CONTROL_NEXT) : curIndex;
-    // if (this.iUrl) {
-    //   this.iUrl = globalVideoList[this.index].iSrc;
-    // } else {
-    //   this.url = globalVideoList[this.index].src;
-    // }
-    this.avPlayer.reset();
-  }
-
-  /**
    * Next video.
    */
   nextVideo() {
     if (this.avPlayer === null) {
       return;
     }
-    /* if (CommonConstants.OPERATE_STATE.indexOf(this.avPlayer.state) === -1) {
-       return;
-     }
-     this.titleThis.playSpeed = 1;
-     let globalVideoList = GlobalContext.getContext().getObject('globalVideoList') as VideoItem[];
-     let curIndex = this.index + PlayConstants.CONTROL_NEXT;
-     this.index = (curIndex === globalVideoList.length) ?
-     PlayConstants.CONTROL_FIRST : curIndex;
-     if (this.iUrl) {
-       this.iUrl = globalVideoList[this.index].iSrc;
-     } else {
-       this.url = globalVideoList[this.index].src;
-     }*/
     this.avPlayer.reset();
   }
 
