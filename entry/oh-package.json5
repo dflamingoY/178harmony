@@ -1,13 +1,12 @@
 {
+  "license": "",
+  "devDependencies": {},
+  "author": "",
   "name": "entry",
-  "version": "1.0.0",
   "description": "Please describe the basic information.",
   "main": "",
-  "author": "",
-  "license": "",
+  "version": "1.0.0",
   "dependencies": {
-    "@ohos/crypto-js":"2.0.0",
-
+    "@ohos/crypto-js": "2.0.0"
   }
 }
-

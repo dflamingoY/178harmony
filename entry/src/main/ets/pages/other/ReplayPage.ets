@@ -1,9 +1,10 @@
 import router from '@ohos.router'
 import display from '@ohos.display';
-import { VideoPresenter } from '../../liveInfo/VideoPresenter';
+import { AvplayerStatus, VideoPresenter } from '../../liveInfo/VideoPresenter';
 import IConstant from '../../utils/IConstant';
 import { MatchBean } from '../../data/Data';
 import { VideoBottom } from '../../widget/VideoBottom';
+import { LoadingPage } from '../../widget/LoadingPage';
 
 @Component
 @Entry //视频回放
@@ -15,6 +16,9 @@ export struct ReplayPage {
   @State playId: number = 0
   matchWidth = 0
   matchHeight = 0
+  @State
+  private avState: AvplayerStatus = AvplayerStatus.IDLE
+  @Provide state: number = 1 //1 开始 2 暂停 3 停止
 
   build() {
     Column() {
@@ -30,7 +34,9 @@ export struct ReplayPage {
           .backgroundColor(Color.White)
           .width(IConstant.MATCH_PARENT)
           .height(`${display.getDefaultDisplaySync().width * 0.5629}px`)
-
+        if (this.avState === AvplayerStatus.PREPARED) {
+          LoadingPage()
+        }
         Column() {
           Image($r('app.media.icon_black_back'))
             .height('21vp')
@@ -42,7 +48,7 @@ export struct ReplayPage {
             })
           Blank()
           //展示视频长度等信息
-          VideoBottom()
+          VideoBottom({ videoController: this.videoController })
         }
         .alignItems(HorizontalAlign.Start)
         .height(IConstant.MATCH_PARENT)
@@ -121,7 +127,7 @@ export struct ReplayPage {
 
       }.alignContent(Alignment.Bottom)
 
-      Text(item.is_video !== undefined || item.is_video == 0 ? `${item.league_name_zh} ${item.home_team_zh} VS ${item.away_team_zh}` : item.title)
+      Text(item.title)
         .textAlign(TextAlign.Start)
         .width('100%')
         .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -155,6 +161,9 @@ export struct ReplayPage {
     setTimeout(() => {
       this.videoController.firstPlay(url, this.surfaceID)
     }, 1000)
+    this.videoController.setStateCallback((state: AvplayerStatus) => {
+      this.avState = state
+    })
   }
 
   aboutToDisappear() {

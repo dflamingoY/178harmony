@@ -4,7 +4,7 @@ import IColors from '../../utils/IColors'
 import IConstant from '../../utils/IConstant'
 import UserViewModel from '../UserViewModel'
 import { PageState } from '../../data/PageState'
-import { LoadingPage } from '../LoadingPage'
+import { LoadingPage } from '../../widget/LoadingPage'
 import CommonUtil from '../../utils/CommonUtil'
 
 @Component

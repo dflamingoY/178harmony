@@ -4,7 +4,7 @@ import { UserBean } from '../../data/user'
 import IColors from '../../utils/IColors'
 import IConstant from '../../utils/IConstant'
 import LogUtil from '../../utils/LogUtil'
-import { LoadingPage } from '../LoadingPage'
+import { LoadingPage } from '../../widget/LoadingPage'
 import UserViewModel from '../UserViewModel'
 import { EditNamePage } from './EditNamePage'
 

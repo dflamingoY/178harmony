@@ -15,6 +15,8 @@
 
 import media from '@ohos.multimedia.media';
 import resourceManager from '@ohos.resourceManager';
+import window from '@ohos.window';
+import DateFormatUtil from '../utils/DateFormatUtil';
 import LogUtil from '../utils/LogUtil';
 
 @Observed
@@ -27,6 +29,10 @@ export class VideoPresenter {
   private url?: resourceManager.RawFileDescriptor = {} as resourceManager.RawFileDescriptor;
   private iUrl: string = '';
   private surfaceId: string = '';
+  currentState: AvplayerStatus = AvplayerStatus.IDLE
+  private onState?: (state: AvplayerStatus) => void
+  private onProgress?: (pro: string, total: string, val: number) => void
+  private seekTime: number = 0;
 
   constructor() {
     this.createAVPlayer();
@@ -53,56 +59,56 @@ export class VideoPresenter {
       if (this.avPlayer === null) {
         return;
       }
+      LogUtil.d("West", "当前播放器状态：" + avplayerStatus)
       switch (avplayerStatus) {
         case AvplayerStatus.IDLE:
+          this.currentState = AvplayerStatus.IDLE;
           this.resetProgress();
           this.avPlayer.url = this.iUrl;
           break;
         case AvplayerStatus.INITIALIZED:
+          this.currentState = AvplayerStatus.INITIALIZED;
           this.avPlayer.surfaceId = this.surfaceId;
           this.avPlayer.prepare();
           break;
         case AvplayerStatus.PREPARED:
+          this.currentState = AvplayerStatus.PREPARED;
           this.avPlayer.videoScaleType = 0;
           this.setVideoSize();
           this.avPlayer.play();
           this.duration = this.avPlayer.duration;
+          LogUtil.d("West", `duration : ${this.duration}`)
           break;
         case AvplayerStatus.PLAYING:
+          this.currentState = AvplayerStatus.PLAYING;
         // this.avPlayer.setVolume(this.playerThis.volume);
         // this.setBright();
-        // this.status = CommonConstants.STATUS_START;
+          this.status = 1;
         // this.watchStatus();
           break;
         case AvplayerStatus.PAUSED:
-        // this.status = CommonConstants.STATUS_PAUSE;
+          this.currentState = AvplayerStatus.PAUSED;
+          this.status = 2;
         // this.watchStatus();
           break;
         case AvplayerStatus.COMPLETED:
-        /*this.titleThis.playSpeed = 1;
-        this.duration = PlayConstants.PLAYER_DURATION;
-        if (!this.loop) {
-          let curIndex = this.index + PlayConstants.PLAYER_NEXT;
-          let globalVideoList = GlobalContext.getContext().getObject('globalVideoList') as VideoItem[];
-          this.index = (curIndex === globalVideoList.length) ?
-          PlayConstants.PLAYER_FIRST : curIndex;
-          if (this.iUrl) {
-            this.iUrl = globalVideoList[this.index].iSrc;
-          } else {
-            this.url = globalVideoList[this.index].src;
-          }
-        }*/
+          this.currentState = AvplayerStatus.COMPLETED;
+          this.duration = 0;
           this.avPlayer.reset();
           break;
         case AvplayerStatus.RELEASED:
-        // this.avPlayer.release();
-        // this.status = CommonConstants.STATUS_STOP;
+          this.currentState = AvplayerStatus.RELEASED;
+          this.avPlayer.release();
+          this.status = 3;
         // this.watchStatus();
         // Logger.info('[PlayVideoModel] state released called')
           break;
         default:
           LogUtil.d('West', '[PlayVideoModel] unKnown state: ' + state);
           break;
+      }
+      if (this.status) {
+        this.onState(this.currentState)
       }
     });
     this.avPlayer.on(Events.TIME_UPDATE, (time: number) => {
@@ -189,11 +195,11 @@ export class VideoPresenter {
     if (this.avPlayer === null) {
       return;
     }
-    // if (this.status === CommonConstants.STATUS_START) {
-    //   this.avPlayer.pause();
-    // } else {
-    //   this.avPlayer.play();
-    // }
+    if (this.status === 1) {
+      this.avPlayer.pause();
+    } else {
+      this.avPlayer.play();
+    }
   }
 
   /**
@@ -203,18 +209,18 @@ export class VideoPresenter {
    * @param mode Slider component change event.
    */
   setSeekTime(value: number, mode: SliderChangeMode) {
-    /*if (mode === Number(SliderMode.MOVING)) {
+    if (mode === Number(SliderMode.MOVING)) {
       // The current time is changed during dragging, and other parameters remain unchanged.
-      this.progressThis.progressVal = value;
-      this.progressThis.currentTime = DateFormatUtil.secondToTime(Math.floor(value * this.duration /
-      CommonConstants.ONE_HUNDRED / CommonConstants.A_THOUSAND));
+      let progressVal = value;
+      let currentTime = DateFormatUtil.secondToTime(Math.floor(value * this.duration /
+      100 / 1000));
     }
     if (mode === Number(SliderMode.END) || mode === Number(SliderMode.CLICK)) {
-      this.seekTime = value * this.duration / CommonConstants.ONE_HUNDRED;
+      this.seekTime = value * this.duration / 100;
       if (this.avPlayer !== null) {
         this.avPlayer.seek(this.seekTime, media.SeekMode.SEEK_PREV_SYNC);
       }
-    }*/
+    }
   }
 
   /**
@@ -238,11 +244,15 @@ export class VideoPresenter {
    * @param time Current video playback time.
    */
   initProgress(time: number) {
-    // let nowSeconds = Math.floor(time / CommonConstants.A_THOUSAND);
-    // let totalSeconds = Math.floor(this.duration / CommonConstants.A_THOUSAND);
-    // this.progressThis.currentTime = DateFormatUtil.secondToTime(nowSeconds);
-    // this.progressThis.totalTime = DateFormatUtil.secondToTime(totalSeconds);
-    // this.progressThis.progressVal = Math.floor(nowSeconds * CommonConstants.ONE_HUNDRED / totalSeconds);
+    let nowSeconds = Math.floor(time / 1000);
+    let totalSeconds = Math.floor(this.duration / 1000);
+    let currentTime = DateFormatUtil.secondToTime(nowSeconds);
+    let totalTime = DateFormatUtil.secondToTime(totalSeconds);
+    let progressVal = Math.floor(nowSeconds * 100 / totalSeconds);
+    if (this.onProgress) {
+      this.onProgress(currentTime, totalTime, progressVal)
+    }
+    // LogUtil.d("West", `currentTime : ${currentTime}  totalTime: ${totalTime} progressVal:${progressVal} `)
   }
 
   /**
@@ -347,14 +357,14 @@ export class VideoPresenter {
   /**
    * Sets whether the screen is a constant based on the playback status.
    */
-  watchStatus() {
-    // let windowClass = GlobalContext.getContext().getObject('windowClass') as window.Window;
-    // if (this.status === CommonConstants.STATUS_START) {
-    //   windowClass.setWindowKeepScreenOn(true);
-    // } else {
-    //   windowClass.setWindowKeepScreenOn(false);
-    // }
-  }
+  // watchStatus() {
+  //   let windowClass = GlobalContext.getContext().getObject('windowClass') as window.Window;
+  //   if (this.status === CommonConstants.STATUS_START) {
+  //     windowClass.setWindowKeepScreenOn(true);
+  //   } else {
+  //     windowClass.setWindowKeepScreenOn(false);
+  //   }
+  // }
 
   /**
    * Sets the playback page size based on the video size.
@@ -363,26 +373,24 @@ export class VideoPresenter {
     if (this.avPlayer === null) {
       return;
     }
-    // if (this.avPlayer.height > this.avPlayer.width) {
-    //   this.playPageThis.videoWidth = PlayConstants.PLAY_PLAYER_HEIGHT_FULL;
-    //   this.playPageThis.videoHeight = PlayConstants.PLAY_PLAYER_HEIGHT_FULL;
-    //   this.playPageThis.videoPosition = FlexAlign.Start;
-    //   this.playPageThis.videoMargin = PlayConstants.HEIGHT;
-    // } else {
-    //   this.playPageThis.videoWidth = CommonConstants.FULL_PERCENT;
-    //   this.playPageThis.videoHeight = PlayConstants.PLAY_PLAYER_HEIGHT;
-    //   this.playPageThis.videoPosition = FlexAlign.Center;
-    //   this.playPageThis.videoMargin = PlayConstants.MARGIN_ZERO;
-    // }
   }
   /**
    * An error is reported during network video playback.
    */
   playError() {
+    this.currentState = AvplayerStatus.ERROR;
     // prompt.showToast({
     //   duration: 200,
     //   message: $r('app.string.link_check_address_internet')
     // });
+  }
+
+  setStateCallback(onState: (state: AvplayerStatus) => void) {
+    this.onState = onState
+  }
+
+  setProgressCallback(onProgress: (pro: string, total: string, val: number) => void) {
+    this.onProgress = onProgress
   }
 }
 
@@ -390,7 +398,7 @@ export class VideoPresenter {
 /**
  * Player component status.
  */
-enum AvplayerStatus {
+export enum AvplayerStatus {
   IDLE = 'idle',
   INITIALIZED = 'initialized',
   PREPARED = 'prepared',
@@ -409,4 +417,14 @@ enum Events {
   STATE_CHANGE = 'stateChange',
   TIME_UPDATE = 'timeUpdate',
   ERROR = 'error'
+}
+
+
+/**
+ * Slider mode.
+ */
+export enum SliderMode {
+  MOVING = 1,
+  END = 2,
+  CLICK = 3
 }
