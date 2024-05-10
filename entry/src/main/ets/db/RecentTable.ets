@@ -1,5 +1,6 @@
 import relationalStore from '@ohos.data.relationalStore';
 import { RecentBean } from '../data/MsgBean';
+import LogUtil from '../utils/LogUtil';
 import SqlConstant from './DatabaseSqlCommont';
 import Rdb from './Rdb';
 
@@ -22,6 +23,10 @@ export default class RecentTable {
   deleteAll(callback?: Function) {
     let predicates = new relationalStore.RdbPredicates(SqlConstant.RECENT_TABLE.tableName)
     this.recent.deleteData(predicates, callback)
+  }
+
+  deleteRecent(listId: string) {
+    this.recent.executeSql(`delete from recent where listId = ${listId}`)
   }
 
   async update(recentBean: RecentBean, callback: Function) {
@@ -71,6 +76,20 @@ export default class RecentTable {
             result.push(recent)
             value.goToNextRow()
           }
+          //数据排序 置顶在前面
+          result.sort((a, b) => {
+            if (a.is_top === 1 && b.is_top === 1) {
+              return b.timestamp - a.timestamp
+            } else if (a.is_top === 1 || b.is_top === 1) {
+              if (a.is_top === 1) {
+                return -1
+              } else {
+                return 1
+              }
+            } else {
+              return b.timestamp - a.timestamp
+            }
+          })
           resolve(result)
         }
         value.close()

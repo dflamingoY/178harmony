@@ -9,7 +9,6 @@ import { MsgBean } from '../data/MsgBean';
 import Dao from '../db/Dao';
 import UserViewModel from '../pages/UserViewModel';
 
-var defaultIpAddress = "wss://ws.gqj.live";
 
 function initGlobal() {
   return "{\"event\":\"woker_internal:subscription_succeeded\", \"data\": \"{}\", \"channel\": \"global\"}"
@@ -101,7 +100,7 @@ export class SocketTask {
       LogUtil.d("Socket", "on error, error:" + JSON.stringify(err))
     });
     let params = { header: { "Origin": HttpIp.origin, "clientType": 'android' } }
-    this.ws.connect(defaultIpAddress, params, (err) => {
+    this.ws.connect(HttpIp.ws_address, params, (err) => {
       if (!err) {
         LogUtil.d("Socket", "connect success")
       } else {
@@ -224,7 +223,7 @@ export class SocketTask {
           'content': last.content,
           'content_type': last.content_type,
           'name': last.type == IConstant.GROUP || last.from == globalThis.uid ? last.to_name : last.from_name,
-          'avatar': last.type == IConstant.GROUP || last.from == globalThis.uid ?last.to_avatar:last.from_avatar,
+          'avatar': last.type == IConstant.GROUP || last.from == globalThis.uid ? last.to_avatar : last.from_avatar,
           'sub_type': last.sub_type,
           'timestamp': last.timestamp
         })

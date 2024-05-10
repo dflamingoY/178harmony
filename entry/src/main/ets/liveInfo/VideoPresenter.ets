@@ -95,6 +95,7 @@ export class VideoPresenter {
           this.currentState = AvplayerStatus.COMPLETED;
           this.duration = 0;
           this.avPlayer.reset();
+          this.iUrl = ''
           break;
         case AvplayerStatus.RELEASED:
           this.currentState = AvplayerStatus.RELEASED;

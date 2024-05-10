@@ -217,5 +217,9 @@ export class RdbModel {
     this.msgTable.deleteAll()
     this.recentTable.deleteAll()
   }
+
+  async deleteRecent(listId: string) {
+    this.recentTable.deleteRecent(listId)
+  }
 }
 

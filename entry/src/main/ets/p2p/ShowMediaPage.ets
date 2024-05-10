@@ -1,14 +1,18 @@
 import router from '@ohos.router'
 import { MsgBean } from '../data/MsgBean'
 import Dao from '../db/Dao'
+import { AvplayerStatus, VideoPresenter } from '../liveInfo/VideoPresenter'
 import CommonUtil from '../utils/CommonUtil'
 import IConstant from '../utils/IConstant'
+import { MediaVideoPage } from '../widget/MediaVideoPage'
 
 @Component
 @Entry
 export struct ShowMediaPage {
   @State resArray: Array<MsgBean> = []
   @State currentIndex: number = 0
+  private videoController: VideoPresenter = new VideoPresenter()
+  @Provide avState: AvplayerStatus = AvplayerStatus.IDLE
 
   build() {
     Swiper() {
@@ -18,6 +22,9 @@ export struct ShowMediaPage {
     }
     .indicator(false)
     .loop(false)
+    .onChange((index) => {
+
+    })
     .index(this.currentIndex)
     .duration(50)
   }
@@ -29,18 +36,7 @@ export struct ShowMediaPage {
         .width(IConstant.MATCH_PARENT)
         .height(IConstant.MATCH_PARENT)
     } else {
-      Stack({ alignContent: Alignment.Center }) {
-        Image(item.remark)
-          .width(IConstant.MATCH_PARENT)
-          .height(IConstant.MATCH_PARENT)
-        Image($r('app.media.icon_video_play'))
-          .width('80vp')
-          .height('80vp')
-          .backgroundColor(0x7fffffff)
-          .borderRadius('40vp')
-
-      }.width(IConstant.MATCH_PARENT)
-      .height(IConstant.MATCH_PARENT)
+      MediaVideoPage({ msgBean: item, videoController: this.videoController })
     }
   }
 
@@ -49,11 +45,14 @@ export struct ShowMediaPage {
     let listId = params.listId as string
     let selectId = params.id as unknown as number
     this.getAllRes(listId, selectId)
+    this.videoController.setStateCallback((state) => {
+      this.avState = state
+    })
   }
 
   private getAllRes(listId: string, selectId: number) {
     Dao.getRdbModel()?.getResByListId(listId).then((value) => {
-      this.resArray = value
+      this.resArray = value.concat(value).concat(value)
       let find = this.resArray.find((item) => {
         return item.id == selectId
       })
@@ -63,5 +62,13 @@ export struct ShowMediaPage {
     }).catch(() => {
       CommonUtil.showToast("数据查询错误")
     })
+  }
+
+  onPageHide() {
+    this.videoController.pause()
+  }
+
+  aboutToDisappear() {
+    this.videoController.release()
   }
 }

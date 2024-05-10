@@ -4,16 +4,17 @@ import router from '@ohos.router'
 import { MsgBean, RecentBean } from '../data/MsgBean'
 import CommonUtil from '../utils/CommonUtil'
 import UserViewModel from './UserViewModel'
-import promptAction from '@ohos.promptAction'
 import IConstant from '../utils/IConstant'
 import emitter from '@ohos.events.emitter'
-import Dao from '../db/Dao'
+import { DialogRecentChat } from '../dialog/DialogRecentChat'
+import IColors from '../utils/IColors'
 
 @Component
 export struct ChatPage {
   @State recentList: Array<RecentBean> = []
   @State currentTime: number = 0
   @State pageNumber: number = 0
+  @State operatorRecent: RecentBean | null = null
 
   build() {
     Column() {
@@ -164,6 +165,7 @@ export struct ChatPage {
     }
     .height('70vp')
     .width('100%')
+    .backgroundColor(item.is_top == 1 ? IColors.color91939A : Color.White)
     .align(Alignment.Bottom)
     .onClick(() => {
       router.pushUrl({ url: "p2p/P2PPage", params: {
@@ -172,8 +174,66 @@ export struct ChatPage {
       } })
     })
     .gesture(LongPressGesture().onAction(() => {
-      promptAction.showToast({ message: "获取到长按事件", duration: 500 })
+      this.operatorRecent = item
+      this.dialogController.open()
     }))
+  }
+
+  dialogController: CustomDialogController = new CustomDialogController({
+    builder: DialogRecentChat({
+      recentBean: this.operatorRecent,
+      onTop: (recent: RecentBean) => {
+        this.topChat(recent)
+      },
+      onDelete: (recent: RecentBean) => {
+        this.deleteChat(recent)
+      }
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: false,
+    offset: { dx: 0, dy: -20 },
+    gridCount: 4
+  })
+
+  private topChat(recent: RecentBean) {
+    recent.is_top = recent.is_top == 1 ? 0 : 1
+    //获取数据 从新插入
+    /* let tempList = this.recentList.filter((item) => {
+       return item.listId != recent.listId
+     })
+     if (recent.is_top == 1) {
+       tempList.unshift(recent)
+       this.recentList = tempList
+     } else { //排序
+       // tempList.sort()
+     }*/
+    UserViewModel.updateRecent(recent)
+    this.sortList()
+  }
+
+  private sortList() {
+    let temp = [...this.recentList].sort((a, b) => {
+      if (a.is_top === 1 && b.is_top === 1) {
+        return b.timestamp - a.timestamp
+      } else if (a.is_top === 1 || b.is_top === 1) {
+        if (a.is_top === 1) {
+          return -1
+        } else {
+          return 1
+        }
+      } else {
+        return b.timestamp - a.timestamp
+      }
+    })
+    this.recentList = temp
+  }
+
+  private deleteChat(recent: RecentBean) {
+    // UserViewModel.deleteRecent(recent.listId)
+    this.recentList = this.recentList.filter((item) => {
+      return item.listId != recent.listId
+    })
   }
 
   private getContentType(content: string, content_type: string): string {
@@ -237,7 +297,7 @@ export struct ChatPage {
           return item.listId != msg.listId
         })
         this.recentList.unshift(find)
-        Dao.getRdbModel()?.updateRecent(find)
+        UserViewModel.updateRecent(find)
       } else {
         let recent = new RecentBean()
         recent.listId = msg.listId
@@ -259,7 +319,7 @@ export struct ChatPage {
         recent.unread_count = 1
         //插入数据
         this.recentList.unshift(recent)
-        Dao.getRdbModel()?.insertRecent(recent)
+        UserViewModel.insertRecent(recent)
       }
     })
     emitter.on({ eventId: IConstant.RECENT_UPDATE_ID }, (event) => {
@@ -299,7 +359,7 @@ export struct ChatPage {
           recent.unread_count = event.data.count
           //插入数据
           this.recentList.unshift(recent)
-          Dao.getRdbModel()?.insertRecent(recent)
+          UserViewModel.insertRecent(recent)
         }
       }
       else if (event.data.type == 'syncLoad') {

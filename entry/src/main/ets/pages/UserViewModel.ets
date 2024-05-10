@@ -413,6 +413,18 @@ class UserViewModel {
       Dao.getRdbModel().insertMsg(msg)
     }
   }
+
+  async updateRecent(recent: RecentBean) {
+    Dao.getRdbModel()?.updateRecent(recent)
+  }
+
+  async insertRecent(recent: RecentBean) {
+    Dao.getRdbModel()?.insertRecent(recent)
+  }
+
+  async deleteRecent(listId: string) {
+    Dao.getRdbModel()?.deleteRecent(listId)
+  }
 }
 
 export default new UserViewModel()

@@ -34,7 +34,7 @@ export struct ReplayPage {
           .backgroundColor(Color.White)
           .width(IConstant.MATCH_PARENT)
           .height(`${display.getDefaultDisplaySync().width * 0.5629}px`)
-        if (this.avState === AvplayerStatus.PREPARED) {
+        if (this.avState === AvplayerStatus.PREPARED || this.avState === AvplayerStatus.IDLE || this.avState === AvplayerStatus.INITIALIZED) {
           LoadingPage()
         }
         Column() {
@@ -164,6 +164,10 @@ export struct ReplayPage {
     this.videoController.setStateCallback((state: AvplayerStatus) => {
       this.avState = state
     })
+  }
+
+  onPageHide() {
+    this.videoController.pause()
   }
 
   aboutToDisappear() {

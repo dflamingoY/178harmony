@@ -1,7 +1,6 @@
 import relationalStore from '@ohos.data.relationalStore';
 import { MsgBean } from '../data/MsgBean';
 import IConstant from '../utils/IConstant';
-import LogUtil from '../utils/LogUtil';
 import SqlConstant from './DatabaseSqlCommont'
 import Rdb from './Rdb'
 
