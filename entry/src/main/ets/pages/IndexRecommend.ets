@@ -299,13 +299,13 @@ export struct IndexRecommend {
         context.startAbility(want)
       }
     }
-   /* else if (item.is_video === undefined || item.is_video == 0) {
+    else if (item.is_video === undefined || item.is_video == 0) {
       router.pushUrl({ url: "liveInfo/LiveContentPage", params: {
         "tournamentId": item.tournament_id,
         "url": item.url,
         "type": item.type,
         "memberId": item.member_id } })
-    }*/ else {
+    } else {
       router.pushUrl({ url: 'pages/other/ReplayPage', params: { 'id': item.id,
         'url': item.video_url,
         "data": JSON.stringify(this.model.recommend)

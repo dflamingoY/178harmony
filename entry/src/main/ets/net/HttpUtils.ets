@@ -22,7 +22,7 @@ export function getData(uri: string): Promise<BaseResp> {
     if (value.responseCode == 200) {
       let result = `${value.result}`
       let resData: BaseResp = JSON.parse(result)
-      if (resData.code == 401) { //清除所有用户登陆凭证相关的缓存
+      if (resData.code === 401 || resData.code === 402) { //清除所有用户登陆凭证相关的缓存
         globalThis.token = null
         globalThis.uid = null
         PreferenceModel.deleteKey('token')
@@ -65,7 +65,7 @@ export function post(uri: String, params: Object): Promise<BaseResp> {
       resp.msg = netResp.msg
       resp.data = netResp.data
       LogUtil.d("NetLog", `post 请求路由  ${uri}  ` + result)
-      if (resp.code == 401) { //清除所有用户登陆凭证相关的缓存
+      if (resp.code == 401 || resp.code == 402) { //清除所有用户登陆凭证相关的缓存
         globalThis.token = null
         globalThis.uid = null
         PreferenceModel.deleteKey('token')

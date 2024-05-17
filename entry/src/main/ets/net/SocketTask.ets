@@ -109,6 +109,7 @@ export class SocketTask {
     });
   }
 
+
   checkWs() {
     setTimeout(this.timer, 1_000)
   }
@@ -137,7 +138,7 @@ export class SocketTask {
 
   private parseWs(value: string | ArrayBuffer) {
     let respData: SocketData = JSON.parse(value.toString())
-    // LogUtil.d("Socket", "message:" + value + "  " + respData)
+    LogUtil.d("Socket", "message:" + value + "  " + respData)
     switch (respData.event) {
       case "pushMatch": { //match_type   match_id on_time away_score home_score
         this.sendEmit(IConstant.EVENT_ID_MATCH, {

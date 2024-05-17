@@ -14,11 +14,12 @@
  */
 
 import relationalStore from '@ohos.data.relationalStore';
+import HttpIp from '../net/HttpIP';
 import IConstant from '../utils/IConstant';
 import LogUtil from '../utils/LogUtil';
 
 let STORE_CONFIG: relationalStore.StoreConfig = {
-  name: globalThis.uid + IConstant.db_name,
+  name: HttpIp.DB_PREFIX + globalThis.uid + IConstant.db_name,
   securityLevel: relationalStore.SecurityLevel.S1
 };
 /* 更新语句：UPDATE tableName SET xx=xx WHERE condition

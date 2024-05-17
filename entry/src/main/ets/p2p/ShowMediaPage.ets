@@ -52,7 +52,7 @@ export struct ShowMediaPage {
 
   private getAllRes(listId: string, selectId: number) {
     Dao.getRdbModel()?.getResByListId(listId).then((value) => {
-      this.resArray = value.concat(value).concat(value)
+      this.resArray = value/*.concat(value).concat(value)*/
       let find = this.resArray.find((item) => {
         return item.id == selectId
       })
