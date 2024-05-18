@@ -149,7 +149,7 @@ export struct ContactPage {
           .height('35vp')
         Text('聊天').fontColor(0xff1E1E20)
           .fontSize('13fp')
-          .margin({ bottom: '12vp' })
+          .margin({ bottom: '12vp', top: '6vp' })
       }.onClick(() => {
         router.pushUrl({ url: 'pages/contact/FriendRequestPage' })
       }).width('100%').height('100%')
@@ -167,7 +167,7 @@ export struct ContactPage {
 
       Text(title)
         .fontSize('13fp')
-        .margin({ bottom: '12vp' })
+        .margin({ bottom: '12vp', top: '6vp' })
         .fontColor(0xff1E1E20)
 
     }.justifyContent(FlexAlign.SpaceBetween).width('33%').height('100%')

@@ -18,10 +18,7 @@ import HttpIp from '../net/HttpIP';
 import IConstant from '../utils/IConstant';
 import LogUtil from '../utils/LogUtil';
 
-let STORE_CONFIG: relationalStore.StoreConfig = {
-  name: HttpIp.DB_PREFIX + globalThis.uid + IConstant.db_name,
-  securityLevel: relationalStore.SecurityLevel.S1
-};
+
 /* 更新语句：UPDATE tableName SET xx=xx WHERE condition
    删除语句：DELETE FROM tableName WHERE condition
  */
@@ -30,8 +27,13 @@ export default class Rdb {
   private tableName: string;
   private sqlCreateTable: string;
   private columns: Array<string>;
+  private STORE_CONFIG: relationalStore.StoreConfig = {
+    name: HttpIp.DB_PREFIX + globalThis.uid + IConstant.db_name,
+    securityLevel: relationalStore.SecurityLevel.S1
+  };
 
   constructor(tableName: string, sqlCreateTable: string, columns: Array<string>) {
+    this.STORE_CONFIG.name = HttpIp.DB_PREFIX + globalThis.uid + IConstant.db_name;
     this.tableName = tableName;
     this.sqlCreateTable = sqlCreateTable;
     this.columns = columns;
@@ -52,9 +54,8 @@ export default class Rdb {
       LogUtil.d("Dao", this.tableName + '未登录不允许创建数据库');
       return
     }
-
     let context: Context = getContext(this) as Context;
-    relationalStore.getRdbStore(context, STORE_CONFIG, (err, rdb) => {
+    relationalStore.getRdbStore(context, this.STORE_CONFIG, (err, rdb) => {
       if (err) {
         LogUtil.d("Dao", this.tableName + `gerRdbStore() failed, err: ${err}`);
         return;

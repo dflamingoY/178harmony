@@ -8,7 +8,9 @@ import IConstant from '../utils/IConstant'
 import emitter from '@ohos.events.emitter'
 import { DialogRecentChat } from '../dialog/DialogRecentChat'
 import IColors from '../utils/IColors'
+import LogUtil from '../utils/LogUtil'
 
+//最近聊天列表
 @Component
 export struct ChatPage {
   @State recentList: Array<RecentBean> = []
@@ -230,7 +232,7 @@ export struct ChatPage {
   }
 
   private deleteChat(recent: RecentBean) {
-    // UserViewModel.deleteRecent(recent.listId)
+    UserViewModel.deleteRecent(recent.listId)
     this.recentList = this.recentList.filter((item) => {
       return item.listId != recent.listId
     })
@@ -279,6 +281,7 @@ export struct ChatPage {
   }
 
   private registerWs() {
+    //消息通知
     emitter.on({ eventId: IConstant.WS_MSG_ID }, (event) => {
       //更新当条消息
       let msg: MsgBean = JSON.parse(event.data.data)
@@ -322,6 +325,7 @@ export struct ChatPage {
         UserViewModel.insertRecent(recent)
       }
     })
+    //聊天单挑通知
     emitter.on({ eventId: IConstant.RECENT_UPDATE_ID }, (event) => {
       let find = this.recentList.find((item) => {
         return item.chat_type == event.data.type && item.chatId == event.data.id
@@ -332,6 +336,7 @@ export struct ChatPage {
         this.recentList = [...this.recentList]
       }
     })
+    //内容操作
     emitter.on({ eventId: IConstant.MSG_OPERATOR_ID }, (event) => {
       if (event.data.type == 'message_froward') {
         let find = this.recentList.find((item) => {
@@ -366,11 +371,20 @@ export struct ChatPage {
         this.loadData()
       }
     })
+    emitter.on({ eventId: IConstant.LOGIN_EVENT_ID }, () => {
+      LogUtil.d("West", '检测到登陆或取消登陆的消息  ' + globalThis.user)
+      if (!globalThis.user || globalThis.user == null) {
+
+      } else {
+        this.loadData()
+      }
+    })
   }
 
   aboutToDisappear() {
     emitter.off(IConstant.WS_MSG_ID)
     emitter.off(IConstant.RECENT_UPDATE_ID)
     emitter.off(IConstant.MSG_OPERATOR_ID)
+    emitter.off(IConstant.LOGIN_EVENT_ID)
   }
 }

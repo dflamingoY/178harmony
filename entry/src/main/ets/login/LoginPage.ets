@@ -35,7 +35,7 @@ export struct LoginPage {
           Text('看球聊天两不误').fontSize('24fp').fontColor(Color.White).margin({ top: '20vp' })
           Row() {
             Image($r('app.media.icon_phone')).width('25vp').height('25vp').margin({ left: "16vp" })
-            TextInput({ placeholder: "请输入手机号/178号" })
+            TextInput({ placeholder: "请输入手机号/178号", text: this.account })
               .fontColor(Color.White)
               .fontSize('22fp')
               .placeholderColor(0x99ffffff)
@@ -163,7 +163,6 @@ export struct LoginPage {
         priority: emitter.EventPriority.IMMEDIATE
       };
       emitter.emit(innerEvent, eventData)
-
       router.back()
     }).catch((err) => {
       promptAction.showToast({

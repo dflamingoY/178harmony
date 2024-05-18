@@ -158,7 +158,9 @@ export struct SettingPage {
     globalThis.user = null
     PreferenceModel.deleteKey('token')
     PreferenceModel.deleteKey('user')
-    let eventData = {}
+    let eventData = { data: {
+      "type": "logout"
+    } }
     let innerEvent = {
       eventId: IConstant.LOGIN_EVENT_ID,
       priority: emitter.EventPriority.IMMEDIATE
