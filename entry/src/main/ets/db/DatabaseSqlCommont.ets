@@ -20,7 +20,7 @@ export default class SqlConstant {
   static readonly MSG_TABLE: TableInfo = {
     tableName: 'msg',
     sqlCreate: 'CREATE TABLE IF NOT EXISTS msg(id INTEGER PRIMARY KEY AUTOINCREMENT,' +
-    ' mid TEXT unique,' +
+    ' mid TEXT ,' +
     ' name_from_ios TEXT,' +
     ' content TEXT,' +
     ' id_from TEXT,' +

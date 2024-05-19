@@ -198,10 +198,10 @@ export default class Rdb {
     if (this.rdbStore) {
       this.rdbStore.executeSql(sql, [], (err, _data) => {
         if (err) {
-          LogUtil.d("Dao", this.tableName + ` executeSql() failed, err:  ${err.message}`);
+          LogUtil.d("Dao", this.tableName + ` executeSql() failed, err:  ${err.message} ` + sql);
           return;
         }
-        LogUtil.d("Dao", this.tableName + '  executeSql() finished.');
+        LogUtil.d("Dao", this.tableName + '  executeSql() finished.' + sql);
       })
     }
   }

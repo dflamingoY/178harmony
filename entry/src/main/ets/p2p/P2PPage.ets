@@ -1,6 +1,5 @@
 import router from '@ohos.router'
 import systemDateTime from '@ohos.systemDateTime'
-import promptAction from '@ohos.promptAction'
 import { GroupBean } from '../data/GroupData'
 import { MsgBean } from '../data/MsgBean'
 import { UserBean } from '../data/user'
@@ -23,7 +22,7 @@ import { DialogPressMsg } from '../dialog/DialogPressMsg'
 export struct P2PPage {
   @State isRefreshing: boolean = false
   @State msgList: Array<MsgBean> = []
-  @State unreadCount: number = 1
+  @State unreadCount: number = 0
   @State name: string = ''
   @State avatarUrl: string = ''
   private type: string = IConstant.FRIEND
@@ -577,10 +576,11 @@ export struct P2PPage {
     await systemDateTime.getCurrentTime(false).then((time) => {
       msgBean.timestamp = time / 1000
     })
+    LogUtil.d("Dao", '本地生成sendId : ' + msgBean.sendId)
+    Dao.getRdbModel().insertMsg(msgBean)
     this.msgList.push(msgBean)
     UserViewModel.sendMsg(msgBean)
     this.msgContent = ''
-    Dao.getRdbModel().insertMsg(msgBean)
     this.scroll.scrollToIndex(this.msgList.length - 1)
   }
 
@@ -609,6 +609,13 @@ export struct P2PPage {
     }
     this.registerWs()
     this.registerMsgStatus()
+    this.getUnreadCount()
+  }
+
+  private getUnreadCount() {
+    UserViewModel.getUnreadCount().then((count) => {
+      this.unreadCount = count
+    })
   }
 
   private getChatList() {
@@ -638,10 +645,16 @@ export struct P2PPage {
     })
   }
 
-  //监听ws推送的消息
+  //监听ws msgBean推送的消息
   private registerWs() {
     emitter.on({ eventId: IConstant.WS_MSG_ID }, (event) => {
       let msgBean: MsgBean = JSON.parse(event.data.data)
+      msgBean.listId = msgBean.type + (IConstant.GROUP == msgBean.type || msgBean.from == globalThis.uid ? msgBean.to : msgBean.from)
+      LogUtil.d("West", 'ws 通知插入数据 ' + msgBean.listId)
+      if (msgBean.listId != this.type + this.chatId) {
+        this.getUnreadCount()
+        return
+      }
       if (msgBean.from == globalThis.uid) {
         //更新状态，没有此条就加入
         let emitMsg = this.msgList.find((item) => {
@@ -676,6 +689,8 @@ export struct P2PPage {
         this.msgList = [...this.msgList]
       }
       else if (event.data.type == 'send') {
+        //发送接口插入数据
+        LogUtil.d("West", '发送接口插入数据 ' + event.data.sendId)
         let filter = this.msgList.find((item) => {
           return item.sendId == event.data.sendId
         })
@@ -732,10 +747,5 @@ export struct P2PPage {
       'id': this.chatId,
       'readId': id
     } })
-  }
-
-  aboutToDisappear() {
-    // emitter.off(IConstant.WS_MSG_ID)
-    // emitter.off(IConstant.MSG_OPERATOR_ID)
   }
 }

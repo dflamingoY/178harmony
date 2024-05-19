@@ -233,6 +233,7 @@ class UserViewModel {
           'type': 'send',
           'sendId': msgBean.sendId
         })
+
       } else {
         msgBean.msgStatus = 2
         Dao.getRdbModel().executeSql(`UPDATE msg SET msgStatus = 2 WHERE sendId = '${msgBean.sendId}' `)
@@ -317,9 +318,9 @@ class UserViewModel {
   }
 
   async sendRoomMsg(content: string, roomId: string) {
-    post('send_room', { 'to': roomId, 'content': content, 'content_type': 'text' }).then((resp) => {
+    post('send_room', { 'to': roomId, 'content': content, 'content_type': 'text' }).then(() => {
 
-    }).catch((err) => {
+    }).catch(() => {
 
     })
   }
@@ -409,7 +410,9 @@ class UserViewModel {
   }
 
   inertVerifyMsg(msg: MsgBean) {
-    if (!(msg.mid in this.localMid)) {
+    if (!this.localMid.some((item) => {
+      return item == msg.mid || item == msg.verify
+    })) {
       Dao.getRdbModel().insertMsg(msg)
     }
   }
@@ -423,8 +426,12 @@ class UserViewModel {
   }
 
   async deleteRecent(listId: string) {
+    //删除最近聊天
     Dao.getRdbModel()?.deleteRecent(listId)
+    //删除聊天记录
+    Dao.getRdbModel()?.deleteChatHistory(listId)
   }
+
 }
 
 export default new UserViewModel()

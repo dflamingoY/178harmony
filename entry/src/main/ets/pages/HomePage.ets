@@ -23,7 +23,7 @@ struct HomePage {
     Flex({ direction: FlexDirection.Column }) {
       Swiper() {
         IndexRecommend()
-        ChatPage()
+        ChatPage({ unreadCount: $unreadCount })
         MatchPage()
         ContactPage()
         UserPage()
@@ -48,6 +48,7 @@ struct HomePage {
       this.getLoginData()
       Dao.getRdbModel().updateMsgSendToFail()
       UserViewModel.getLocalMid()
+      this.getUnreadCount()
     }
     emitter.on({
       eventId: IConstant.LOGIN_EVENT_ID
@@ -63,12 +64,17 @@ struct HomePage {
     })
     emitter.on({ eventId: IConstant.MSG_OPERATOR_ID }, (event) => {
       if (event.data.type == 'syncLoad') {
-        UserViewModel.getUnreadCount().then((count) => {
-          this.unreadCount = count
-        })
+        this.getUnreadCount()
       }
     })
   }
+
+  private getUnreadCount() {
+    UserViewModel.getUnreadCount().then((count) => {
+      this.unreadCount = count
+    })
+  }
+
   //登陆之后需要获取的数据
   private getLoginData() {
     UserViewModel.getGroupSaveCached()

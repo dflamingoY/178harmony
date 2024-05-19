@@ -17,6 +17,7 @@ export struct ChatPage {
   @State currentTime: number = 0
   @State pageNumber: number = 0
   @State operatorRecent: RecentBean | null = null
+  @Link unreadCount: number
 
   build() {
     Column() {
@@ -201,15 +202,6 @@ export struct ChatPage {
   private topChat(recent: RecentBean) {
     recent.is_top = recent.is_top == 1 ? 0 : 1
     //获取数据 从新插入
-    /* let tempList = this.recentList.filter((item) => {
-       return item.listId != recent.listId
-     })
-     if (recent.is_top == 1) {
-       tempList.unshift(recent)
-       this.recentList = tempList
-     } else { //排序
-       // tempList.sort()
-     }*/
     UserViewModel.updateRecent(recent)
     this.sortList()
   }
@@ -280,6 +272,14 @@ export struct ChatPage {
     }
   }
 
+  private calcUnread() {
+    this.unreadCount = this.recentList.map((item) => {
+      return item.unread_count
+    }).reduce((a, b) => {
+      return a + b
+    })
+  }
+
   private registerWs() {
     //消息通知
     emitter.on({ eventId: IConstant.WS_MSG_ID }, (event) => {
@@ -295,7 +295,9 @@ export struct ChatPage {
         find.timestamp = msg.timestamp
         find.remark = msg.remark
         find.mid = msg.mid
-        find.unread_count = find.unread_count + 1
+        if (msg.from != globalThis.uid) {
+          find.unread_count = find.unread_count + 1
+        }
         this.recentList = this.recentList.filter((item) => {
           return item.listId != msg.listId
         })
@@ -313,17 +315,20 @@ export struct ChatPage {
         if (msg.from == globalThis.uid || msg.type == IConstant.GROUP) {
           recent.name = msg.to_name
           recent.avatar = msg.to_avatar
-          recent.chatId = msg.to
+          recent.chatId = `${msg.to}`
         } else {
           recent.name = msg.from_name_ios
           recent.avatar = msg.from_avatar
           recent.chatId = `${msg.from}`
         }
-        recent.unread_count = 1
+        if (msg.from != globalThis.uid) {
+          recent.unread_count = 1
+        }
         //插入数据
         this.recentList.unshift(recent)
         UserViewModel.insertRecent(recent)
       }
+      this.calcUnread()
     })
     //聊天单挑通知
     emitter.on({ eventId: IConstant.RECENT_UPDATE_ID }, (event) => {
@@ -335,6 +340,7 @@ export struct ChatPage {
         find.readMid = event.data.readId
         this.recentList = [...this.recentList]
       }
+      this.calcUnread()
     })
     //内容操作
     emitter.on({ eventId: IConstant.MSG_OPERATOR_ID }, (event) => {
@@ -360,7 +366,7 @@ export struct ChatPage {
           recent.timestamp = event.data.timestamp
           recent.name = event.data.name
           recent.avatar = event.data.avatar
-          recent.chatId = event.data.id
+          recent.chatId = `${event.data.id}`
           recent.unread_count = event.data.count
           //插入数据
           this.recentList.unshift(recent)
@@ -372,9 +378,8 @@ export struct ChatPage {
       }
     })
     emitter.on({ eventId: IConstant.LOGIN_EVENT_ID }, () => {
-      LogUtil.d("West", '检测到登陆或取消登陆的消息  ' + globalThis.user)
       if (!globalThis.user || globalThis.user == null) {
-
+        this.recentList = []
       } else {
         this.loadData()
       }

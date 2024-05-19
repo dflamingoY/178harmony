@@ -26,7 +26,11 @@ export default class RecentTable {
   }
 
   deleteRecent(listId: string) {
-    this.recent.executeSql(`delete from recent where listId = ${listId}`)
+    let predicates = new relationalStore.RdbPredicates(SqlConstant.RECENT_TABLE.tableName)
+    predicates.equalTo('listId', listId)
+    this.recent.deleteData(predicates, () => {
+    })
+    // this.recent.executeSql(`DELETE FROM recent WHERE listId = "${listId}"` )
   }
 
   async update(recentBean: RecentBean, callback: Function) {
@@ -116,6 +120,7 @@ export default class RecentTable {
           }
         }
         resolve(allCount)
+        value.close()
       }).catch(() => {
         resolve(0)
       })

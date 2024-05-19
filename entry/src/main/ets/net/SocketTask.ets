@@ -141,9 +141,9 @@ export class SocketTask {
     LogUtil.d("Socket", "message:" + value + "  " + respData)
     switch (respData.event) {
       case "pushMatch": { //match_type   match_id on_time away_score home_score
-        this.sendEmit(IConstant.EVENT_ID_MATCH, {
-          "data": respData.data
-        })
+        // this.sendEmit(IConstant.EVENT_ID_MATCH, {
+        //   "data": respData.data
+        // })
         break;
       }
       case "room": { //"channel":"room-122968"

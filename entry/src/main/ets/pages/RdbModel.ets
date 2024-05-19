@@ -30,7 +30,9 @@ export class RdbModel {
   getAllFriend(): Promise<Array<UserBean>> {
     return this.friendTable.getAll()
   }
-
+  /*
+  插入离线消息
+   */
   async insertMsgs(offline: OffLineData) {
     if (offline.msg != null && offline.msg.length > 0) {
       let revokes = offline.revoke?.map((item) => {
@@ -88,7 +90,7 @@ export class RdbModel {
               if (find.from == globalThis.uid || find.type == IConstant.GROUP) {
                 recent.name = find.to_name
                 recent.avatar = find.to_avatar
-                recent.chatId = find.to
+                recent.chatId = `${find.to}`
               } else {
                 recent.name = find.from_name_ios
                 recent.avatar = find.from_avatar
@@ -121,7 +123,7 @@ export class RdbModel {
     if (find.from == globalThis.uid || find.type == IConstant.GROUP) {
       recent.name = find.to_name
       recent.avatar = find.to_avatar
-      recent.chatId = find.to
+      recent.chatId = `${find.to}`
     } else {
       recent.name = find.from_name_ios
       recent.avatar = find.from_avatar
@@ -144,16 +146,16 @@ export class RdbModel {
   getMsgByChatId(key: string, id: number): Promise<Array<MsgBean>> {
     return this.msgTable.getChatListByKey(key, id)
   }
-
+  //插入单条消息
   async insertMsg(msg: MsgBean) {
     this.msgTable.insert(msg, () => {
     })
   }
-
+  //获取所有图片视频资源
   getResByListId(listId: string): Promise<Array<MsgBean>> {
     return this.msgTable.getResByListId(listId)
   }
-
+  //通过mid sendId 查询消息
   queryMsgByMid(mid: string) {
     return this.msgTable.queryBySendId(mid)
   }
@@ -173,7 +175,7 @@ export class RdbModel {
   async executeSql(sql: string) {
     this.msgTable.executeSql(sql)
   }
-
+  //更新撤回消息
   async revoke(mid: string) {
     this.msgTable.executeSql(`UPDATE msg SET content = '此消息已撤回' , content_type = 'notice' WHERE mid = ${mid} `)
   }
@@ -217,9 +219,14 @@ export class RdbModel {
     this.msgTable.deleteAll()
     this.recentTable.deleteAll()
   }
-
-  async deleteRecent(listId: string) {
+  //删除最近聊天的某条记录
+  deleteRecent(listId: string) {
     this.recentTable.deleteRecent(listId)
+  }
+  //删除与某个好友的所有聊天记录
+  deleteChatHistory(listId: string) {
+    let sql = `DELETE FROM msg WHERE listId = "${listId}"`
+    this.msgTable.executeSql(sql)
   }
 }
 
