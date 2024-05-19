@@ -156,8 +156,12 @@ export class RdbModel {
     return this.msgTable.getResByListId(listId)
   }
   //通过mid sendId 查询消息
-  queryMsgByMid(mid: string) {
+  queryMsgBySendId(mid: string) {
     return this.msgTable.queryBySendId(mid)
+  }
+
+  queryMsgByMid(mid: string) {
+    return this.msgTable.queryByMid(mid)
   }
 
   async updateMsg(msg: MsgBean) {

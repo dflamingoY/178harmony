@@ -109,8 +109,7 @@ export struct P2PPage {
         }.onRefreshing(() => {
           this.isRefreshing = true
           this.getChatList()
-        }).height('100%')
-
+        }).layoutWeight(1)
         Column() {
           RelativeContainer() {
             /* Image($r('app.media.icon_record_default'))
@@ -650,7 +649,6 @@ export struct P2PPage {
     emitter.on({ eventId: IConstant.WS_MSG_ID }, (event) => {
       let msgBean: MsgBean = JSON.parse(event.data.data)
       msgBean.listId = msgBean.type + (IConstant.GROUP == msgBean.type || msgBean.from == globalThis.uid ? msgBean.to : msgBean.from)
-      LogUtil.d("West", 'ws 通知插入数据 ' + msgBean.listId)
       if (msgBean.listId != this.type + this.chatId) {
         this.getUnreadCount()
         return
@@ -668,6 +666,8 @@ export struct P2PPage {
       } else {
         this.msgList.push(msgBean)
       }
+      //更新本地最新的阅读的id 并更新未读书 获取该条消息的id
+      this.queryMid(`${msgBean.mid}`)
     })
   }
 
@@ -735,6 +735,13 @@ export struct P2PPage {
           })
         }
       }
+    })
+  }
+
+  //查询本地的mid
+  private queryMid(mid: string) {
+    UserViewModel.getMsgByMid(mid).then((msg) => {
+      this.updateRecent(msg.id)
     })
   }
 

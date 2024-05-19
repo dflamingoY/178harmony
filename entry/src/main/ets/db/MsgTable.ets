@@ -73,6 +73,28 @@ export default class MsgTable {
     })
   }
 
+  queryByMid(mid: string): Promise<MsgBean> {
+    return new Promise((resolve: Function, reject: Function) => {
+      let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)
+      predicates.equalTo('mid', mid)
+      predicates.limitAs(1)
+      this.msgTable.queryAsync(predicates)?.then((value) => {
+        let count = value.rowCount
+        if (count == 0) {
+          reject("empty")
+        } else {
+          value.goToFirstRow()
+          let msg = this.parseMsgBean(value)
+          resolve(msg)
+        }
+        value.close()
+      })?.catch(() => {
+        reject("empty")
+      })
+    })
+  }
+
+
   getTopByListId(listId: string): Promise<MsgBean> {
     return new Promise((resolve: Function, reject: Function) => {
       let predicates = new relationalStore.RdbPredicates(SqlConstant.MSG_TABLE.tableName)

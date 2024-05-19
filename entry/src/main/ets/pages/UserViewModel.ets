@@ -421,7 +421,7 @@ class UserViewModel {
     Dao.getRdbModel()?.updateRecent(recent)
   }
 
-  async insertRecent(recent: RecentBean) {
+  insertRecent(recent: RecentBean) {
     Dao.getRdbModel()?.insertRecent(recent)
   }
 
@@ -432,6 +432,9 @@ class UserViewModel {
     Dao.getRdbModel()?.deleteChatHistory(listId)
   }
 
+  getMsgByMid(mid: string) {
+    return Dao.getRdbModel()?.queryMsgByMid(mid)
+  }
 }
 
 export default new UserViewModel()
