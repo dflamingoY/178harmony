@@ -1,7 +1,14 @@
 import router from '@ohos.router'
+import { GroupDetailsData } from '../../data/GroupData'
+import UserViewModel from '../../pages/UserViewModel'
+import IConstant from '../../utils/IConstant'
+
 @Entry
 @Component
 export struct GroupDetails {
+  private gid: string
+  @State group: GroupDetailsData | null = null
+
   build() {
     Column() {
       Stack({ alignContent: Alignment.Start }) {
@@ -23,6 +30,23 @@ export struct GroupDetails {
 
       }.width('100%')
       .height('48vp')
-    }
+
+
+      Grid(){
+
+      }
+
+    }.width(IConstant.MATCH_PARENT)
+    .height(IConstant.MATCH_PARENT)
+  }
+
+  aboutToAppear() {
+    let params = router.getParams() as Record<string, string>
+    this.gid = params.id
+    UserViewModel.getGroupInfo(this.gid).then((group) => {
+      this.group = group
+    }).catch(() => {
+
+    })
   }
 }

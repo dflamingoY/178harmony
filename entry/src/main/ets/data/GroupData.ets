@@ -18,7 +18,7 @@ export class GroupBean {
   is_owner: boolean = false
 }
 
-export class GroupDetails {
+export class GroupDetailsData {
   group: GroupBean | null = null
   is_owner: boolean = false
   noticeBean: string | null = null

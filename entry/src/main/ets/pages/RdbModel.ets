@@ -17,7 +17,10 @@ export class RdbModel {
   })
   private recentTable = new RecentTable(() => {
   })
-
+  private recentUpdateList: Set<String> = new Set()
+  /*
+    插入功能
+   */
   insertFriends(user?: UserBean[]) {
     if (user == null) return
     new Promise(() => {
@@ -26,13 +29,7 @@ export class RdbModel {
       })
     })
   }
-
-  getAllFriend(): Promise<Array<UserBean>> {
-    return this.friendTable.getAll()
-  }
-  /*
-  插入离线消息
-   */
+  //插入离线消息
   async insertMsgs(offline: OffLineData) {
     if (offline.msg != null && offline.msg.length > 0) {
       let revokes = offline.revoke?.map((item) => {
@@ -110,8 +107,81 @@ export class RdbModel {
         })
     }
   }
+  //插入单条消息
+  async insertMsg(msg: MsgBean) {
+    this.msgTable.insert(msg, () => {
+    })
+  }
 
-  private recentUpdateList: Set<String> = new Set()
+  async insertMsgList(arr: Array<MsgBean>) {
+    this.msgTable.insertTx(arr, () => {
+    })
+  }
+
+  async insertRecent(recent: RecentBean) {
+    this.recentTable.insert(recent, () => {
+    })
+  }
+
+
+  /*
+ 查询 获取方法
+  */
+  getMsgByChatId(key: string, id: number): Promise<Array<MsgBean>> {
+    return this.msgTable.getChatListByKey(key, id)
+  }
+
+  getAllFriend(): Promise<Array<UserBean>> {
+    return this.friendTable.getAll()
+  }
+  //获取所有图片视频资源
+  getResByListId(listId: string): Promise<Array<MsgBean>> {
+    return this.msgTable.getResByListId(listId)
+  }
+
+  getRecentList() {
+    return this.recentTable.getAll()
+  }
+
+  getAllMid() {
+    return this.msgTable.queryAllMid()
+  }
+
+  getRecentMsg(listId: string, endId: number) {
+    return this.msgTable.getRecentList(listId, endId)
+  }
+
+  getUnreadCount(): Promise<number> {
+    return this.recentTable.getUnread()
+  }
+
+  //通过mid sendId 查询消息
+  queryMsgBySendId(mid: string) {
+    return this.msgTable.queryBySendId(mid)
+  }
+
+  queryMsgByMid(mid: string) {
+    return this.msgTable.queryByMid(mid)
+  }
+
+  queryFriend(uid:string){
+   return this.friendTable.queryByUid(uid,false)
+  }
+
+  //更新方法
+  async updateMsg(msg: MsgBean) {
+    this.msgTable.update(msg, () => {
+    })
+  }
+
+  updateRecent(recent: RecentBean) {
+    this.recentTable.update(recent, () => {
+    })
+  }
+
+  async updateMsgSendToFail() {
+    this.msgTable.executeSql(`UPDATE msg SET msgStatus = 2 WHERE msgStatus = 1 `)
+  }
 
   private async updateRecentOffline(recent: RecentBean, find: MsgBean) {
     recent.timestamp = find.timestamp
@@ -143,80 +213,10 @@ export class RdbModel {
     }
   }
 
-  getMsgByChatId(key: string, id: number): Promise<Array<MsgBean>> {
-    return this.msgTable.getChatListByKey(key, id)
-  }
-  //插入单条消息
-  async insertMsg(msg: MsgBean) {
-    this.msgTable.insert(msg, () => {
-    })
-  }
-  //获取所有图片视频资源
-  getResByListId(listId: string): Promise<Array<MsgBean>> {
-    return this.msgTable.getResByListId(listId)
-  }
-  //通过mid sendId 查询消息
-  queryMsgBySendId(mid: string) {
-    return this.msgTable.queryBySendId(mid)
-  }
-
-  queryMsgByMid(mid: string) {
-    return this.msgTable.queryByMid(mid)
-  }
-
-  async updateMsg(msg: MsgBean) {
-    this.msgTable.update(msg, () => {
-    })
-  }
-
-  getRecentList() {
-    return this.recentTable.getAll()
-  }
-
-  /*
-   * 执行sql语句
-   */
-  async executeSql(sql: string) {
-    this.msgTable.executeSql(sql)
-  }
-  //更新撤回消息
-  async revoke(mid: string) {
-    this.msgTable.executeSql(`UPDATE msg SET content = '此消息已撤回' , content_type = 'notice' WHERE mid = ${mid} `)
-  }
-
-  async updateMsgSendToFail() {
-    this.msgTable.executeSql(`UPDATE msg SET msgStatus = 2 WHERE msgStatus = 1 `)
-  }
-
-  async insertMsgList(arr: Array<MsgBean>) {
-    this.msgTable.insertTx(arr, () => {
-    })
-  }
-
-  getRecentMsg(listId: string, endId: number) {
-    return this.msgTable.getRecentList(listId, endId)
-  }
-
-  getUnreadCount(): Promise<number> {
-    return this.recentTable.getUnread()
-  }
-
-  getAllMid() {
-    return this.msgTable.queryAllMid()
-  }
+  //删除后者清除函数
 
   async deleteMsgByMid(mid: string) {
     this.msgTable.deleteFromMid(mid)
-  }
-
-  updateRecent(recent: RecentBean) {
-    this.recentTable.update(recent, () => {
-    })
-  }
-
-  async insertRecent(recent: RecentBean) {
-    this.recentTable.insert(recent, () => {
-    })
   }
 
   async clearChatList() {
@@ -231,6 +231,15 @@ export class RdbModel {
   deleteChatHistory(listId: string) {
     let sql = `DELETE FROM msg WHERE listId = "${listId}"`
     this.msgTable.executeSql(sql)
+  }
+
+  // 执行sql语句
+  async executeSql(sql: string) {
+    this.msgTable.executeSql(sql)
+  }
+  //更新撤回消息
+  async revoke(mid: string) {
+    this.msgTable.executeSql(`UPDATE msg SET content = '此消息已撤回' , content_type = 'notice' WHERE mid = ${mid} `)
   }
 }
 

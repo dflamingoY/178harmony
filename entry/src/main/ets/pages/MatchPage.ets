@@ -1,7 +1,6 @@
 import emitter from '@ohos.events.emitter'
 import { MatchListData } from '../data/Data'
 import IConstant from '../utils/IConstant'
-import LogUtil from '../utils/LogUtil'
 import { MatchChildPage } from './match/MatchChildPage'
 import MatchModel from './match/MatchModel'
 import { MatchTopBar } from './match/MatchTopBar'

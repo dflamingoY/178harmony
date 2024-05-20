@@ -74,9 +74,13 @@ export struct P2PPage {
               .onClick(() => {
                 //跳转好友或者群的聊天设置
                 if (this.type == IConstant.FRIEND) {
-                  router.pushUrl({ url: 'p2p/friend/FriendChatConfig' })
+                  router.pushUrl({ url: 'p2p/friend/FriendChatConfig', params: {
+                    "id": this.chatId
+                  } })
                 } else {
-                  router.pushUrl({ url: 'p2p/group/GroupDetails' })
+                  router.pushUrl({ url: 'p2p/group/GroupDetails', params: {
+                    "id": this.chatId
+                  } })
                 }
               })
           }.justifyContent(FlexAlign.End)
@@ -110,6 +114,7 @@ export struct P2PPage {
           this.isRefreshing = true
           this.getChatList()
         }).layoutWeight(1)
+
         Column() {
           RelativeContainer() {
             /* Image($r('app.media.icon_record_default'))

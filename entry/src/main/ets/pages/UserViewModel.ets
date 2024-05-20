@@ -1,7 +1,7 @@
 import emitter from '@ohos.events.emitter'
 import { BaseResp } from '../data/Data'
 import { FriendKeyData } from '../data/FriendKeyData'
-import { GroupBean, GroupDetails } from '../data/GroupData'
+import { GroupBean, GroupDetailsData } from '../data/GroupData'
 import { MatchSearchData } from '../data/MatchData'
 import { MsgBean, RecentBean } from '../data/MsgBean'
 import { OffLineData } from '../data/OffLineData'
@@ -161,7 +161,7 @@ class UserViewModel {
     })
   }
 
-  getGroupInfo(gid: string): Promise<GroupDetails> {
+  getGroupInfo(gid: string): Promise<GroupDetailsData> {
     return new Promise(async (resolve: Function, reject: Function) => {
       getData('detail_group/' + gid).then((resp: BaseResp) => {
         if (resp.code == 200) {
@@ -435,6 +435,13 @@ class UserViewModel {
   getMsgByMid(mid: string) {
     return Dao.getRdbModel()?.queryMsgByMid(mid)
   }
+
+  getLocalUserById(uid:string){
+    return Dao.getRdbModel()?.queryFriend(uid)
+  }
+
+
+
 }
 
 export default new UserViewModel()
