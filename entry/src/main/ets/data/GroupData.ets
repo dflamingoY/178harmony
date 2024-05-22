@@ -1,4 +1,4 @@
-import { MsgBean } from './MsgBean'
+import { UserBean } from './user'
 
 export class GroupBean {
   gid: string = ''
@@ -24,5 +24,6 @@ export class GroupDetailsData {
   noticeBean: string | null = null
   manager_uid: string = ''
   supervise_uid: Array<string> = [] //管理员
+  members: Array<UserBean> = []
 }
 
